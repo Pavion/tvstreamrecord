@@ -1,0 +1,54 @@
+html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-size:100%; height:100%; margin:0; padding:0;}
+
+#mybody {
+    float:left;
+    min-width:1000px;
+    width:100%;
+    background:#F4F7FB;
+    font-size:93%;
+    line-height:normal;
+    border-bottom:1px solid #BCD2E6;
+}
+
+	body{
+		font: 62.5% "Trebuchet MS", sans-serif;
+		margin: 50px;
+	}
+	.demoHeaders {
+		margin-top: 2em;
+	}
+	a[id^=icons-] {
+		margin: 0px 0px;
+		position: relative;
+		padding: 0px 0;
+		cursor: pointer;
+		float: left;
+	}
+	a[id^=icons-] span.ui-icon {
+		float: left;
+		margin: -1px -1px;
+	}
+	.fakewindowcontain .ui-widget-overlay {
+		position: absolute;
+	}
+    
+label, input, select, option { display:block;}
+label {clear:both; }
+input.text { margin-bottom:8px; width:95%; padding: .2em; }
+input.file { margin-bottom:118px; width:95%; padding: .2em; }
+fieldset { padding:0; border:0; margin-top:15px; }
+h1 { font-size: 1.2em; margin: .6em 0; }
+div#users-contain { width: 90%; margin: 20px 5%; }
+div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
+div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
+.ui-dialog .ui-state-error { padding: .3em; }
+.validateTips { border: 1px solid transparent; padding: 0.3em; }
+#timepicker_inline_div1 { width:45%; float:left; }
+#timepicker_inline_div2 { width:45%; float:left; margin-left:10px; }
+select { width:85%; float:left; margin-bottom:8px; padding: .2em; } 
+input#cname { width:75%; float:left; }
+
+[id=upload-user].ui-button-text-only .ui-button-text { padding: 0px 3px; }
+[id=create-channel].ui-button-text-only .ui-button-text { padding: 0px 3px; }
+[id=create-user].ui-button-text-only .ui-button-text { padding: 0px 3px; }
+label#append {float: left; margin-top: 3px;}

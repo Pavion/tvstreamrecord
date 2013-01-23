@@ -56,7 +56,7 @@ def getProgList():
                 if dt>lastdate:   
                     source = url+id+"_"+dttext+".xml.gz"
                     print source
-                    getProg(source)    
+                    #getProg(source)    
                 if dt>dtmax:
                     dtmax = dt
 
@@ -65,10 +65,9 @@ def getProgList():
             else:
                 sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), id))
             
-            print source
-            raw_input("Press Enter to continue...")            
+            #raw_input("Press Enter to continue...")            
             
-        
+       
 def getProg(p_id):    
     stri = getFile(p_id)
     #tree = et.parse(p_id)
@@ -125,8 +124,13 @@ def purgeDB():
         print "rows purged: %d" %i
     return i
 
-
 #getProgList()
+
+#rows=sqlRun("SELECT g_name, g_title, g_start, g_stop, g_desc FROM guide, guide_chan WHERE guide.g_id=guide_chan.g_id")
+#rows=sqlRun("SELECT * FROM guide_chan")
+#for row in rows:
+#    print row[0],row[1],row[2]#,row[3],row[4]
+#print "aah"
 
 #getFile('http://xmltv.spaetfruehstuecken.org/xmltv/hd.daserste.de_2013-01-23.xml.gz')
 

@@ -52,3 +52,11 @@ input#cname { width:75%; float:left; }
 [id=create-channel].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=create-user].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 label#append {float: left; margin-top: 3px;}
+
+#feedback { font-size: 1.4em; }
+#selectable .ui-selecting { background: #FECA40; }
+#selectable .ui-selected { background: #F39814; color: white; }
+#selectable { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+#selectable li { height: 80px; font-size: 4em; text-align: center; position: absolute}
+#xselectable li { margin: 1px -1px; padding: 0px; float: left; height: 80px; font-size: 4em; text-align: center; position: absolute}
+#xselectable li { width: 33.3%; }

@@ -1,7 +1,7 @@
 from bottle import route, run, template, post, request
 from bottle import static_file, redirect
 import sqlite3
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import urllib2
 import threading 
 #import json
@@ -92,6 +92,30 @@ def upload_p():
 @route('/records')
 def records_s():    
     return template('records', rows1=sqlRun("SELECT records.rowid, recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)) FROM channels, records where channels.rowid=records.cid AND datetime(rbis)>=datetime('now', 'localtime') ORDER BY rvon"), rows2=sqlRun('SELECT rowid, cname FROM channels where cenabled=1'))
+
+@route('/epg')
+def epg_s():    
+    rows=sqlRun("SELECT guide.g_id FROM guide, guide_chan WHERE guide.g_id=guide_chan.g_id AND date(g_start)=date('2013-02-02') GROUP BY guide.g_id")
+    y=0
+    for row in rows:
+        y+=1 
+        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc FROM guide WHERE date(g_start)=date('2013-02-02') AND g_id='%s' ORDER BY g_start" % row[0])
+        for event in c_rows:
+            d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
+            d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
+            if d_bis.date() > d_von.date():
+                d_bis=datetime.combine(d_bis.date(),time.min)
+            x = d_von - datetime.combine(d_von.date(),time.min)
+            w = d_bis - d_von
+            print x.total_seconds(),w.total_seconds()
+            
+            
+            
+            
+        
+        #print row[0]#,row[1]#,row[2],row[3],row[4]
+    #return template('epg', rows1=sqlRun("SELECT g_name, g_title, g_start, g_stop, g_desc FROM guide, guide_chan WHERE guide.g_id=guide_chan.g_id"))
+
 
 @post('/records')
 def records_p():

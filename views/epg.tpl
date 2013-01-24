@@ -1,10 +1,16 @@
 %include header 
 
+%for rows in rowss:
+%if rows[0][0] == 1:
+<ol id="selectabletitle">
+%else:
 <ol id="selectable">
-<li class="ui-state-default" id="event" x="20" width="20" y="1">1</li>
-<li class="ui-state-default" id="event" x="10" width="20" y="2">2</li>
-<li class="ui-state-default">3</li>
-<li class="ui-state-default">4</li>
+%end
+%for row in rows:
+<li class="ui-state-default" id="event" x="{{row[1]}}" width="{{row[2]}}" y="{{row[0]}}" title="{{row[4]}}">{{row[3]}}</li>
+%end
+</ol>
+%end
 
 </body>
 </html>

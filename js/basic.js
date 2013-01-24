@@ -150,18 +150,37 @@ $(function() {
 		}
 	);
 
-	$(function() {
-		$( "#selectable" ).selectable();
-	});
+//	$(function() {
+    var selcount = 0;
+    $( "#selectabletitle" ).selectable({
+        disabled: true,
+        autoRefresh: false
+    });
+    $( "#selectable" ).selectable({
+        autoRefresh: false,
+        selected: function (event, ui) {
+            //alert (ui);
+        }
+        start: function (event, ui) {
+            alert(ui);            
+        }
+    });
+    
+    $(function() {
+        $( document ).tooltip();
+    });
 	
-	$( "[id=event]" ).each(function(i) {
+	$( "[id=event]" ).each(function(i) {        
 		w = $(this).attr('width')+"%";
 		x = $(this).attr('x')+"%";
 		y = parseInt($(this).css("height").replace("px","")) * parseInt($(this).attr('y'))+"px";
+        y = "0px"
 		//alert (y);
         $(this).css("margin-top", y);		
         $(this).css("margin-left", x);		
         $(this).css("width", w);		
+        if (parseInt($(this).attr('y'))>=1) {
+        }
 	});
 	
 	

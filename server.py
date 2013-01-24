@@ -95,21 +95,37 @@ def records_s():
 
 @route('/epg')
 def epg_s():    
-    rows=sqlRun("SELECT guide.g_id FROM guide, guide_chan WHERE guide.g_id=guide_chan.g_id AND date(g_start)=date('2013-02-02') GROUP BY guide.g_id")
-    y=0
+    widthq = 0.9
+    ret = list()
+    rtemp = list()
+    w = 0.0
+    for i in range(24):
+        t = time(i)
+        x = i * 100.0 / 24.0 * widthq
+        w =  1.0 / 24.0 * widthq * 100.0 
+        print w
+        rtemp.append([1, x, w, t.strftime("%H:%M"), ""])
+    ret.append(rtemp)    
+        
+    rows=sqlRun("SELECT guide.g_id FROM guide, guide_chan WHERE guide.g_id=guide_chan.g_id AND (date(g_start)=date('2013-02-02') OR date(g_stop)=date('2013-02-02')) GROUP BY guide.g_id")
+    y=1
     for row in rows:
+        rtemp = list()
         y+=1 
-        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc FROM guide WHERE date(g_start)=date('2013-02-02') AND g_id='%s' ORDER BY g_start" % row[0])
+        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc FROM guide WHERE (date(g_start)=date('2013-02-02') OR date(g_stop)=date('2013-02-02')) AND g_id='%s' ORDER BY g_start" % row[0])
         for event in c_rows:
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
+            if d_von.date() < d_bis.date():
+                d_von = datetime.combine(d_bis.date(),time.min)
             if d_bis.date() > d_von.date():
                 d_bis=datetime.combine(d_bis.date(),time.min)
             x = d_von - datetime.combine(d_von.date(),time.min)
             w = d_bis - d_von
-            print x.total_seconds(),w.total_seconds()
-            
-            
+            #print x.total_seconds(),w.total_seconds()     
+            rtemp.append ([y, x.total_seconds()/86400*100*widthq, w.total_seconds()/86400*100*widthq, event[0], event[3]])
+        ret.append(rtemp)
+    return template('epg', rowss=ret)            
             
             
         
@@ -255,7 +271,7 @@ sqlRun('CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT
 
 setRecords()
     
-run(host='0.0.0.0', port=8030)
+run(host='127.0.0.1', port=8030)
 
 for t in records:
     t.stop()

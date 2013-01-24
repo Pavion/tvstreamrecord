@@ -157,12 +157,18 @@ $(function() {
         autoRefresh: false
     });
     $( "#selectable" ).selectable({
-        autoRefresh: false,
+        autoRefresh: true,
         selected: function (event, ui) {
             //alert (ui);
-        }
-        start: function (event, ui) {
-            alert(ui);            
+        },
+        stop: function () {
+            //alert(ui.attr("title"));
+            var result = $( "#select-result" ).empty();
+			$( ".ui-selected", this ).each(function() {
+				var index = $( "#selectable li" ).attr("title");//.index( this );
+				//result.append( " #" + ( index + 1 ) );
+				alert (index);
+			});			       
         }
     });
     
@@ -175,15 +181,14 @@ $(function() {
 		x = $(this).attr('x')+"%";
 		y = parseInt($(this).css("height").replace("px","")) * parseInt($(this).attr('y'))+"px";
         y = "0px"
-		//alert (y);
         $(this).css("margin-top", y);		
         $(this).css("margin-left", x);		
         $(this).css("width", w);		
-        if (parseInt($(this).attr('y'))>=1) {
-        }
+        //if (parseInt($(this).attr('y'))>=1) {
+        //}
 	});
 	
-	
+
 	
 });
 

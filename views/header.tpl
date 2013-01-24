@@ -10,11 +10,11 @@
 	<script src="js/jquery-ui-1.9.2.custom.js"></script>
 	<link href="css/jquery.ui.timepicker.css" rel="stylesheet">
 	<script src="js/jquery.ui.timepicker.js"></script>
-    <link rel="stylesheet" href="css/menu.css" type="text/css" />
+    <link rel="stylesheet" href="css/tvstreamrecord.menu.css" type="text/css" />
 	<link href="css/slickswitch.css" rel="stylesheet">
 	<script src="js/jquery.slickswitch.js"></script>
-	<script src="js/basic.js"></script>
-    <link rel="stylesheet" href="css/basic.css" type="text/css" />
+	<script src="js/tvstreamrecord.basic.js"></script>
+    <link rel="stylesheet" href="css/tvstreamrecord.basic.css" type="text/css" />
 </head><BODY>
 <div id="tabs">
   <ul>

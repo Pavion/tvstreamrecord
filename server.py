@@ -103,18 +103,18 @@ def epg_s():
         t = time(i)
         x = i * 100.0 / 24.0 * widthq
         w =  1.0 / 24.0 * widthq * 100.0 
-        print w
         rtemp.append([1, x, w, t.strftime("%H:%M"), ""])
     ret.append(rtemp)    
     
     today =  datetime.strptime("2013-02-02 00:00:00","%Y-%m-%d %H:%M:%S")
+    todaysql = datetime.strftime(today, "%Y-%m-%d %H:%M:%S")
         
-    rows=sqlRun("SELECT guide.g_id FROM guide, guide_chan WHERE guide.g_id=guide_chan.g_id AND (date(g_start)=date('2013-02-02') OR date(g_stop)=date('2013-02-02')) GROUP BY guide.g_id")
+    rows=sqlRun("SELECT guide.g_id FROM guide, guide_chan WHERE guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY guide.g_id" % (todaysql, todaysql))
     y=1
     for row in rows:
         rtemp = list()
         y+=1 
-        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc FROM guide WHERE (date(g_start)=date('2013-02-02') OR date(g_stop)=date('2013-02-02')) AND g_id='%s' ORDER BY g_start" % row[0])
+        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc FROM guide WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND g_id='%s' ORDER BY g_start" % (todaysql, todaysql, row[0]))
         for event in c_rows:
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")

@@ -161,16 +161,24 @@ $(function() {
         selected: function (event, ui) {
             //alert (ui);
         },
-        stop: function () {
+        selected: function (event, ui) {
             //alert(ui.attr("title"));
-            var result = $( "#select-result" ).empty();
+            //var result = $( "#select-result" ).empty();
+            $(ui.selected).addClass("ui-selected").siblings().removeClass("ui-selected");   
 			$( ".ui-selected", this ).each(function() {
-				var index = $( "#selectable li" ).attr("title");//.index( this );
+				var index = $( "#selectable li" ).index( this );//.attr("title");
+				q=this.title;//$( "#selectable li" ).get(index).title;
 				//result.append( " #" + ( index + 1 ) );
-				alert (index);
+				console.log (index, q);
 			});			       
         }
     });
+    
+    $("li").live("click", function(event) {
+   		$(this).siblings().removeClass("selected");
+   		$(this).addClass("selected");
+   		console.log ("ok");
+	});
     
     $(function() {
         $( document ).tooltip();

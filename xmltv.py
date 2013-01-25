@@ -2,38 +2,37 @@
 import xml.etree.ElementTree as et
 import csv
 from datetime import datetime, timedelta
-import sqlite3
+#import sqlite3
 import httplib
 import urllib2
 import zlib
+from sql import sqlRun
 
 purgedelta = 30
 initpath = 'http://xmltv.spaetfruehstuecken.org/xmltv/datalist.xml.gz'
     
-def sqlRun(sql, t=-1):    
-    try:
-        conn = sqlite3.connect('settings.db')
-        c = conn.cursor()
-        conn.text_factory = str
-        if t != -1:
-            rows = c.execute(sql, t)
-        else:
-            rows = c.execute(sql)
-        fa=rows.fetchall();
-        #if not fa:
-        #    fa = c.rowcount
-        conn.commit()
-        conn.close()
-    except:
-        fa = -1
-        pass
-    return fa
+#def sqlRun(sql, t=-1):    
+#    try:
+#        conn = sqlite3.connect('settings.db')
+#        c = conn.cursor()
+#        conn.text_factory = str
+#        if t != -1:
+#            rows = c.execute(sql, t)
+#        else:
+#            rows = c.execute(sql)
+#        fa=rows.fetchall();
+#        conn.commit()
+#        conn.close()
+#    except:
+#        fa = -1
+#        pass
+#    return fa
     
 #sqlRun('DROP TABLE IF EXISTS guide_chan')
 #sqlRun('DROP TABLE IF EXISTS guide')
 #sqlRun('DROP TABLE IF EXISTS caching')
 sqlRun('CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT)')
-sqlRun('CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT, g_lasttime TEXT)')  
+sqlRun('CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT)')  
 sqlRun('CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT UNIQUE, g_stop TEXT, g_desc TEXT)')    
 
 def getProgList():
@@ -44,28 +43,31 @@ def getProgList():
             id = dict_el.attrib.get("id")
             name = dict_el.find('display-name').text
             url = dict_el.find('base-url').text 
-            rows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (id))
-            lastdate = datetime.now()-timedelta(days=1)
-            if rows:
-                lastdate = datetime.strptime(rows[0][0], "%Y-%m-%d %H:%M:%S")
-            source = "" 
-            dtmax = datetime.min
-            for tim in dict_el.iter("datafor"):
-                dttext = tim.text
-                dt = datetime.strptime(tim.attrib.get("lastmodified")[0:14],"%Y%m%d%H%M%S")
-                if dt>lastdate:   
-                    source = url+id+"_"+dttext+".xml.gz"
-                    print source
-                    #getProg(source)    
-                if dt>dtmax:
-                    dtmax = dt
-
-            if not rows:
-                sqlRun("INSERT INTO guide_chan VALUES (?, ?, ?)", (id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
-            else:
-                sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), id))
             
-            #raw_input("Press Enter to continue...")            
+            rows=sqlRun("SELECT cname from channels WHERE cname = '%s' GROUP BY cname")
+            if rows:
+
+                rows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (id))
+                lastdate = datetime.now()-timedelta(days=1)
+                if rows:
+                    lastdate = datetime.strptime(rows[0][0], "%Y-%m-%d %H:%M:%S")
+                #source = "" 
+                dtmax = datetime.min
+                for tim in dict_el.iter("datafor"):
+                    dttext = tim.text
+                    dt = datetime.strptime(tim.attrib.get("lastmodified")[0:14],"%Y%m%d%H%M%S")
+                    if dt>lastdate:   
+                        source = url+id+"_"+dttext+".xml.gz"
+                        print source
+                        #getProg(source)    
+                    if dt>dtmax:
+                        dtmax = dt
+
+                if not rows:
+                    sqlRun("INSERT INTO guide_chan VALUES (?, ?, ?)", (id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
+                else:
+                    sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), id))
+           
             
        
 def getProg(p_id):    
@@ -83,7 +85,6 @@ def getProg(p_id):
         if dict_el.find('desc') is not None:
             desc = dict_el.find('desc').text
         sqlRun("INSERT INTO guide VALUES (?, ?, ?, ?, ?)", (p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc))
-        #print "ready"
         
 def getFile(file_in):
     rows=sqlRun("SELECT * FROM caching WHERE url='%s'" % file_in)    
@@ -113,16 +114,13 @@ def getFile(file_in):
     except:
         print "passed"
         pass
-    #print out
     return out
     
 def purgeDB():
-    i=sqlRun("DELETE FROM caching WHERE julianday('now', 'localtime')-julianday(crTime)>%d" % purgedelta)
-    i+=sqlRun("DELETE FROM guide_chan WHERE julianday('now', 'localtime')-julianday(g_lasttime)>%d" % purgedelta)
-    i+=sqlRun("DELETE FROM guide WHERE julianday('now', 'localtime')-julianday(g_start)>%d" % purgedelta)
-    if i>0: 
-        print "rows purged: %d" %i
-    return i
+    sqlRun("DELETE FROM caching WHERE julianday('now', 'localtime')-julianday(crTime)>%d" % purgedelta)
+    sqlRun("DELETE FROM guide_chan WHERE julianday('now', 'localtime')-julianday(g_lasttime)>%d" % purgedelta)
+    sqlRun("DELETE FROM guide WHERE julianday('now', 'localtime')-julianday(g_start)>%d" % purgedelta)
+    return
 
 #getProgList()
 

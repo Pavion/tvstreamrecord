@@ -51,6 +51,7 @@ input#cname { width:75%; float:left; }
 [id=upload-user].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=create-channel].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=create-user].ui-button-text-only .ui-button-text { padding: 0px 3px; }
+[id=refreshme].ui-button-text-only .ui-button-text { padding: 1px 5px; }
 label#append {float: left; margin-top: 3px;}
 
 #feedback { font-size: 1.4em; }
@@ -63,6 +64,9 @@ label#append {float: left; margin-top: 3px;}
 #selectabletitle .ui-selected { background: #F39814; color: white; }
 #selectabletitle { list-style-type: none; margin: 0; padding: 0 0 30px 0; width: 100%; }
 #selectabletitle li { height: 20px; font-size: 8px; text-align: center; position: absolute}
+
+#datepicker1 { width: 100px; float:left; margin-left: 5px; margin-right: 5px;}
+#float { float:left; margin-top: 3px; }
 
 label {
     display: inline-block;

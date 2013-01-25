@@ -18,6 +18,8 @@ function endsWith(str, suffix) {
 
 $(function() {
 	
+    var pickerform = "dd.mm.yy";
+
 	$( "#accordion" ).accordion();
 	
 	var availableTags = [
@@ -120,10 +122,11 @@ $(function() {
     });
 
 		
-	$( "#datepicker" ).datepicker({
+	$( "[id^=datepicker]" ).datepicker({
         constrainInput: true,
-        minDate: -1,            
-        dateFormat: "dd.mm.yy"
+        minDate: -1,          
+        defaultDate: 0,
+        dateFormat: pickerform
 	});
 
 	$( "#slider" ).slider({
@@ -156,30 +159,8 @@ $(function() {
         disabled: true,
         autoRefresh: false
     });
-    $( "#selectable" ).selectable({
-        autoRefresh: true,
-        selected: function (event, ui) {
-            //alert (ui);
-        },
-        selected: function (event, ui) {
-            //alert(ui.attr("title"));
-            //var result = $( "#select-result" ).empty();
-            $(ui.selected).addClass("ui-selected").siblings().removeClass("ui-selected");   
-			$( ".ui-selected", this ).each(function() {
-				var index = $( "#selectable li" ).index( this );//.attr("title");
-				q=this.title;//$( "#selectable li" ).get(index).title;
-				//result.append( " #" + ( index + 1 ) );
-				console.log (index, q);
-			});			       
-        }
-    });
-    
-    $("li").live("click", function(event) {
-   		$(this).siblings().removeClass("selected");
-   		$(this).addClass("selected");
-   		console.log ("ok");
-	});
-    
+    $( "#selectable" ).selectable({ distance: 99999 } );
+   
     $(function() {
         $( document ).tooltip();
     });
@@ -187,15 +168,24 @@ $(function() {
 	$( "[id=event]" ).each(function(i) {        
 		w = $(this).attr('width')+"%";
 		x = $(this).attr('x')+"%";
-		y = parseInt($(this).css("height").replace("px","")) * parseInt($(this).attr('y'))+"px";
-        y = "0px"
-        $(this).css("margin-top", y);		
+		//y = parseInt($(this).css("height").replace("px","")) * parseInt($(this).attr('y'))+"px";
+        //y = "0px"
+        //$(this).css("margin-top", y);		
         $(this).css("margin-left", x);		
         $(this).css("width", w);		
         //if (parseInt($(this).attr('y'))>=1) {
         //}
 	});
 	
+    $("li").live("click", function(event) {
+   		$(this).addClass("ui-selected");
+   		$(this).siblings().removeClass("ui-selected");        
+   		console.log ($("#dialog_content").text());
+   		//console.log ($(this).attr("cid"),$(this).attr("rid"));
+        $("#dialog_content").text(  $(this).attr("fulltext")  );        
+        $( "#record_from_epg" ).dialog( "open" );
+        
+	});
 
 	
 });
@@ -203,13 +193,6 @@ $(function() {
 
 $(function() {
 
-    //var allFields = $( [] ).add( "#name"  ).add( "#email" ).add( "#password" );
-    //tips = $( ".validateTips" );
-    /*var name = $( "#name" ),
-    email = $( "#email" ),
-    password = $( "#password" ),
-    allFields = $( [] ).add( name ).add( email ).add( password ),*/
-    //tips = $( ".validateTips" );
     var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" );
     function updateTips( t ) {
         $( ".validateTips" )
@@ -287,6 +270,23 @@ $(function() {
             allFields.removeClass( "ui-state-error" ); //.val( "" )
         }
     });
+
+    $( "#record_from_epg" ).dialog({
+        autoOpen: false,
+        height: 310,
+        width: 350,
+        modal: true,
+        buttons: {
+            "Record": function() {
+                $( this ).dialog( "close" );
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+
+
     
     $( "#upload-form" ).dialog({
         autoOpen: false,
@@ -336,6 +336,20 @@ $(function() {
         .button()
         .click(function() {
             $( "#dialog-form" ).dialog( "open" );
+        });
+
+    $( "#refreshme" )
+        .button()
+        .click(function() {
+            document.uploader.submit();                
+/*            post("/create", { 
+                recname:document.getElementById("recname").value, 
+                Sender:document.getElementById("channel").value, 
+                von:document.getElementById("timepicker_inline_div1").value, 
+                bis:document.getElementById("timepicker_inline_div2").value, 
+                am:document.getElementById("datepicker").value, 
+                aktiv:akt 
+            }, 1); */
         });
         
     $( "#create-channel" )

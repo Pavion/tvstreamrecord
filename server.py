@@ -1,12 +1,18 @@
+# coding=UTF-8
 from bottle import route, run, template, post, request
 from bottle import static_file, redirect
-import sqlite3
-from datetime import datetime, timedelta, time
+#import sqlite3
+from datetime import datetime, timedelta, time, date
 import urllib2
 import threading 
-#import json
+#import xmltv
+from sql import sqlRun
 
 records = []    
+localdatetime = "%d.%m.%Y %H:%M:%S"
+localtime = "%H:%M"
+localdate = "%d.%m.%Y"
+dayshown = datetime.combine(date.today(), time.min) #datetime.strptime("2013-02-02 00:00:00","%Y-%m-%d %H:%M:%S")  ## Here comes "now"
 
 @route('/js/<filename>')
 def server_static1(filename):
@@ -93,9 +99,18 @@ def upload_p():
 def records_s():    
     return template('records', rows1=sqlRun("SELECT records.rowid, recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)) FROM channels, records where channels.rowid=records.cid AND datetime(rbis)>=datetime('now', 'localtime') ORDER BY rvon"), rows2=sqlRun('SELECT rowid, cname FROM channels where cenabled=1'))
 
+    
+@post('/epg')
+def epg_p():    
+    day = request.forms.datepicker1
+    #print "******************", day
+    global dayshown
+    dayshown = datetime.strptime(day,localdate)
+    redirect("/epg") 
+
 @route('/epg')
 def epg_s():    
-    widthq = 0.9
+    widthq = 0.8
     ret = list()
     rtemp = list()
     w = 0.0
@@ -103,37 +118,39 @@ def epg_s():
         t = time(i)
         x = i * 100.0 / 24.0 * widthq
         w =  1.0 / 24.0 * widthq * 100.0 
-        rtemp.append([1, x, w, t.strftime("%H:%M"), ""])
+        rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", -1])
     ret.append(rtemp)    
     
-    today =  datetime.strptime("2013-02-02 00:00:00","%Y-%m-%d %H:%M:%S")
-    todaysql = datetime.strftime(today, "%Y-%m-%d %H:%M:%S")
-        
-    rows=sqlRun("SELECT guide.g_id FROM guide, guide_chan WHERE guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY guide.g_id" % (todaysql, todaysql))
-    y=1
+    global dayshown    
+    todaysql = datetime.strftime(dayshown, "%Y-%m-%d %H:%M:%S")
+    d_von = dayshown    
+    rows=sqlRun("SELECT guide.g_id, channels.rowid FROM guide, guide_chan, channels WHERE channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY guide.g_id" % (todaysql, todaysql))
     for row in rows:
+        cid=row[1]
         rtemp = list()
-        y+=1 
-        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc FROM guide WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND g_id='%s' ORDER BY g_start" % (todaysql, todaysql, row[0]))
+        #y+=1 
+        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid FROM guide WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND g_id='%s' ORDER BY g_start" % (todaysql, todaysql, row[0]))
         for event in c_rows:
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
-            if d_von.date() < today.date():
-                d_von = today
-            if d_bis.date() > today.date():
+            fulltext = datetime.strftime(d_von, localtime) + " - " + datetime.strftime(d_bis, localtime) + "<BR>"+event[3]
+            title = fulltext
+            if len(title)>300:
+                title = title[:297]+"..."
+                try:
+                    title.decode("UTF-8")
+                except:
+                    title = title[:296]+"..."
+                    pass
+            if d_von.date() < dayshown.date():
+                d_von = dayshown
+            if d_bis.date() > dayshown.date():
                 d_bis=datetime.combine(d_bis.date(),time.min)
             x = d_von - datetime.combine(d_von.date(),time.min)
             w = d_bis - d_von
-            #print x.total_seconds(),w.total_seconds()     
-            rtemp.append ([y, x.total_seconds()/86400.0*100.0*widthq, w.total_seconds()/86400.0*100.0*widthq, event[0], event[1]+" till "+event[2]+" "+event[3]])
+            rtemp.append ([cid, x.total_seconds()/86400.0*100.0*widthq, w.total_seconds()/86400.0*100.0*widthq, event[0], title, fulltext, event[4]])
         ret.append(rtemp)
-    return template('epg', rowss=ret)            
-            
-            
-        
-        #print row[0]#,row[1]#,row[2],row[3],row[4]
-    #return template('epg', rows1=sqlRun("SELECT g_name, g_title, g_start, g_stop, g_desc FROM guide, guide_chan WHERE guide.g_id=guide_chan.g_id"))
-
+    return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret)            
 
 @post('/records')
 def records_p():
@@ -173,20 +190,7 @@ def create_p():
     
     #redirect("/recordings")
     return 
-    
-def sqlRun(sql, t=-1):    
-    conn = sqlite3.connect('settings.db')
-    c = conn.cursor()
-    conn.text_factory = str
-    if t != -1:
-        rows = c.execute(sql, t)
-    else:
-        rows = c.execute(sql)
-    fa=rows.fetchall();
-    conn.commit()
-    conn.close()
-    return fa
-    
+   
 def getBool(stri):
     r = 0
     if stri == "on" or stri == "1" or stri == "delete" or stri==1:
@@ -268,7 +272,7 @@ def setRecords():
             del records[index]
 
 #sqlRun('DROP TABLE records')    
-sqlRun('CREATE TABLE IF NOT EXISTS channels (cname TEXT, cpath TEXT, cenabled INTEGER)')  
+sqlRun('CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase, cpath TEXT, cenabled INTEGER)')  
 sqlRun('CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER)')    
 
 setRecords()

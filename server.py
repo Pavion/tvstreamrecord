@@ -5,7 +5,7 @@ from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
 import urllib2
 import threading 
-#import xmltv
+import xmltv
 from sql import sqlRun
 
 records = []    
@@ -61,9 +61,11 @@ def createchannel():
 def main():
     return template('header', rows = None)
 
-#@route('/upload')
-#def upload():
-#    return template('upload')
+@route('/f2')
+def f2():
+    # unbedingt in einem Thread machen!!!
+    threading.Thread(target=xmltv.getProgList()).start()
+    return 
 
 @post('/upload')
 def upload_p():
@@ -72,11 +74,12 @@ def upload_p():
     if header.startswith("#EXTM3U"):
         how = getBool(request.forms.get("switch00"))
         upfilecontent = upfile.file.read()        
-        conn = sqlite3.connect('settings.db')
-        conn.text_factory = str
-        c = conn.cursor()
+        #conn = sqlite3.connect('settings.db')
+        #conn.text_factory = str
+        #c = conn.cursor()
         if how==0:
-            c.execute('DELETE FROM channels')
+            #c.execute('DELETE FROM channels')
+            sqlRun('DELETE FROM channels')
         lines = upfilecontent.splitlines()
         i = 0
         name = ""
@@ -86,12 +89,13 @@ def upload_p():
             if i>1:
                 if i % 2 == 0: 
                     name = line.split(",",1)[1]
-                if i % 2 == 1: 
-                    c.execute("INSERT INTO channels VALUES (?, ?, '1')", (name, line))
+                if i % 2 == 1:
+                    sqlRun("INSERT INTO channels VALUES (?, ?, '1')", (name, line)) 
+                    #c.execute("INSERT INTO channels VALUES (?, ?, '1')", (name, line))
                     #id = id + 1
                     name = ""
-        conn.commit()
-        conn.close() 
+        #conn.commit()
+        #conn.close() 
             
         redirect("/list") 
 
@@ -274,6 +278,15 @@ def setRecords():
 #sqlRun('DROP TABLE records')    
 sqlRun('CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase, cpath TEXT, cenabled INTEGER)')  
 sqlRun('CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER)')    
+
+#sqlRun('DROP TABLE IF EXISTS guide_chan')
+#sqlRun('DROP TABLE IF EXISTS guide')
+#sqlRun('DROP TABLE IF EXISTS caching')
+
+sqlRun('CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT)')
+sqlRun('CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT)')  
+sqlRun('CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT, g_stop TEXT, g_desc TEXT, PRIMARY KEY (g_id, g_start, g_stop))')    
+
 
 setRecords()
     

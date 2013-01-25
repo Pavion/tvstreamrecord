@@ -7,9 +7,6 @@ import httplib
 import urllib2
 import zlib
 from sql import sqlRun
-
-purgedelta = 30
-initpath = 'http://xmltv.spaetfruehstuecken.org/xmltv/datalist.xml.gz'
     
 #def sqlRun(sql, t=-1):    
 #    try:
@@ -28,27 +25,23 @@ initpath = 'http://xmltv.spaetfruehstuecken.org/xmltv/datalist.xml.gz'
 #        pass
 #    return fa
     
-#sqlRun('DROP TABLE IF EXISTS guide_chan')
-#sqlRun('DROP TABLE IF EXISTS guide')
-#sqlRun('DROP TABLE IF EXISTS caching')
-sqlRun('CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT)')
-sqlRun('CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT)')  
-sqlRun('CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT UNIQUE, g_stop TEXT, g_desc TEXT)')    
 
 def getProgList():
+    initpath = 'http://xmltv.spaetfruehstuecken.org/xmltv/datalist.xml.gz'
     stri = getFile(initpath)
+    print stri
     if stri:    
         tree = et.fromstring(stri)
         for dict_el in tree.iterfind('channel'):
-            id = dict_el.attrib.get("id")
+            g_id = dict_el.attrib.get("id")
             name = dict_el.find('display-name').text
             url = dict_el.find('base-url').text 
             
-            rows=sqlRun("SELECT cname from channels WHERE cname = '%s' GROUP BY cname")
+            rows=sqlRun("SELECT cname from channels WHERE cname = '%s' GROUP BY cname" % name)
             if rows:
 
-                rows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (id))
-                lastdate = datetime.now()-timedelta(days=1)
+                rows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s' and cenabled=1" % (g_id))
+                lastdate = datetime.now()-timedelta(days=10)
                 if rows:
                     lastdate = datetime.strptime(rows[0][0], "%Y-%m-%d %H:%M:%S")
                 #source = "" 
@@ -57,22 +50,21 @@ def getProgList():
                     dttext = tim.text
                     dt = datetime.strptime(tim.attrib.get("lastmodified")[0:14],"%Y%m%d%H%M%S")
                     if dt>lastdate:   
-                        source = url+id+"_"+dttext+".xml.gz"
+                        source = url+g_id+"_"+dttext+".xml.gz"
                         print source
-                        #getProg(source)    
+                        getProg(source)    
                     if dt>dtmax:
                         dtmax = dt
 
                 if not rows:
-                    sqlRun("INSERT INTO guide_chan VALUES (?, ?, ?)", (id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
+                    sqlRun("INSERT INTO guide_chan VALUES (?, ?, ?)", (g_id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
                 else:
-                    sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), id))
-           
-            
+                    sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))
+                       
        
 def getProg(p_id):    
     stri = getFile(p_id)
-    #tree = et.parse(p_id)
+    #tree = et.parse("hd.zdf.de_2013-02-14.xml")
     tree = et.fromstring(stri)
     for dict_el in tree.iterfind('programme'):
         dt1 = datetime.strptime(dict_el.attrib.get("start")[0:14],"%Y%m%d%H%M%S")        
@@ -84,6 +76,7 @@ def getProg(p_id):
             title = dict_el.find('title').text
         if dict_el.find('desc') is not None:
             desc = dict_el.find('desc').text
+        print dt1, dt2, p_id, title
         sqlRun("INSERT INTO guide VALUES (?, ?, ?, ?, ?)", (p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc))
         
 def getFile(file_in):
@@ -110,19 +103,22 @@ def getFile(file_in):
             sqlRun("INSERT INTO caching VALUES (datetime('now', 'localtime'), ?, ?, ?)", (file_in, response.info().getheader('Last-Modified'), response.info().getheader('ETag')))        
         d = zlib.decompressobj(16+zlib.MAX_WBITS)
         out = d.decompress(feeddata)
-        print "nope"
+        #print "nope"
     except:
         print "passed"
         pass
     return out
     
 def purgeDB():
+    purgedelta = 30
     sqlRun("DELETE FROM caching WHERE julianday('now', 'localtime')-julianday(crTime)>%d" % purgedelta)
     sqlRun("DELETE FROM guide_chan WHERE julianday('now', 'localtime')-julianday(g_lasttime)>%d" % purgedelta)
     sqlRun("DELETE FROM guide WHERE julianday('now', 'localtime')-julianday(g_start)>%d" % purgedelta)
     return
 
 #getProgList()
+
+#getProg(0)
 
 #rows=sqlRun("SELECT g_name, g_title, g_start, g_stop, g_desc FROM guide, guide_chan WHERE guide.g_id=guide_chan.g_id")
 #rows=sqlRun("SELECT * FROM guide_chan")

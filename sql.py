@@ -14,5 +14,6 @@ def sqlRun(sql, t=-1):
         conn.commit()
         conn.close()
     except:
+        print "exception"
         pass
     return fa

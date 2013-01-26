@@ -1,12 +1,14 @@
 # coding=UTF-8
 from bottle import route, run, template, post, request
 from bottle import static_file, redirect
-#import sqlite3
 from datetime import datetime, timedelta, time, date
 import urllib2
 import threading 
 import xmltv
 from sql import sqlRun
+import config
+
+#todo config, multipaged list 
 
 records = []    
 localdatetime = "%d.%m.%Y %H:%M:%S"
@@ -56,6 +58,10 @@ def createchannel():
     aktiv = getBool(request.forms.aktiv)
     sqlRun("INSERT INTO channels VALUES (?, ?, ?)", (cname, cpath, aktiv))
     return
+
+#@post('/fff')
+#def fff():
+#    print , "**************"
     
 @route('/')
 def main():
@@ -64,7 +70,9 @@ def main():
 @route('/f2')
 def f2():
     # unbedingt in einem Thread machen!!!
-    threading.Thread(target=xmltv.getProgList()).start()
+    t=threading.Thread(target=xmltv.getProgList())
+    t.start()
+    redirect("/epg")
     return 
 
 @post('/upload')
@@ -74,16 +82,11 @@ def upload_p():
     if header.startswith("#EXTM3U"):
         how = getBool(request.forms.get("switch00"))
         upfilecontent = upfile.file.read()        
-        #conn = sqlite3.connect('settings.db')
-        #conn.text_factory = str
-        #c = conn.cursor()
         if how==0:
-            #c.execute('DELETE FROM channels')
             sqlRun('DELETE FROM channels')
         lines = upfilecontent.splitlines()
         i = 0
         name = ""
-        #id = 0
         for line in lines:
             i = i + 1
             if i>1:
@@ -91,11 +94,7 @@ def upload_p():
                     name = line.split(",",1)[1]
                 if i % 2 == 1:
                     sqlRun("INSERT INTO channels VALUES (?, ?, '1')", (name, line)) 
-                    #c.execute("INSERT INTO channels VALUES (?, ?, '1')", (name, line))
-                    #id = id + 1
                     name = ""
-        #conn.commit()
-        #conn.close() 
             
         redirect("/list") 
 
@@ -106,8 +105,7 @@ def records_s():
     
 @post('/epg')
 def epg_p():    
-    day = request.forms.datepicker1
-    #print "******************", day
+    day = request.forms.datepicker3
     global dayshown
     dayshown = datetime.strptime(day,localdate)
     redirect("/epg") 
@@ -122,13 +120,13 @@ def epg_s():
         t = time(i)
         x = i * 100.0 / 24.0 * widthq
         w =  1.0 / 24.0 * widthq * 100.0 
-        rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", -1])
+        rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", -1, ""])
     ret.append(rtemp)    
     
     global dayshown    
     todaysql = datetime.strftime(dayshown, "%Y-%m-%d %H:%M:%S")
     d_von = dayshown    
-    rows=sqlRun("SELECT guide.g_id, channels.rowid FROM guide, guide_chan, channels WHERE channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY guide.g_id" % (todaysql, todaysql))
+    rows=sqlRun("SELECT guide.g_id, channels.rowid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY guide.g_id" % (todaysql, todaysql))
     for row in rows:
         cid=row[1]
         rtemp = list()
@@ -137,7 +135,7 @@ def epg_s():
         for event in c_rows:
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
-            fulltext = datetime.strftime(d_von, localtime) + " - " + datetime.strftime(d_bis, localtime) + "<BR>"+event[3]
+            fulltext = "<b>"+event[0]+": "+datetime.strftime(d_von, localtime) + " - " + datetime.strftime(d_bis, localtime) + "</b><BR><BR>"+event[3]
             title = fulltext
             if len(title)>300:
                 title = title[:297]+"..."
@@ -152,7 +150,8 @@ def epg_s():
                 d_bis=datetime.combine(d_bis.date(),time.min)
             x = d_von - datetime.combine(d_von.date(),time.min)
             w = d_bis - d_von
-            rtemp.append ([cid, x.total_seconds()/86400.0*100.0*widthq, w.total_seconds()/86400.0*100.0*widthq, event[0], title, fulltext, event[4]])
+            rtemp.append ([cid, x.total_seconds()/86400.0*100.0*widthq, w.total_seconds()/86400.0*100.0*widthq, event[0], title, fulltext, event[4], row[2]])
+            #print row[2]
         ret.append(rtemp)
     return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret)            
 
@@ -166,6 +165,17 @@ def records_p():
         sqlRun("UPDATE records SET renabled=%s WHERE rowid=%s" % (what, myid))            
     setRecords()
     return
+
+delta_for_epg = 3 # minutes
+
+@post('/createepg')
+def createepg():
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%d minutes'), datetime(guide.g_stop, '+%d minutes'), 1 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (delta_for_epg, delta_for_epg, request.forms.ret))
+
+    setRecords()
+        
+    redirect("/records")
+    return 
     
 @post('/create')
 def create_p():
@@ -192,7 +202,6 @@ def create_p():
     
     setRecords()
     
-    #redirect("/recordings")
     return 
    
 def getBool(stri):
@@ -206,6 +215,7 @@ class record(threading.Thread):
     id = -1
     stopflag = 0 
     timer = None
+    name = ""
         
     def __init__(self, row):
         threading.Thread.__init__(self)
@@ -213,11 +223,12 @@ class record(threading.Thread):
         self.id = row[0]
         self.von = datetime.strptime(row[2],"%Y-%m-%d %H:%M:%S")
         self.bis = datetime.strptime(row[3],"%Y-%m-%d %H:%M:%S")        
-        print self.von
-        print self.bis
-        print row[4]
-        print row[2]
-        self.fname = row[4]+row[2]
+        self.name = row[5]        
+#        print self.von
+#        print self.bis
+#        print row[4]
+#        print row[2]
+        #self.fname = row[4]+row[2]
         self.url = row[1]
     
     def run(self): 
@@ -232,7 +243,9 @@ class record(threading.Thread):
         block_sz = 8192
         print "record started"    
         u = urllib2.urlopen(self.url)
-        fn = datetime.now().strftime("%Y%m%d%H%M%S")
+        fn = datetime.now().strftime("%Y%m%d%H%M%S") + " - "        
+        fn = fn + "".join([x if x.isalnum() else "_" for x in self.name])
+        print fn
         f = open(fn+".mkv", 'wb')
         while self.bis > datetime.now() and self.stopflag==0:
             mybuffer = u.read(block_sz)
@@ -249,9 +262,9 @@ class record(threading.Thread):
         #print "stopping"        
    
 def setRecords():
-    return
+    #return
 
-    rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname FROM channels, records where channels.rowid=records.cid AND datetime(rbis)>=datetime('now', 'localtime') AND renabled = 1 ORDER BY datetime(rvon)")
+    rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname FROM channels, records where channels.rowid=records.cid AND datetime(rbis)>=datetime('now', 'localtime') AND renabled = 1 ORDER BY datetime(rvon)")
     for row in rows: 
         chk = False
         for t in records:

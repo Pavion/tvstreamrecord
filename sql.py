@@ -14,6 +14,14 @@ def sqlRun(sql, t=-1):
         conn.commit()
         conn.close()
     except:
-        print "exception"
+            
+        print "exception: %s" % sql
         pass
     return fa
+
+def purgeDB():
+    purgedelta = 30 # config
+    sqlRun("DELETE FROM caching WHERE julianday('now', 'localtime')-julianday(crTime)>%d" % purgedelta)
+    sqlRun("DELETE FROM guide_chan WHERE julianday('now', 'localtime')-julianday(g_lasttime)>%d" % purgedelta)
+    sqlRun("DELETE FROM guide WHERE julianday('now', 'localtime')-julianday(g_start)>%d" % purgedelta)
+    return

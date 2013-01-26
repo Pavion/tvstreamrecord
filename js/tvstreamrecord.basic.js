@@ -121,14 +121,21 @@ $(function() {
         $(this).css("margin-left", "7px");
     });
 
-		
+		// hier weiter machen! 
 	$( "[id^=datepicker]" ).datepicker({
         constrainInput: true,
         minDate: -1,          
         defaultDate: 0,
+        onSelect: function() {
+            document.daychooser.submit();
+                            
+//			console.log(  document.getElementById("datepicker3").value );	
+        },
         dateFormat: pickerform
 	});
 
+
+	
 	$( "#slider" ).slider({
 		range: true,
 		values: [ 17, 67 ]
@@ -178,20 +185,25 @@ $(function() {
 	});
 	
     $("li").live("click", function(event) {
+   		$("li").siblings().removeClass("ui-selected");        
    		$(this).addClass("ui-selected");
-   		$(this).siblings().removeClass("ui-selected");        
-   		console.log ($("#dialog_content").text());
+   		//console.log ($("#dialog_content").text());
    		//console.log ($(this).attr("cid"),$(this).attr("rid"));
-        $("#dialog_content").text(  $(this).attr("fulltext")  );        
-        $( "#record_from_epg" ).dialog( "open" );
+   		var ft = $(this).attr("fulltext");
+   		console.log (ft);
+   		if (ft)   {
+			document.getElementById("ret").value = $(this).attr("rid");             
+			$("#dialog_content").html ( ft );	
+	        $( "#record_from_epg" ).dialog( "open" );
+   		}
         
 	});
 
 	
-});
+//});
 
 
-$(function() {
+//$(function() {
 
     var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" );
     function updateTips( t ) {
@@ -254,12 +266,6 @@ $(function() {
                         am:document.getElementById("datepicker").value, 
                         aktiv:akt 
                     }, 1); 
-                    //$( "#users tbody" ).append( "<tr>" +
-                    //"<td>" + document.getElementById("channel").value + "</td>" +
-                    //"<td>" + $("#timepicker_inline_div1").value + "</td>" +
-                    //"<td>" + password.val() + "</td>" +
-                    //"<td>" + password.val() + "</td>" +
-                    //"</tr>" );
                 }
             },
             Cancel: function() {
@@ -279,10 +285,16 @@ $(function() {
         buttons: {
             "Record": function() {
                 $( this ).dialog( "close" );
+				$("#dialog_content").html("");
+	            document.returnform.submit();	            
             },
             Cancel: function() {
                 $( this ).dialog( "close" );
+				$("#dialog_content").html("");
             }
+        },
+        close: function() {
+			$("#dialog_content").html("");
         }
     });
 
@@ -341,7 +353,7 @@ $(function() {
     $( "#refreshme" )
         .button()
         .click(function() {
-            document.uploader.submit();                
+            document.daychooser.submit();                
 /*            post("/create", { 
                 recname:document.getElementById("recname").value, 
                 Sender:document.getElementById("channel").value, 

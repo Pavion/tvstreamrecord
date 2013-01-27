@@ -4,7 +4,7 @@
 <button id="upload-user">Import</button>
 <button id="create-channel">Create</button>
 </h1>
-<table id="users" class="ui-widget ui-widget-content">
+<table id="clist"> <!-- <table id="users" class="ui-widget ui-widget-content">-->
 <thead>
 <tr class="ui-widget-header ">
 <th>ID</th>

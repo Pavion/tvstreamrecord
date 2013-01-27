@@ -128,8 +128,6 @@ $(function() {
         defaultDate: 0,
         onSelect: function() {
             document.daychooser.submit();
-                            
-//			console.log(  document.getElementById("datepicker3").value );	
         },
         dateFormat: pickerform
 	});
@@ -375,4 +373,10 @@ $(function() {
         .click(function() {
             $( "#upload-form" ).dialog( "open" );
         });
+        
+    $('#clist').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers"
+    });   
+        
 });

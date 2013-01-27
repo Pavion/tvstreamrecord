@@ -14,7 +14,7 @@ records = []
 localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
-dayshown = datetime.combine(date.today(), time.min) #datetime.strptime("2013-02-02 00:00:00","%Y-%m-%d %H:%M:%S")  ## Here comes "now"
+dayshown = datetime.combine(date.today(), time.min) 
 
 @route('/js/<filename>')
 def server_static1(filename):
@@ -38,7 +38,7 @@ def server_static5(filename):
     
 @route('/list')
 def list_s():
-    return template('list', rows=sqlRun('SELECT channels.rowid, cname, cpath, cenabled FROM channels'))
+    return template('list', rows=sqlRun('SELECT channels.rowid, cname, cpath, cenabled FROM channels LIMIT 100'))
 
 @post('/list')
 def list_p():
@@ -59,9 +59,9 @@ def createchannel():
     sqlRun("INSERT INTO channels VALUES (?, ?, ?)", (cname, cpath, aktiv))
     return
 
-#@post('/fff')
-#def fff():
-#    print , "**************"
+@post('/fff')
+def fff():
+    return ('(server updated)')
     
 @route('/')
 def main():
@@ -77,6 +77,8 @@ def f2():
 
 @post('/upload')
 def upload_p():
+    print "upload started"
+    retl = []
     upfile = request.files.upfile
     header = upfile.file.read(7)
     if header.startswith("#EXTM3U"):
@@ -88,15 +90,18 @@ def upload_p():
         i = 0
         name = ""
         for line in lines:
+            print line
             i = i + 1
             if i>1:
                 if i % 2 == 0: 
                     name = line.split(",",1)[1]
                 if i % 2 == 1:
-                    sqlRun("INSERT INTO channels VALUES (?, ?, '1')", (name, line)) 
+                    #sqlRun("INSERT INTO channels VALUES (?, ?, '1')", (name, line))
+                    retl.append([name, line]) 
                     name = ""
+        sqlRun("INSERT INTO channels VALUES (?, ?, '1')", retl, 1)             
             
-        redirect("/list") 
+    redirect("/list") 
 
 @route('/records')
 def records_s():    
@@ -189,11 +194,10 @@ def create_p():
     print "%s - %s - %s - %s - %s - %s" % (recname, sender, von, bis, am, aktiv)
     #return
 #    if hasattr(datetime, 'strptime'):
-    strptime = datetime.strptime
-#    else:
-#        strptime = lambda date_string, format: datetime(*(time.strptime(date_string, format)[0:6]))
-    d_von = strptime(am + " " + von, "%d.%m.%Y %H:%M")
-    d_bis = strptime(am + " " + bis, "%d.%m.%Y %H:%M")
+    #strptime = datetime.strptime
+
+    d_von = datetime.strptime(am + " " + von, "%d.%m.%Y %H:%M")
+    d_bis = datetime.strptime(am + " " + bis, "%d.%m.%Y %H:%M")
     delta = timedelta(days=1)
     if d_bis < d_von:
         d_bis = d_bis + delta         
@@ -224,11 +228,6 @@ class record(threading.Thread):
         self.von = datetime.strptime(row[2],"%Y-%m-%d %H:%M:%S")
         self.bis = datetime.strptime(row[3],"%Y-%m-%d %H:%M:%S")        
         self.name = row[5]        
-#        print self.von
-#        print self.bis
-#        print row[4]
-#        print row[2]
-        #self.fname = row[4]+row[2]
         self.url = row[1]
     
     def run(self): 
@@ -243,7 +242,7 @@ class record(threading.Thread):
         block_sz = 8192
         print "record started"    
         u = urllib2.urlopen(self.url)
-        fn = datetime.now().strftime("%Y%m%d%H%M%S") + " - "        
+        fn = '/volume1/common/'+datetime.now().strftime("%Y%m%d%H%M%S") + " - "        
         fn = fn + "".join([x if x.isalnum() else "_" for x in self.name])
         print fn
         f = open(fn+".mkv", 'wb')
@@ -303,7 +302,7 @@ sqlRun('CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT,
 
 setRecords()
     
-run(host='127.0.0.1', port=8030)
+run(host='0.0.0.0', port=8030)
 
 for t in records:
     t.stop()

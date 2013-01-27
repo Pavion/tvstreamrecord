@@ -23,7 +23,7 @@
 <div id="users-contain" class="ui-widget">
 <h1>Records:
 <button id="create-user">Create new record</button></h1>
-<table id="users" class="ui-widget ui-widget-content">
+<table id="clist"><!--<table id="users" class="ui-widget ui-widget-content">-->
 <thead>
 <tr class="ui-widget-header ">
 <th>Record name</th>

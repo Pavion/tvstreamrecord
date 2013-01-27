@@ -5,10 +5,12 @@ import httplib
 import urllib2
 import zlib
 from sql import sqlRun
+import config
+
+## todo exceutemany implementation
 
 def getProgList():
-    initpath = 'http://xmltv.spaetfruehstuecken.org/xmltv/datalist.xml.gz'
-    stri = getFile(initpath)
+    stri = getFile(config.xmltvinitpath)
     if stri:    
         tree = et.fromstring(stri)
         for dict_el in tree.iterfind('channel'):

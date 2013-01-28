@@ -1,5 +1,4 @@
 import sqlite3
-import config
 
 def sqlRun(sql, t=-1, many=0):    
     fa = []
@@ -9,12 +8,14 @@ def sqlRun(sql, t=-1, many=0):
         conn.text_factory = str
         if t != -1:
             if many == 1:
-                print "na dann mal los"
                 rows = c.executemany(sql, t)
             else:                
                 rows = c.execute(sql, t)
         else:
-            rows = c.execute(sql)
+            if many == 1:
+                rows = c.executescript(sql)
+            else:
+                rows = c.execute(sql)
         fa=rows.fetchall();
         conn.commit()
         conn.close()
@@ -24,8 +25,31 @@ def sqlRun(sql, t=-1, many=0):
         pass
     return fa
 
+def sqlDropAll():
+    sql  = 'DROP TABLE IF EXISTS channels;'
+    sql += 'DROP TABLE IF EXISTS records;'
+    sql += 'DROP TABLE IF EXISTS guide_chan;'
+    sql += 'DROP TABLE IF EXISTS guide;'
+    sql += 'DROP TABLE IF EXISTS caching;'
+    sql += 'DROP TABLE IF EXISTS config;'
+    sqlRun(sql, -1, 1)
+    return    
+    
+def sqlCreateAll():
+    sql  = 'CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase, cpath TEXT, cenabled INTEGER);'
+    sql += 'CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER);'    
+    sql += 'CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT);'
+    sql += 'CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT);'
+    sql += 'CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT, g_stop TEXT, g_desc TEXT, PRIMARY KEY (g_id, g_start, g_stop));'
+    sql += 'CREATE TABLE IF NOT EXISTS config (param TEXT UNIQUE, desc TEXT, value TEXT);'
+    sqlRun(sql, -1, 1)
+    return
+    
 def purgeDB():
-    sqlRun("DELETE FROM caching WHERE julianday('now', 'localtime')-julianday(crTime)>%d" % config.purgedelta)
-    sqlRun("DELETE FROM guide_chan WHERE julianday('now', 'localtime')-julianday(g_lasttime)>%d" % config.purgedelta)
-    sqlRun("DELETE FROM guide WHERE julianday('now', 'localtime')-julianday(g_start)>%d" % config.purgedelta)
+    import config
+    sql  = "DELETE FROM records WHERE julianday('now', 'localtime')-julianday(rbis)>%d;" % config.cfg_purgedelta
+    sql += "DELETE FROM caching WHERE julianday('now', 'localtime')-julianday(crTime)>%d;" % config.cfg_purgedelta
+    sql += "DELETE FROM guide_chan WHERE julianday('now', 'localtime')-julianday(g_lasttime)>%d;" % config.cfg_purgedelta
+    sql += "DELETE FROM guide WHERE julianday('now', 'localtime')-julianday(g_start)>%d;" % config.cfg_purgedelta
+    sqlRun(sql, -1, 1)
     return

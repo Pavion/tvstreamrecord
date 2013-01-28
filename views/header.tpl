@@ -24,6 +24,6 @@
     <li><a href="/records"><span>Records</span></a></li>
     <li><a href="/list"><span>Channels</span></a></li>
     <li><a href="/epg"><span>EPG</span></a></li>
-<!--    <li><a href="/config"><span>Config (dummy)</span></a></li>-->
+    <li><a href="/config"><span>Config</span></a></li>
   </ul>
 </div><br><div id="mybody">

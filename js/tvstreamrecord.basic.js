@@ -373,6 +373,14 @@ $(function() {
         .click(function() {
             $( "#upload-form" ).dialog( "open" );
         });
+
+    $( "#submit_cfg" )
+        .button()
+        .click(function() {
+            console.log("123");
+            document.submit_cfg_form.submit();
+        });
+
         
     $('#clist').dataTable({
         "bJQueryUI": true,

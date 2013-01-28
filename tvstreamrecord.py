@@ -2,11 +2,11 @@
 from bottle import route, run, template, post, request
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
+import config
+from sql import sqlRun, sqlCreateAll, sqlDropAll
+import xmltv
 import urllib2
 import threading 
-import xmltv
-from sql import sqlRun
-import config
 
 #todo config, multipaged list 
 
@@ -34,7 +34,23 @@ def server_static4(filename):
 @route('/images/<filename>')
 def server_static5(filename):
     return static_file(filename, root='./images')
-    
+
+@post('/config')
+def config_p():    
+    attrl = []
+    dict = config.getDict()
+    for d in dict:
+        print d
+        print request.forms.get(d)        
+        print "******************"
+        val = request.forms.get(d)
+        attrl.append([d, val])
+    config.setConfig(attrl)
+    redirect("/config") 
+
+@route('/config')
+def config_s():    
+    return template('config', rows=sqlRun('SELECT * FROM config'))
     
 @route('/list')
 def list_s():
@@ -59,9 +75,9 @@ def createchannel():
     sqlRun("INSERT INTO channels VALUES (?, ?, ?)", (cname, cpath, aktiv))
     return
 
-@post('/fff')
-def fff():
-    return ('(server updated)')
+#@post('/fff')
+#def fff():
+#    return ('(server updated)')
     
 @route('/')
 def main():
@@ -171,11 +187,9 @@ def records_p():
     setRecords()
     return
 
-delta_for_epg = 3 # minutes
-
 @post('/createepg')
 def createepg():
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%d minutes'), datetime(guide.g_stop, '+%d minutes'), 1 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (delta_for_epg, delta_for_epg, request.forms.ret))
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
 
     setRecords()
         
@@ -190,11 +204,6 @@ def create_p():
     bis = request.forms.bis
     am = request.forms.am
     aktiv = getBool(request.forms.aktiv)    
-
-    print "%s - %s - %s - %s - %s - %s" % (recname, sender, von, bis, am, aktiv)
-    #return
-#    if hasattr(datetime, 'strptime'):
-    #strptime = datetime.strptime
 
     d_von = datetime.strptime(am + " " + von, "%d.%m.%Y %H:%M")
     d_bis = datetime.strptime(am + " " + bis, "%d.%m.%Y %H:%M")
@@ -223,7 +232,6 @@ class record(threading.Thread):
         
     def __init__(self, row):
         threading.Thread.__init__(self)
-        #print "init id: %d" % row[0]
         self.id = row[0]
         self.von = datetime.strptime(row[2],"%Y-%m-%d %H:%M:%S")
         self.bis = datetime.strptime(row[3],"%Y-%m-%d %H:%M:%S")        
@@ -242,7 +250,7 @@ class record(threading.Thread):
         block_sz = 8192
         print "record started"    
         u = urllib2.urlopen(self.url)
-        fn = '/volume1/common/'+datetime.now().strftime("%Y%m%d%H%M%S") + " - "        
+        fn = config.cfg_recordpath+datetime.now().strftime("%Y%m%d%H%M%S") + " - "        
         fn = fn + "".join([x if x.isalnum() else "_" for x in self.name])
         print fn
         f = open(fn+".mkv", 'wb')
@@ -287,22 +295,14 @@ def setRecords():
             t.stop()
             del records[index]
 
-#sqlRun('DROP TABLE records')    
-sqlRun('CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase, cpath TEXT, cenabled INTEGER)')  
-sqlRun('CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER)')    
 
-#sqlRun('DROP TABLE IF EXISTS guide_chan')
-#sqlRun('DROP TABLE IF EXISTS guide')
-#sqlRun('DROP TABLE IF EXISTS caching')
-
-sqlRun('CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT)')
-sqlRun('CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT)')  
-sqlRun('CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT, g_stop TEXT, g_desc TEXT, PRIMARY KEY (g_id, g_start, g_stop))')    
-
-
+#sqlRun('DROP TABLE config')
+sqlCreateAll()            
+config.loadConfig()
 setRecords()
     
-run(host='0.0.0.0', port=8030)
+#print config.cfg_server_port
+run(host=config.cfg_server_bind_address, port=config.cfg_server_port)
 
 for t in records:
     t.stop()

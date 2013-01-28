@@ -7,10 +7,8 @@ import zlib
 from sql import sqlRun
 import config
 
-## todo exceutemany implementation
-
 def getProgList():
-    stri = getFile(config.xmltvinitpath)
+    stri = getFile(config.cfg_xmltvinitpath)
     if stri:    
         tree = et.fromstring(stri)
         for dict_el in tree.iterfind('channel'):
@@ -45,6 +43,7 @@ def getProgList():
        
 def getProg(p_id):    
     stri = getFile(p_id)
+    sqllist = []
     if stri: #tree = et.parse("hd.zdf.de_2013-02-14.xml")
         tree = et.fromstring(stri)
         for dict_el in tree.iterfind('programme'):
@@ -58,7 +57,8 @@ def getProg(p_id):
             if dict_el.find('desc') is not None:
                 desc = dict_el.find('desc').text
             print dt1, dt2, p_id, title
-            sqlRun("INSERT INTO guide VALUES (?, ?, ?, ?, ?)", (p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc))
+            sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
+        sqlRun("INSERT INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
         
 def getFile(file_in):
     rows=sqlRun("SELECT * FROM caching WHERE url='%s'" % file_in)    

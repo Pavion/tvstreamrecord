@@ -2072,6 +2072,9 @@ def redirect(url, code=None):
     if code is None:
         code = 303 if request.get('SERVER_PROTOCOL') == "HTTP/1.1" else 302
     location = urljoin(request.url, url)
+    # Pavel: SSL Suppression to avoid ssl_error_rx_record_too_long
+    location = location.replace('HTTPS://', 'HTTP://', 1)
+    location = location.replace('https://', 'http://', 1)     
     raise HTTPResponse("", status=code, Location=location)
 
 

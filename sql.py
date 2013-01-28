@@ -36,7 +36,7 @@ def sqlDropAll():
     return    
     
 def sqlCreateAll():
-    sql  = 'CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase, cpath TEXT, cenabled INTEGER);'
+    sql  = 'CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase UNIQUE, cpath TEXT, cenabled INTEGER);'
     sql += 'CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER);'    
     sql += 'CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT);'
     sql += 'CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT);'

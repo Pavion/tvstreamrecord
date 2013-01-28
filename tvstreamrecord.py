@@ -38,8 +38,8 @@ def server_static5(filename):
 @post('/config')
 def config_p():    
     attrl = []
-    dict = config.getDict()
-    for d in dict:
+    dicts = config.getDict()
+    for d in dicts:
         print d
         print request.forms.get(d)        
         print "******************"
@@ -85,7 +85,7 @@ def main():
 
 @route('/f2')
 def f2():
-    # unbedingt in einem Thread machen!!!
+    # unbedingt in einem Thread machen!!! Geht naemlich immer noch nicht!
     t=threading.Thread(target=xmltv.getProgList())
     t.start()
     redirect("/epg")
@@ -115,7 +115,7 @@ def upload_p():
                     #sqlRun("INSERT INTO channels VALUES (?, ?, '1')", (name, line))
                     retl.append([name, line]) 
                     name = ""
-        sqlRun("INSERT INTO channels VALUES (?, ?, '1')", retl, 1)             
+        sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1')", retl, 1)             
             
     redirect("/list") 
 
@@ -129,7 +129,7 @@ def epg_p():
     day = request.forms.datepicker3
     global dayshown
     dayshown = datetime.strptime(day,localdate)
-    redirect("/epg") 
+    redirect("/epg", 303) 
 
 @route('/epg')
 def epg_s():    
@@ -189,6 +189,7 @@ def records_p():
 
 @post('/createepg')
 def createepg():
+    print "INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret)
     sqlRun("INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
 
     setRecords()
@@ -302,7 +303,7 @@ config.loadConfig()
 setRecords()
     
 #print config.cfg_server_port
-run(host=config.cfg_server_bind_address, port=config.cfg_server_port)
+run(host=config.cfg_server_bind_address, port=config.cfg_server_port) #, quiet=True
 
 for t in records:
     t.stop()

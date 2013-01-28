@@ -19,19 +19,19 @@ configuration = [
 
 [
 'cfg_recordpath',
-'path for recording',
+'Path for your recordings',
 '/volume1/common/'
 ],
 
 [
 'cfg_server_bind_address',
-'Server bind address',
+'Server bind address (restart needed)',
 '0.0.0.0'
 ],   
 
 [
 'cfg_server_port',
-'Server port',
+'Server port (restart needed)',
 8030
 ]
 

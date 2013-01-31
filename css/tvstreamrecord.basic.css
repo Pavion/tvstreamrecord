@@ -17,14 +17,14 @@ html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-si
 	.demoHeaders {
 		margin-top: 2em;
 	}
-	a[id^=icons-] {
+	[id^=icons-] {
 		margin: 0px 0px;
 		position: relative;
 		padding: 0px 0;
 		cursor: pointer;
 		float: left;
 	}
-	a[id^=icons-] span.ui-icon {
+	[id^=icons-] span.ui-icon {
 		float: left;
 		margin: -1px -1px;
 	}

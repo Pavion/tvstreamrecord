@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, time, date
 import config
 from sql import sqlRun, sqlCreateAll, sqlDropAll
 import xmltv
+import json
 import urllib2
 import threading 
 
@@ -35,6 +36,15 @@ def server_static4(filename):
 def server_static5(filename):
     return static_file(filename, root='./images')
 
+@route('/channellist')
+def chanlist():
+    l = []
+    rows=sqlRun('SELECT channels.rowid, cname, cpath, cenabled FROM channels')    
+    for row in rows:
+        l.append([row[0], row[1], row[2], row[3]])
+        
+    return json.dumps({"aaData": l } )
+    
 @post('/config')
 def config_p():    
     attrl = []
@@ -60,6 +70,7 @@ def list_s():
 def list_p():
     what = request.forms.get("what")
     myid = request.forms.get("myid")
+    print what, myid
     if what=="-1":
         sqlRun("DELETE FROM channels WHERE channels.rowid=%s" % (myid))
     else: 
@@ -129,7 +140,7 @@ def epg_p():
     day = request.forms.datepicker3
     global dayshown
     dayshown = datetime.strptime(day,localdate)
-    redirect("/epg", 303) 
+    redirect("/epg") 
 
 @route('/epg')
 def epg_s():    

@@ -1,3 +1,28 @@
+var dialognr = -1; 
+ 
+function initIcons() {
+	$( "[id^=icons-]" ).hover(
+		function() {
+			$( this ).addClass( "ui-state-hover" );
+		},
+		function() {
+			$( this ).removeClass( "ui-state-hover" );
+		}
+	);
+
+	$( "[id^=icons-]" ).click(function( event ) {
+        dialognr = parseInt($(this).attr('id').replace("icons-",""));
+		$( "#dialog" ).dialog( "open" );
+		event.preventDefault();            
+	});
+	
+	$( "[id^=icons-]" ).each(function(i) {
+        $(this).height(14);
+        $(this).width(14);
+        $(this).css("margin-left", "7px");
+    });
+}
+
 function post(dest1, data1, rel) {
     $.ajax({
         type: "POST",
@@ -87,7 +112,7 @@ $(function() {
 
     $(".switch").each(function(index) { $(this).css("margin-left", "7px"); });
 
-	var dialognr = -1;
+//	var dialognr = -1;
     
 	$( "#dialog" ).dialog({
 		autoOpen: false,
@@ -110,16 +135,6 @@ $(function() {
 		]
 	});
 
-	$( "[id^=icons-]" ).click(function( event ) {
-        dialognr = parseInt($(this).attr('id').replace("icons-",""));
-		$( "#dialog" ).dialog( "open" );
-		event.preventDefault();            
-	});
-	$( "[id^=icons-]" ).each(function(i) {
-        $(this).height(14);
-        $(this).width(14);
-        $(this).css("margin-left", "7px");
-    });
 
 		// hier weiter machen! 
 	$( "[id^=datepicker]" ).datepicker({
@@ -149,14 +164,6 @@ $(function() {
     });
 
 	// Hover states on the static widgets
-	$( "[id^=icons-]" ).hover(
-		function() {
-			$( this ).addClass( "ui-state-hover" );
-		},
-		function() {
-			$( this ).removeClass( "ui-state-hover" );
-		}
-	);
 
 //	$(function() {
     var selcount = 0;
@@ -382,9 +389,36 @@ $(function() {
         });
 
         
-    $('#clist').dataTable({
+ $('#clist').dataTable({
         "bJQueryUI": true,
-        "sPaginationType": "full_numbers"
-    });   
-        
+        "sPaginationType": "full_numbers",
+        "bProcessing": true,
+        "sAjaxSource": "/channellist",
+        "fnDrawCallback": function( oSettings ) {
+            console.log( 'DataTables has redrawn the table');
+            
+            $('[id^=switchx-]').each(function() {
+                switchnr = parseInt($(this).attr('id').replace("switchx-",""));
+                $(this).slickswitch({
+                    toggledOn: function() {            
+                        post("/list", { myid:switchnr, what:"1" }, 0); 
+                    },
+                    toggledOff: function() {  
+                        post("/list", { myid:switchnr, what:"0" }, 0); 
+                    }
+                });
+            });
+            
+            initIcons();
+            
+        },
+        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {        
+            var chk = "";
+            if (aData[3] == 1) {
+                chk = 'checked="checked"';
+            }            
+            $('td:eq(3)', nRow).html('<input type="checkbox" class="switch icons" id="switchx-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>');            
+        }        
+    }); 
+            
 });

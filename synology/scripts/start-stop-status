@@ -1,0 +1,32 @@
+#!/bin/sh
+
+[ ${SYNOPKG_PKGDEST} ] || SYNOPKG_PKGDEST=`ls -l /var/packages/tvstreamrecord/target | cut -d\> -f2 | cut -d\  -f2`
+
+stop() {
+	PID=`ps | grep 'python [t]vstreamrecord.py' | cut -c 1-5`
+    kill ${PID}
+	sleep 3
+	kill -2 ${PID}	
+	sleep 3
+	kill -9 ${PID}	
+    exit 0
+}
+
+case $1 in
+	start)
+		cd ${SYNOPKG_PKGDEST}
+        nohup python tvstreamrecord.py >/dev/null 2>&1 &
+        exit 0
+	;;
+	stop)	stop
+			;;
+	status)
+		exit 0
+	;;
+	log)
+		echo "tvstreamrecord is installed properly. To access it, click icon under 'admin' menu">/tmp/cc.log
+		echo "/tmp/cc.log";
+		exit 0
+	;;
+esac
+                                     

@@ -56,7 +56,7 @@ def getProg(p_id):
                 title = dict_el.find('title').text
             if dict_el.find('desc') is not None:
                 desc = dict_el.find('desc').text
-            print dt1, dt2, p_id, title
+            #print dt1, dt2, p_id, title
             sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
         sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
         

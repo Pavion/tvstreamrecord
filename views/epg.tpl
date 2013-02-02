@@ -5,7 +5,7 @@
 <form method='POST' enctype='multipart/form-data' action='/epg' name='daychooser'>
 <h1><div id="float">Current date:</div>
 <input type="text" maxlength="10" id="datepicker3" class="text ui-widget-content ui-corner-all" name="datepicker3" value="{{curr}}"/> 
-<button id="refreshme">Refresh</button></h1>
+<button id="getepg">Load EPG information</button></h1>
 </form>
 %for rows in rowss:
 %if rows[0][0] == -1:

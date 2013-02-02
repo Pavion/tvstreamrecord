@@ -3,13 +3,11 @@ from bottle import route, run, template, post, request
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
 import config
-from sql import sqlRun, sqlCreateAll, sqlDropAll
+from sql import sqlRun, sqlCreateAll, purgeDB
 import xmltv
 import json
 import urllib2
 import threading 
-
-#todo config, multipaged list 
 
 records = []    
 localdatetime = "%d.%m.%Y %H:%M:%S"
@@ -36,14 +34,33 @@ def server_static4(filename):
 def server_static5(filename):
     return static_file(filename, root='./images')
 
+#------------------------------- Channel List -------------------------------
+
 @route('/channellist')
 def chanlist():
     l = []
     rows=sqlRun('SELECT channels.rowid, cname, cpath, cenabled FROM channels')    
     for row in rows:
         l.append([row[0], row[1], row[2], row[3]])
-        
     return json.dumps({"aaData": l } )
+
+@route('/list')
+def list_s():
+    return template('list')
+    
+@post('/list')
+def list_p():
+    what = request.forms.get("what")
+    myid = request.forms.get("myid")
+    print what, myid
+    if what=="-1":
+        sqlRun("DELETE FROM channels WHERE channels.rowid=%s" % (myid))
+    else: 
+        sqlRun("UPDATE channels SET cenabled=%s WHERE channels.rowid=%s" % (what, myid))            
+    setRecords()
+    return
+
+#------------------------------- Configuration -------------------------------
     
 @post('/config')
 def config_p():    
@@ -61,22 +78,6 @@ def config_p():
 @route('/config')
 def config_s():    
     return template('config', rows=sqlRun('SELECT * FROM config'))
-    
-@route('/list')
-def list_s():
-    return template('list', rows=sqlRun('SELECT channels.rowid, cname, cpath, cenabled FROM channels LIMIT 100'))
-
-@post('/list')
-def list_p():
-    what = request.forms.get("what")
-    myid = request.forms.get("myid")
-    print what, myid
-    if what=="-1":
-        sqlRun("DELETE FROM channels WHERE channels.rowid=%s" % (myid))
-    else: 
-        sqlRun("UPDATE channels SET cenabled=%s WHERE channels.rowid=%s" % (what, myid))            
-    setRecords()
-    return
 
 @post('/create_channel')
 def createchannel():
@@ -85,22 +86,25 @@ def createchannel():
     aktiv = getBool(request.forms.aktiv)
     sqlRun("INSERT INTO channels VALUES (?, ?, ?)", (cname, cpath, aktiv))
     return
-
-#@post('/fff')
-#def fff():
-#    return ('(server updated)')
     
 @route('/')
 def main():
     return template('header', rows = None)
 
-@route('/f2')
-def f2():
-    # unbedingt in einem Thread machen!!! Geht naemlich immer noch nicht!
-    t=threading.Thread(target=xmltv.getProgList())
-    t.start()
-    redirect("/epg")
+@post('/getepg')
+def getepg():
+    thread = epgthread() 
+    thread.start()
     return 
+
+class epgthread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+
+    def run(self):
+        xmltv.getProgList()
+
+
 
 @post('/upload')
 def upload_p():
@@ -123,17 +127,13 @@ def upload_p():
                 if i % 2 == 0: 
                     name = line.split(",",1)[1]
                 if i % 2 == 1:
-                    #sqlRun("INSERT INTO channels VALUES (?, ?, '1')", (name, line))
                     retl.append([name, line]) 
                     name = ""
         sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1')", retl, 1)             
             
     redirect("/list") 
 
-@route('/records')
-def records_s():    
-    return template('records', rows1=sqlRun("SELECT records.rowid, recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)) FROM channels, records where channels.rowid=records.cid AND datetime(rbis)>=datetime('now', 'localtime') ORDER BY rvon"), rows2=sqlRun('SELECT rowid, cname FROM channels where cenabled=1'))
-
+#------------------------------- EPG -------------------------------
     
 @post('/epg')
 def epg_p():    
@@ -187,6 +187,32 @@ def epg_s():
         ret.append(rtemp)
     return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret)            
 
+@post('/createepg')
+def createepg():
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
+
+    setRecords()
+        
+    redirect("/records")
+    return 
+
+#------------------------------- Record List -------------------------------
+
+
+@route('/getrecordlist')
+def getrecordlist():
+    l = []
+    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid FROM channels, records where channels.rowid=records.cid AND datetime(rbis)>=datetime('now', 'localtime') ORDER BY rvon")    
+    for row in rows:
+        l.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
+    return json.dumps({"aaData": l } )
+    
+
+@route('/records')
+def records_s():    
+    return template('records', rows2=sqlRun('SELECT rowid, cname FROM channels where cenabled=1'))
+
+
 @post('/records')
 def records_p():
     what = request.forms.get("what")
@@ -197,16 +223,6 @@ def records_p():
         sqlRun("UPDATE records SET renabled=%s WHERE rowid=%s" % (what, myid))            
     setRecords()
     return
-
-@post('/createepg')
-def createepg():
-    print "INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret)
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
-
-    setRecords()
-        
-    redirect("/records")
-    return 
     
 @post('/create')
 def create_p():
@@ -308,12 +324,11 @@ def setRecords():
             del records[index]
 
 
-#sqlRun('DROP TABLE config')
-sqlCreateAll()            
+sqlCreateAll()
+purgeDB()          
 config.loadConfig()
 setRecords()
     
-#print config.cfg_server_port
 run(host=config.cfg_server_bind_address, port=config.cfg_server_port) #, quiet=True
 
 for t in records:

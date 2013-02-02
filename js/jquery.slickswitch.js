@@ -69,6 +69,7 @@
 
                 self.after(
 					div.attr('class', self.attr('class'))
+						.attr('id', id)
 						.append($('<span>').addClass(settings.cssPrefix + 'on'))
 						.append($('<span>').addClass(settings.cssPrefix + 'slider'))
 						.click(function () {

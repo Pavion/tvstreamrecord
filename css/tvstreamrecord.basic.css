@@ -12,7 +12,9 @@ html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-si
 
 	body{
 		font: 62.5% "Trebuchet MS", sans-serif;
-		margin: 5%;
+		margin-left: 5%;
+        margin-right: 5%;
+        margin-top: 20px;
 	}
 	.demoHeaders {
 		margin-top: 2em;
@@ -55,7 +57,7 @@ input#cname { width:75%; float:left; }
 [id=create-channel].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=create-user].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=submit_cfg].ui-button-text-only .ui-button-text { padding: 0px 3px; }
-[id=refreshme].ui-button-text-only .ui-button-text { padding: 1px 5px; }
+[id=getepg].ui-button-text-only .ui-button-text { padding: 1px 5px; }
 label#append {float: left; margin-top: 3px;}
 
 
@@ -74,5 +76,19 @@ label#append {float: left; margin-top: 3px;}
 #datepicker3 { width: 100px; float:left; margin-left: 5px; margin-right: 5px;}
 #float { float:left; margin-top: 3px; }
 
-//label { display: inline-block; width: 200px; }
+
+th.ccontrols { width: 80px; }
+th.cid { width: 40px; }
+th.cname { width: 300px; }
+
+th.rcontrols { width: 180px; }
+th.rtill { width: 15%; }
+th.rat { width: 15%; }
+
+#logo {
+    position: absolute;
+    top: 5px;    
+    right: 5%;    
+}
+
 

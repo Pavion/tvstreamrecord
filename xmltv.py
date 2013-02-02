@@ -36,7 +36,7 @@ def getProgList():
                         dtmax = dt
 
                 if not rows:
-                    sqlRun("INSERT INTO guide_chan VALUES (?, ?, ?)", (g_id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
+                    sqlRun("INSERT OR IGNORE INTO guide_chan VALUES (?, ?, ?)", (g_id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
                 else:
                     sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))
                        
@@ -58,7 +58,7 @@ def getProg(p_id):
                 desc = dict_el.find('desc').text
             print dt1, dt2, p_id, title
             sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
-        sqlRun("INSERT INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
+        sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
         
 def getFile(file_in):
     rows=sqlRun("SELECT * FROM caching WHERE url='%s'" % file_in)    

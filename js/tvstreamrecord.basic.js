@@ -1,4 +1,38 @@
 var dialognr = -1; 
+
+function checkLength( o, n, min, max ) {
+    x = document.getElementById(o);
+    if ( x.value.length > max || x.value.length < min ) {
+        $("#"+o).addClass( "ui-state-error" );
+        updateTips( "Length of " + n + " must be between " +
+        min + " and " + max + "." );
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function checkRegexp( o, regexp, n ) {
+    x = document.getElementById(o);
+    if ( !( regexp.test( x.value ) ) ) {
+        $("#"+o).addClass( "ui-state-error" );
+        updateTips( n );
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function initProgressbar() {
+	$( "[id^=progressbar]" ).each(function(i) {
+        $(this).progressbar({
+            value: parseInt($(this).attr('id').replace("progressbar","")),
+        });
+        $(this).width(100);
+        $(this).height(14);
+        $(this).css("float", "left");
+    });
+}
  
 function initIcons() {
 	$( "[id^=icons-]" ).hover(
@@ -20,6 +54,23 @@ function initIcons() {
         $(this).height(14);
         $(this).width(14);
         $(this).css("margin-left", "7px");
+    });
+}
+
+
+function initSwitch() {
+    $('[id^=switch-]').each(function() {
+    	//$(this).css("margin-top", "2px"); 
+        var switchnr = parseInt($(this).attr('id').replace("switch-",""));
+        var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
+        $(this).slickswitch({
+            toggledOn: function() {            
+                post(postto, { myid:switchnr, what:"1" }, 0); 
+            },
+            toggledOff: function() {  
+                post(postto, { myid:switchnr, what:"0" }, 0); 
+            }
+        });
     });
 }
 
@@ -77,13 +128,10 @@ $(function() {
 		
 
 		
-	$( "#button" ).button();
+	//$( "#button" ).button();
 	$( "#radioset" ).buttonset();
 	
 
-	
-	//$( "#tabs" ).tabs();
-	
     $("#timepicker_inline_div1").timepicker({
         constrainInput: true,
         showPeriodLabels: false
@@ -93,26 +141,8 @@ $(function() {
         showPeriodLabels: false
     });
     
-    $( "#switch00" ).slickswitch();
+    $( "#switch00" ).slickswitch();   
     $( "#switch01" ).slickswitch();
-    $(".switch").each(function(index) { $(this).css("margin-top", "2px"); });
-            
-    $( "[id^=switch-]" ).each(function(index) {
-        var switchnr = parseInt($( "[id^=switch-]" ).get(index).id.replace("switch-",""));
-        var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
-        $(this).slickswitch({
-            toggledOn: function() {            
-                post(postto, { myid:switchnr, what:"1" }, 0); 
-            },
-            toggledOff: function() {  
-                post(postto, { myid:switchnr, what:"0" }, 0); 
-            }
-        });
-    });
-
-    $(".switch").each(function(index) { $(this).css("margin-left", "7px"); });
-
-//	var dialognr = -1;
     
 	$( "#dialog" ).dialog({
 		autoOpen: false,
@@ -136,7 +166,6 @@ $(function() {
 	});
 
 
-		// hier weiter machen! 
 	$( "[id^=datepicker]" ).datepicker({
         constrainInput: true,
         minDate: -1,          
@@ -147,25 +176,13 @@ $(function() {
         dateFormat: pickerform
 	});
 
-
 	
 	$( "#slider" ).slider({
 		range: true,
 		values: [ 17, 67 ]
 	});
 	
-	$( "[id^=progressbar]" ).each(function(i) {
-        $(this).progressbar({
-            value: parseInt($(this).attr('id').replace("progressbar","")),
-        });
-        $(this).width(100);
-        $(this).height(14);
-        $(this).css("float", "left");
-    });
 
-	// Hover states on the static widgets
-
-//	$(function() {
     var selcount = 0;
     $( "#selectabletitle" ).selectable({
         disabled: true,
@@ -180,20 +197,13 @@ $(function() {
 	$( "[id=event]" ).each(function(i) {        
 		w = $(this).attr('width')+"%";
 		x = $(this).attr('x')+"%";
-		//y = parseInt($(this).css("height").replace("px","")) * parseInt($(this).attr('y'))+"px";
-        //y = "0px"
-        //$(this).css("margin-top", y);		
         $(this).css("margin-left", x);		
         $(this).css("width", w);		
-        //if (parseInt($(this).attr('y'))>=1) {
-        //}
 	});
 	
     $("li").live("click", function(event) {
    		$("li").siblings().removeClass("ui-selected");        
    		$(this).addClass("ui-selected");
-   		//console.log ($("#dialog_content").text());
-   		//console.log ($(this).attr("cid"),$(this).attr("rid"));
    		var ft = $(this).attr("fulltext");
    		console.log (ft);
    		if (ft)   {
@@ -205,11 +215,6 @@ $(function() {
 	});
 
 	
-//});
-
-
-//$(function() {
-
     var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" );
     function updateTips( t ) {
         $( ".validateTips" )
@@ -218,27 +223,6 @@ $(function() {
         setTimeout(function() {
             $( ".validateTips" ).removeClass( "ui-state-highlight", 1500 );
         }, 500 );
-    }
-    function checkLength( o, n, min, max ) {
-        x = document.getElementById(o);
-        if ( x.value.length > max || x.value.length < min ) {
-            $("#"+o).addClass( "ui-state-error" );
-            updateTips( "Length of " + n + " must be between " +
-            min + " and " + max + "." );
-            return false;
-        } else {
-            return true;
-        }
-    }
-    function checkRegexp( o, regexp, n ) {
-        x = document.getElementById(o);
-        if ( !( regexp.test( x.value ) ) ) {
-            $("#"+o).addClass( "ui-state-error" );
-            updateTips( n );
-            return false;
-        } else {
-            return true;
-        }
     }
     $( "#dialog-form" ).dialog({
         autoOpen: false,
@@ -354,71 +338,75 @@ $(function() {
         .click(function() {
             $( "#dialog-form" ).dialog( "open" );
         });
-
-    $( "#refreshme" )
-        .button()
-        .click(function() {
-            document.daychooser.submit();                
-/*            post("/create", { 
-                recname:document.getElementById("recname").value, 
-                Sender:document.getElementById("channel").value, 
-                von:document.getElementById("timepicker_inline_div1").value, 
-                bis:document.getElementById("timepicker_inline_div2").value, 
-                am:document.getElementById("datepicker").value, 
-                aktiv:akt 
-            }, 1); */
-        });
         
+    $( "#getepg" )
+        .button()
+        .click(function(event ) {
+            post("/getepg", {}, 0);                  
+            event.preventDefault();
+        });
+
     $( "#create-channel" )
         .button()
-        .click(function() {
+        .click(function(event ) {
             $( "#createchannel-form" ).dialog( "open" );
+            event.preventDefault();
         });
         
     $( "#upload-user" )
         .button()
-        .click(function() {
+        .click(function(event ) {
             $( "#upload-form" ).dialog( "open" );
+            event.preventDefault();
         });
 
     $( "#submit_cfg" )
         .button()
-        .click(function() {
-            console.log("123");
+        .click(function(event ) {
             document.submit_cfg_form.submit();
+            event.preventDefault();
         });
 
         
- $('#clist').dataTable({
+ 	$('#clist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bProcessing": true,
         "sAjaxSource": "/channellist",
         "fnDrawCallback": function( oSettings ) {
-            console.log( 'DataTables has redrawn the table');
-            
-            $('[id^=switchx-]').each(function() {
-                switchnr = parseInt($(this).attr('id').replace("switchx-",""));
-                $(this).slickswitch({
-                    toggledOn: function() {            
-                        post("/list", { myid:switchnr, what:"1" }, 0); 
-                    },
-                    toggledOff: function() {  
-                        post("/list", { myid:switchnr, what:"0" }, 0); 
-                    }
-                });
-            });
-            
+            initSwitch();
             initIcons();
             
         },
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {        
             var chk = "";
-            if (aData[3] == 1) {
-                chk = 'checked="checked"';
-            }            
-            $('td:eq(3)', nRow).html('<input type="checkbox" class="switch icons" id="switchx-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>');            
+            if (aData[3] == 1) chk = 'checked="checked"';
+            $('td:eq(3)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>');            
         }        
     }); 
+    
+ 	$('#recordlist').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bProcessing": true,
+        "sAjaxSource": "/getrecordlist",
+        "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 5,6 ] } ],
+        "fnDrawCallback": function( oSettings ) {
+            initSwitch();
+            initIcons();
+            initProgressbar();
+            
+        },
+        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {        
+            var chk = "";
+            if (aData[4] == 1) chk = 'checked="checked"';
+            htmltext  = '<div id="progressbar' + aData[5] + '"></div>';
+            htmltext += '<input type="checkbox" class="switch icons" id="switch-' + aData[6] + '" ' + chk + ' />';  
+			htmltext += '<a href="#" id="icons-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>';                        
+            $('td:eq(4)', nRow).html(htmltext);            
+        }        
+    }); 
+    
+    
             
 });

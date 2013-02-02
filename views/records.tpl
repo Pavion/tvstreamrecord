@@ -23,28 +23,17 @@
 <div id="users-contain" class="ui-widget">
 <h1>Records:
 <button id="create-user">Create new record</button></h1>
-<table id="clist1"><!--<table id="users" class="ui-widget ui-widget-content">-->
+<table id="recordlist"><!--<table id="clist1"><table id="users" class="ui-widget ui-widget-content">-->
 <thead>
 <tr class="ui-widget-header ">
-<th>Record name</th>
-<th>Channel</th>
-<th>at</th>
-<th>till</th>
-<th>control</th>
+<th class="rname">Record name</th>
+<th class="rchan">Channel</th>
+<th class="rat">at</th>
+<th class="rtill">till</th>
+<th class="rcontrols">control</th>
 </tr>
 </thead>
 <tbody>
-%for row in rows1:
-%chk = ""
-%if row[5]==1:
-%chk = "checked=\"checked\""
-%end
-<tr><td>{{row[1]}}</td><td>{{row[2]}}</td><td>{{row[3]}}</td><td>{{row[4]}}</td><td>
-<div id="progressbar{{row[6]}}"></div>
-<input type="checkbox" class="switch icons" id="switch-{{row[0]}}" {{chk}} />  
-<a href="#" id="icons-{{row[0]}}" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>
-</tr>
-%end
 </tbody>
 </table>
 </div>

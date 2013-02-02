@@ -7,23 +7,13 @@
 <table id="clist"> <!-- <table id="users" class="ui-widget ui-widget-content">-->
 <thead>
 <tr class="ui-widget-header ">
-<th>ID</th>
-<th>Name</th>
-<th>URL</th>
-<th>Active</th>
+<th class="cid">ID</th>
+<th class="cname">Name</th>
+<th class="curl">URL</th>
+<th class="ccontrols">Active</th>
 </tr>
 </thead>
 <tbody>
-%for row in rows:
-%chk = ""
-%if row[3]==1:
-%chk = "checked=\"checked\""
-%end
-<tr><td>{{row[0]}}</td><td>{{row[1]}}</td><td>{{row[2]}}</td><td>
-<input type="checkbox" class="switch icons" id="switch-{{row[0]}}" {{chk}} />  
-<a href="#" id="icons-{{row[0]}}" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>
-</tr>
-%end
 </tbody>
 </table>
 </div>

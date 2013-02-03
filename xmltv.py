@@ -26,7 +26,12 @@ import zlib
 from sql import sqlRun
 import config
 
-def getProgList():
+version = ''
+
+def getProgList(ver=''):
+    global version
+    version = ver    
+    print "tvstreamrecord v.%s / XMLTV import started" % version
     stri = getFile(config.cfg_xmltvinitpath)
     if stri:    
         tree = et.fromstring(stri)
@@ -49,7 +54,7 @@ def getProgList():
                     dt = datetime.strptime(tim.attrib.get("lastmodified")[0:14],"%Y%m%d%H%M%S")
                     if dt>lastdate:   
                         source = url+g_id+"_"+dttext+".xml.gz"
-                        print source
+                        #print source
                         getProg(source)    
                     if dt>dtmax:
                         dtmax = dt
@@ -58,6 +63,7 @@ def getProgList():
                     sqlRun("INSERT OR IGNORE INTO guide_chan VALUES (?, ?, ?)", (g_id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
                 else:
                     sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))                       
+    print "XMLTV import completed"
        
 def getProg(p_id):    
     stri = getFile(p_id)
@@ -87,10 +93,10 @@ def getFile(file_in):
         lastmod = rows[0][2]
         etag = rows[0][3]
     try:
-        print lastmod, etag
+        #print lastmod, etag
         httplib.HTTPConnection.debuglevel = 1                            
         request = urllib2.Request(file_in)
-        request.add_header('User-Agent', 'tvstreamrecord/0.3 (alpha/test)')
+        request.add_header('User-Agent', 'tvstreamrecord/' + version)
         request.add_header('If-Modified-Since', lastmod)
         request.add_header('If-None-Match', etag)    
         opener = urllib2.build_opener()
@@ -104,7 +110,7 @@ def getFile(file_in):
         out = d.decompress(feeddata)
         print "XMLTV: reading URL %s" % file_in
     except:
-        print "XMLTV: no new data, try again later" % file_in
+        print "XMLTV: no new data, try again later"
         pass
     return out
     

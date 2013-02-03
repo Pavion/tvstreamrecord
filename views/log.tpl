@@ -3,6 +3,7 @@
 <div id="users-contain" class="ui-widget">
 <h1>Log:
 <button id="resetlog">Reset log</button>
+<button id="downlog">Download log</button>
 </h1>
 <table id="loglist"> 
 <thead>

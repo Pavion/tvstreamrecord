@@ -35,6 +35,9 @@ localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 version = '0.4.2' 
 
+@route('/log.txt')
+def server_static7():
+    return static_file("/log.txt", root='')
 @route('/js/<filename>')
 def server_static1(filename):
     return static_file(filename, root='./js')
@@ -55,7 +58,8 @@ def server_static5(filename):
 
 @route('/')
 def main():
-    return template('header', rows = None)
+    return records_s()
+    #return template('header', rows = None)
 
 #------------------------------- Logging -------------------------------
         
@@ -76,14 +80,12 @@ def log_s():
 
 @route('/logget')
 def log_get():
-    #logging.logPause()
     l = list()
     lfile = open("log.txt", "r")
     for lline in lfile:
         if len(lline)>24:
             l.append([ lline[0:19], lline[20:23], lline[24:] ])
     lfile.close()    
-    #logging.logResume()
     return json.dumps({"aaData": l } )
 
 #------------------------------- Channel List -------------------------------
@@ -177,7 +179,7 @@ class epgthread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        xmltv.getProgList()
+        xmltv.getProgList(version)
 
 @post('/epg')
 def epg_p():    
@@ -376,10 +378,11 @@ setRecords()
 print "Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port)
 run(host=config.cfg_server_bind_address, port=config.cfg_server_port, quiet=True)
 
+
 print "Server aborted. Stopping all records before exiting"
 for t in records:
     t.stop()
 
 print "tvstreamrecord v.%s: bye-bye" % version
-
+logging.logStop()
     

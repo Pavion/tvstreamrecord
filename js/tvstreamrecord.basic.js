@@ -391,6 +391,13 @@ $(function() {
             document.submit_cfg_form.submit();
             event.preventDefault();
         });
+        
+    $( "#downlog" )
+        .button()
+        .click(function(event ) {
+            window.location = "./log.txt";
+            event.preventDefault();
+        });
        
   
  	$('#clist').dataTable({

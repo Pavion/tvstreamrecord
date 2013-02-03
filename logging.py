@@ -16,6 +16,7 @@
     @author: pavion
     @version: v0.4.1
 """
+
 import sys
 from datetime import datetime
 
@@ -25,20 +26,19 @@ stderr_old = sys.stderr
 
 class Logger(object):
     msg = ''
-    def __init__(self, filename, typ):
+    def __init__(self, logfile, typ):
         self.typ = typ
-        #self.filename = filename
-        self.log = filename
+        self.log = logfile
         if typ == "OUT":
             self.terminal = sys.stdout
         else:
             self.terminal = sys.stderr
-        #self.resume()
 
     def write(self, message):       
         self.terminal.write(message)        
         mylines = message.replace('\n', '')
         mylines = mylines.replace('\r', '')
+        mylines = mylines.strip()
         if mylines!="": 
             self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + self.typ + " " + mylines + "\n")
         
@@ -79,3 +79,7 @@ def logPause():
 def logResume():    
     logInit()
        
+def logStop():
+    global log
+    log.close()
+    

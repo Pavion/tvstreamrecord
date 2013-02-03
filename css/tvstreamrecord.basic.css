@@ -59,6 +59,7 @@ input#cname { width:75%; float:left; }
 [id=submit_cfg].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=getepg].ui-button-text-only .ui-button-text { padding: 1px 5px; }
 [id=resetlog].ui-button-text-only .ui-button-text { padding: 1px 5px; }
+[id=downlog].ui-button-text-only .ui-button-text { padding: 1px 5px; }
 label#append {float: left; margin-top: 3px;}
 
 

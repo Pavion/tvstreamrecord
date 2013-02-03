@@ -1,4 +1,22 @@
 # coding=UTF-8
+"""
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License,
+    or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+    @author: pavion
+    @version: v0.4.1
+"""
+
 from bottle import route, run, template, post, request
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
@@ -8,12 +26,14 @@ import xmltv
 import json
 import urllib2
 import threading 
+import logging
 
 records = []    
 localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
-dayshown = datetime.combine(date.today(), time.min) 
+dayshown = datetime.combine(date.today(), time.min)
+version = '0.4.2' 
 
 @route('/js/<filename>')
 def server_static1(filename):
@@ -21,9 +41,6 @@ def server_static1(filename):
 @route('/css/smoothness/<filename>')
 def server_static2(filename):
     return static_file(filename, root='./css/smoothness')
-@route('/css/images/<filename>')
-def server_static6(filename):
-    return static_file(filename, root='./css/images')
 @route('/css/<filename>')
 def server_static3(filename):
     return static_file(filename, root='./css')
@@ -33,6 +50,41 @@ def server_static4(filename):
 @route('/images/<filename>')
 def server_static5(filename):
     return static_file(filename, root='./images')
+
+#------------------------------- Main menu -------------------------------
+
+@route('/')
+def main():
+    return template('header', rows = None)
+
+#------------------------------- Logging -------------------------------
+        
+
+logging.logInit()    
+
+print "Starting tvstreamrecord v.%s" % version
+print "Logging output initialized"
+
+@post('/resetlog')
+def log_reset():
+    logging.logRenew()
+    return
+
+@route('/log')
+def log_s():
+    return template('log')
+
+@route('/logget')
+def log_get():
+    #logging.logPause()
+    l = list()
+    lfile = open("log.txt", "r")
+    for lline in lfile:
+        if len(lline)>24:
+            l.append([ lline[0:19], lline[20:23], lline[24:] ])
+    lfile.close()    
+    #logging.logResume()
+    return json.dumps({"aaData": l } )
 
 #------------------------------- Channel List -------------------------------
 
@@ -52,7 +104,6 @@ def list_s():
 def list_p():
     what = request.forms.get("what")
     myid = request.forms.get("myid")
-    print what, myid
     if what=="-1":
         sqlRun("DELETE FROM channels WHERE channels.rowid=%s" % (myid))
     else: 
@@ -60,24 +111,8 @@ def list_p():
     setRecords()
     return
 
-#------------------------------- Configuration -------------------------------
-    
-@post('/config')
-def config_p():    
-    attrl = []
-    dicts = config.getDict()
-    for d in dicts:
-        print d
-        print request.forms.get(d)        
-        print "******************"
-        val = request.forms.get(d)
-        attrl.append([d, val])
-    config.setConfig(attrl)
-    redirect("/config") 
+#------------------------------- Channel creation -------------------------------
 
-@route('/config')
-def config_s():    
-    return template('config', rows=sqlRun('SELECT * FROM config'))
 
 @post('/create_channel')
 def createchannel():
@@ -87,10 +122,50 @@ def createchannel():
     sqlRun("INSERT INTO channels VALUES (?, ?, ?)", (cname, cpath, aktiv))
     return
     
-@route('/')
-def main():
-    return template('header', rows = None)
+@post('/upload')
+def upload_p():
+    print "M3U upload parsing started"
+    retl = []
+    upfile = request.files.upfile
+    header = upfile.file.read(7)
+    if header.startswith("#EXTM3U"):
+        how = getBool(request.forms.get("switch00"))
+        upfilecontent = upfile.file.read()        
+        if how==0:
+            sqlRun('DELETE FROM channels')
+        lines = upfilecontent.splitlines()
+        i = 0
+        name = ""
+        for line in lines:
+            i = i + 1
+            if i>1:
+                if i % 2 == 0: 
+                    name = line.split(",",1)[1]
+                if i % 2 == 1:
+                    retl.append([name, line]) 
+                    name = ""
+        sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1')", retl, 1)             
+            
+    redirect("/list") 
 
+#------------------------------- Configuration -------------------------------
+    
+@post('/config')
+def config_p():    
+    attrl = []
+    dicts = config.getDict()
+    for d in dicts:
+        val = request.forms.get(d)
+        attrl.append([d, val])
+    config.setConfig(attrl)
+    redirect("/config") 
+
+@route('/config')
+def config_s():    
+    return template('config', rows=sqlRun('SELECT * FROM config'))
+
+#------------------------------- EPG -------------------------------
+    
 @post('/getepg')
 def getepg():
     thread = epgthread() 
@@ -104,37 +179,6 @@ class epgthread(threading.Thread):
     def run(self):
         xmltv.getProgList()
 
-
-
-@post('/upload')
-def upload_p():
-    print "upload started"
-    retl = []
-    upfile = request.files.upfile
-    header = upfile.file.read(7)
-    if header.startswith("#EXTM3U"):
-        how = getBool(request.forms.get("switch00"))
-        upfilecontent = upfile.file.read()        
-        if how==0:
-            sqlRun('DELETE FROM channels')
-        lines = upfilecontent.splitlines()
-        i = 0
-        name = ""
-        for line in lines:
-            print line
-            i = i + 1
-            if i>1:
-                if i % 2 == 0: 
-                    name = line.split(",",1)[1]
-                if i % 2 == 1:
-                    retl.append([name, line]) 
-                    name = ""
-        sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1')", retl, 1)             
-            
-    redirect("/list") 
-
-#------------------------------- EPG -------------------------------
-    
 @post('/epg')
 def epg_p():    
     day = request.forms.datepicker3
@@ -183,21 +227,10 @@ def epg_s():
             x = d_von - datetime.combine(d_von.date(),time.min)
             w = d_bis - d_von
             rtemp.append ([cid, x.total_seconds()/86400.0*100.0*widthq, w.total_seconds()/86400.0*100.0*widthq, event[0], title, fulltext, event[4], row[2]])
-            #print row[2]
         ret.append(rtemp)
     return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret)            
 
-@post('/createepg')
-def createepg():
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
-
-    setRecords()
-        
-    redirect("/records")
-    return 
-
 #------------------------------- Record List -------------------------------
-
 
 @route('/getrecordlist')
 def getrecordlist():
@@ -206,12 +239,10 @@ def getrecordlist():
     for row in rows:
         l.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
     return json.dumps({"aaData": l } )
-    
 
 @route('/records')
 def records_s():    
     return template('records', rows2=sqlRun('SELECT rowid, cname FROM channels where cenabled=1'))
-
 
 @post('/records')
 def records_p():
@@ -223,7 +254,16 @@ def records_p():
         sqlRun("UPDATE records SET renabled=%s WHERE rowid=%s" % (what, myid))            
     setRecords()
     return
+
+#------------------------------- Record creation -------------------------------
     
+@post('/createepg')
+def createepg():
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
+    setRecords()        
+    redirect("/records")
+    return 
+
 @post('/create')
 def create_p():
     recname = request.forms.recname
@@ -271,34 +311,38 @@ class record(threading.Thread):
         deltas = td.total_seconds()
         self.timer = threading.Timer(deltas, self.doIt)
         self.timer.start()
-        print "Timer started for %d seconds" % (deltas)
+        if deltas>0:
+            print "\nRecord: Thread timer for '%s' started for %d seconds" % (self.name, deltas)
         
     def doIt(self):
         self.running = 1
         block_sz = 8192
-        print "record started"    
+        print "\nRecord: '%s' started" % (self.name)
         u = urllib2.urlopen(self.url)
         fn = config.cfg_recordpath+datetime.now().strftime("%Y%m%d%H%M%S") + " - "        
         fn = fn + "".join([x if x.isalnum() else "_" for x in self.name])
-        print fn
-        f = open(fn+".mkv", 'wb')
-        while self.bis > datetime.now() and self.stopflag==0:
-            mybuffer = u.read(block_sz)
-            if not mybuffer:
-                break
-            f.write(mybuffer)
-        f.close()
-        print "record ended"
+        #print fn
+        try:
+            f = open(fn+".mkv", 'wb')
+        except:
+            print "\nOutput file %s can't be created. Please check your settings." % (fn+".mkv")  
+            pass
+        else:
+            while self.bis > datetime.now() and self.stopflag==0:
+                mybuffer = u.read(block_sz)
+                if not mybuffer:
+                    break
+                f.write(mybuffer)
+            f.close()
+            print "\nRecord: '%s' ended" % (self.name)
     
     def stop(self):
         if self.running==0:
             self.timer.cancel()
         self.stopflag = 1
-        #print "stopping"        
+        print "\nRecord: Stopflag for '%s' received" % (self.name)
    
-def setRecords():
-    #return
-
+def setRecords():    
     rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname FROM channels, records where channels.rowid=records.cid AND datetime(rbis)>=datetime('now', 'localtime') AND renabled = 1 ORDER BY datetime(rvon)")
     for row in rows: 
         chk = False
@@ -307,7 +351,6 @@ def setRecords():
                 chk = True
                 break
         if chk == False:
-            print "created new thread"
             thread = record(row) 
             thread.start()
             records.append(thread)
@@ -319,17 +362,24 @@ def setRecords():
                 chk = True
                 break
         if chk == False:
-            print "recording stopped"
             t.stop()
             del records[index]
 
-
+print "Initializing database..."
 sqlCreateAll()
 purgeDB()          
+print "Initializing config..."
 config.loadConfig()
+print "Initializing records..."
 setRecords()
     
-run(host=config.cfg_server_bind_address, port=config.cfg_server_port) #, quiet=True
+print "Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port)
+run(host=config.cfg_server_bind_address, port=config.cfg_server_port, quiet=True)
 
+print "Server aborted. Stopping all records before exiting"
 for t in records:
     t.stop()
+
+print "tvstreamrecord v.%s: bye-bye" % version
+
+    

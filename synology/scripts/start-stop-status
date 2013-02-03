@@ -15,7 +15,7 @@ stop() {
 case $1 in
 	start)
 		cd ${SYNOPKG_PKGDEST}
-        nohup python tvstreamrecord.py >/dev/null 2>&1 &
+        nohup python tvstreamrecord.py > log.txt 2>&1 &
         exit 0
 	;;
 	stop)	stop

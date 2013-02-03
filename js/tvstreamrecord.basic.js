@@ -1,3 +1,21 @@
+/*
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License,
+    or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+    @author: pavion
+    @version: v0.4.1
+*/
+
 var dialognr = -1; 
 
 function checkLength( o, n, min, max ) {
@@ -346,6 +364,13 @@ $(function() {
             event.preventDefault();
         });
 
+    $( "#resetlog" )
+        .button()
+        .click(function(event ) {
+            post("/resetlog", {}, 1);                  
+            event.preventDefault();
+        });
+
     $( "#create-channel" )
         .button()
         .click(function(event ) {
@@ -366,8 +391,8 @@ $(function() {
             document.submit_cfg_form.submit();
             event.preventDefault();
         });
-
-        
+       
+  
  	$('#clist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
@@ -406,7 +431,19 @@ $(function() {
             $('td:eq(4)', nRow).html(htmltext);            
         }        
     }); 
+
+ 	$('#loglist').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bProcessing": true,
+        "sAjaxSource": "/logget"
+    }); 
     
+    $(window).bind('resize', function () {
+    	$('#loglist').dataTable().fnAdjustColumnSizing();
+    	$('#recordlist').dataTable().fnAdjustColumnSizing();
+    	$('#clist').dataTable().fnAdjustColumnSizing();
+  	} );
     
             
 });

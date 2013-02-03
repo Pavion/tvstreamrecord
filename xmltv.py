@@ -1,4 +1,23 @@
 # coding=UTF-8
+
+"""
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License,
+    or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+    @author: pavion
+    @version: v0.4.1
+"""
+
 import xml.etree.ElementTree as et
 from datetime import datetime, timedelta
 import httplib
@@ -38,8 +57,7 @@ def getProgList():
                 if not rows:
                     sqlRun("INSERT OR IGNORE INTO guide_chan VALUES (?, ?, ?)", (g_id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
                 else:
-                    sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))
-                       
+                    sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))                       
        
 def getProg(p_id):    
     stri = getFile(p_id)
@@ -84,9 +102,9 @@ def getFile(file_in):
             sqlRun("INSERT INTO caching VALUES (datetime('now', 'localtime'), ?, ?, ?)", (file_in, response.info().getheader('Last-Modified'), response.info().getheader('ETag')))        
         d = zlib.decompressobj(16+zlib.MAX_WBITS)
         out = d.decompress(feeddata)
-        print "XML got"
+        print "XMLTV: reading URL %s" % file_in
     except:
-        print "XML passed"
+        print "XMLTV: no new data, try again later" % file_in
         pass
     return out
     

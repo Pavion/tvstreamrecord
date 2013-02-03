@@ -10,7 +10,6 @@
 	<script src="js/jquery-ui-1.9.2.custom.js"></script>
 	<link href="css/jquery.ui.timepicker.css" rel="stylesheet">
 	<script src="js/jquery.ui.timepicker.js"></script>
-<!--	<link href="css/demo_page.css" rel="stylesheet"> -->
 	<link href="css/demo_table_jui.css" rel="stylesheet">
     <link rel="stylesheet" href="css/tvstreamrecord.menu.css" type="text/css" />
 	<link href="css/slickswitch.css" rel="stylesheet">
@@ -28,5 +27,6 @@
     <li><a href="/list"><span>Channels</span></a></li>
     <li><a href="/epg"><span>EPG</span></a></li>
     <li><a href="/config"><span>Config</span></a></li>
+    <li><a href="/log"><span>Log</span></a></li>
   </ul>
 </div><br><div id="mybody">

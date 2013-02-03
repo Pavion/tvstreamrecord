@@ -1,3 +1,21 @@
+"""
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License,
+    or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+    @author: pavion
+    @version: v0.4.1
+"""
+
 configuration = [
 [
 'cfg_xmltvinitpath',
@@ -58,26 +76,15 @@ def setConfig(attrlist = []):
     for attr in attrlist:
         if attr[0] in globals():
             globals()[attr[0]] = attr[1]                
-    #if attrlist:
     saveConfig()
             
             
 def saveConfig():
     from sql import sqlRun
-    #ret = []
     sql = ''   
     for var in getDict():
         sql += "UPDATE config SET value='%s' WHERE param='%s';" % (globals()[var], var) 
-        #ret.append([var, globals()[var]])
-        #print [var, globals()[var]]
-    # may as well use 'INSERT OR REPLACE INTO', this one is easier while working
-    #sqlRun('DELETE FROM config')
-    #sqlRun('INSERT INTO config VALUES (?, ?)', ret, 1)
     sqlRun(sql, -1, 1)
     return    
         
-#print getDict()
-#globals().append('hahaha')
-#globals()['cfg_hahaha'] = 12
-#print getDict()
 

@@ -26,7 +26,7 @@ import xmltv
 import json
 import urllib2
 import threading 
-from logging import logInit, logRenew, logStop
+from mylogging import logInit, logRenew, logStop
 
 records = []    
 localdatetime = "%d.%m.%Y %H:%M:%S"

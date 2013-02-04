@@ -14,9 +14,9 @@
     along with this program; if not, see <http://www.gnu.org/licenses/>.
 
     @author: pavion
-    @version: v0.4.1
 """
 
+from bottle import CherryPyServer
 from bottle import route, run, template, post, request
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
@@ -26,14 +26,14 @@ import xmltv
 import json
 import urllib2
 import threading 
-import logging
+from logging import logInit, logRenew, logStop
 
 records = []    
 localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.4.2' 
+version = '0.4.3' 
 
 @route('/log.txt')
 def server_static7():
@@ -64,14 +64,14 @@ def main():
 #------------------------------- Logging -------------------------------
         
 
-logging.logInit()    
+logInit()    
 
 print "Starting tvstreamrecord v.%s" % version
 print "Logging output initialized"
 
 @post('/resetlog')
 def log_reset():
-    logging.logRenew()
+    logRenew()
     return
 
 @route('/log')
@@ -376,7 +376,7 @@ print "Initializing records..."
 setRecords()
     
 print "Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port)
-run(host=config.cfg_server_bind_address, port=config.cfg_server_port, quiet=True)
+run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
 
 
 print "Server aborted. Stopping all records before exiting"
@@ -384,5 +384,5 @@ for t in records:
     t.stop()
 
 print "tvstreamrecord v.%s: bye-bye" % version
-logging.logStop()
+logStop()
     

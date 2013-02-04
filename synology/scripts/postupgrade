@@ -1,8 +1,8 @@
 #!/bin/sh
 
-if [ -x ${SYNOPKG_PKGDEST}/../tvstreamrecord_tmp_upgrade/settings.db ]; then
-	rm -r ${SYNOPKG_PKGDEST}/settings.db
-	mv ${SYNOPKG_PKGDEST}/../tvstreamrecord_tmp_upgrade/settings.db  ${SYNOPKG_PKGDEST}/
-fi
+rm -r ${SYNOPKG_PKGDEST}/settings.db
+mv ${SYNOPKG_PKGDEST}/../tvstreamrecord_tmp_upgrade/settings.db  ${SYNOPKG_PKGDEST}/
+rm -r ${SYNOPKG_PKGDEST}/../tvstreamrecord_tmp_upgrade 
+
 exit 0
 

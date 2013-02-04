@@ -13,7 +13,6 @@
     along with this program; if not, see <http://www.gnu.org/licenses/>.
 
     @author: pavion
-    @version: v0.4.1
 """
 
 import sqlite3

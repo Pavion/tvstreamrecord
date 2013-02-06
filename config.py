@@ -50,8 +50,14 @@ configuration = [
 'cfg_server_port',
 'Server port (restart needed)',
 8030
-]
+],
 
+[
+'cfg_file_extension',
+'File extension for the recorded stream (default=".ts")',
+'.ts'
+]
+                 
 ]
 
 for config in configuration:

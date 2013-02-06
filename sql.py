@@ -64,8 +64,8 @@ def sqlCreateAll():
     
 def purgeDB():
     import config
-    sql  = "DELETE FROM records WHERE julianday('now', 'localtime')-julianday(rbis)>%d;" % config.cfg_purgedelta
-    sql += "DELETE FROM caching WHERE julianday('now', 'localtime')-julianday(crTime)>%d;" % config.cfg_purgedelta
+    #sql  = "DELETE FROM records WHERE julianday('now', 'localtime')-julianday(rbis)>%d;" % config.cfg_purgedelta
+    sql  = "DELETE FROM caching WHERE julianday('now', 'localtime')-julianday(crTime)>%d;" % config.cfg_purgedelta
     sql += "DELETE FROM guide_chan WHERE julianday('now', 'localtime')-julianday(g_lasttime)>%d;" % config.cfg_purgedelta
     sql += "DELETE FROM guide WHERE julianday('now', 'localtime')-julianday(g_start)>%d;" % config.cfg_purgedelta
     sqlRun(sql, -1, 1)

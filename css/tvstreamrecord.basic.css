@@ -56,6 +56,7 @@ input#cname { width:75%; float:left; }
 [id=upload-user].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=create-channel].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=create-user].ui-button-text-only .ui-button-text { padding: 0px 3px; }
+[id=purge-records].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=submit_cfg].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=getepg].ui-button-text-only .ui-button-text { padding: 1px 5px; }
 [id=resetlog].ui-button-text-only .ui-button-text { padding: 1px 5px; }
@@ -78,6 +79,7 @@ label#append {float: left; margin-top: 3px;}
 #datepicker3 { width: 100px; float:left; margin-left: 5px; margin-right: 5px;}
 #float { float:left; margin-top: 3px; }
 
+div#about {font-size:150%;}
 
 th.ccontrols { width: 80px; }
 th.cid { width: 40px; }

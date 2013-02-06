@@ -57,9 +57,12 @@ def server_static5(filename):
 #------------------------------- Main menu -------------------------------
 
 @route('/')
-def main():
+def main_s():
     return records_s()
-    #return template('header', rows = None)
+
+@route('/about')
+def about_s():    
+    return template('about', ver = version)
 
 #------------------------------- Logging -------------------------------
         
@@ -237,9 +240,9 @@ def epg_s():
 @route('/getrecordlist')
 def getrecordlist():
     l = []
-    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid FROM channels, records where channels.rowid=records.cid AND datetime(rbis)>=datetime('now', 'localtime') ORDER BY rvon")    
+    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis FROM channels, records where channels.rowid=records.cid ORDER BY rvon")     
     for row in rows:
-        l.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
+        l.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]])
     return json.dumps({"aaData": l } )
 
 @route('/records')
@@ -250,6 +253,8 @@ def records_s():
 def records_p():
     what = request.forms.get("what")
     myid = request.forms.get("myid")
+    if what=="-2":
+        sqlRun("DELETE FROM records WHERE datetime(rbis)<datetime('now', 'localtime')")
     if what=="-1":
         sqlRun("DELETE FROM records WHERE records.rowid=%s" % (myid))
     else: 
@@ -325,7 +330,7 @@ class record(threading.Thread):
         fn = fn + "".join([x if x.isalnum() else "_" for x in self.name])
         #print fn
         try:
-            f = open(fn+".mkv", 'wb')
+            f = open(fn+config.cfg_file_extension, 'wb')
         except:
             print "\nOutput file %s can't be created. Please check your settings." % (fn+".mkv")  
             pass

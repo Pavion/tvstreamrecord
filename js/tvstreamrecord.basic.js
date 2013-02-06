@@ -183,8 +183,36 @@ $(function() {
 		]
 	});
 
+	$( "#confirm01" ).dialog({
+		autoOpen: false,
+		width: 300,
+		buttons: [
+			{
+				text: "OK",
+				click: function() {
+                    var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
+                    post(postto, { myid:'-1', what:"-2" }, 1);
+					$( this ).dialog( "close" );                        
+				}
+			},
+			{
+				text: "Cancel",
+				click: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		]
+	});
 
-	$( "[id^=datepicker]" ).datepicker({
+
+	$( "#datepicker" ).datepicker({
+        constrainInput: true,
+        minDate: -1,          
+        defaultDate: 0,        
+        dateFormat: pickerform
+	});
+
+	$( "#datepicker3" ).datepicker({
         constrainInput: true,
         minDate: -1,          
         defaultDate: 0,
@@ -356,6 +384,13 @@ $(function() {
         .click(function() {
             $( "#dialog-form" ).dialog( "open" );
         });
+
+    $( "#purge-records" )
+        .button()
+        .click(function() {
+            $( "#confirm01" ).dialog( "open" );
+        });
+
         
     $( "#getepg" )
         .button()
@@ -422,7 +457,9 @@ $(function() {
         "sPaginationType": "full_numbers",
         "bProcessing": true,
         "sAjaxSource": "/getrecordlist",
-        "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 5,6 ] } ],
+        "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 5,6,7,8 ] },
+        				  { "iDataSort": 7, "aTargets": [ 2 ] }, 
+        				  { "iDataSort": 8, "aTargets": [ 3 ] } ],
         "fnDrawCallback": function( oSettings ) {
             initSwitch();
             initIcons();
@@ -436,14 +473,21 @@ $(function() {
             htmltext += '<input type="checkbox" class="switch icons" id="switch-' + aData[6] + '" ' + chk + ' />';  
 			htmltext += '<a href="#" id="icons-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>';                        
             $('td:eq(4)', nRow).html(htmltext);            
-        }        
+        },
+        "fnInitComplete": function() {
+		 	this.fnSort([ [2,'desc'] ]);        	
+        } 
+        
     }); 
 
  	$('#loglist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bProcessing": true,
-        "sAjaxSource": "/logget"
+        "sAjaxSource": "/logget",
+        "fnInitComplete": function() {
+		 	this.fnSort([ [0,'desc'] ]);        	
+        } 
     }); 
     
     $(window).bind('resize', function () {

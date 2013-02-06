@@ -28,5 +28,6 @@
     <li><a href="/epg"><span>EPG</span></a></li>
     <li><a href="/config"><span>Config</span></a></li>
     <li><a href="/log"><span>Log</span></a></li>
+    <li><a href="/about"><span>About</span></a></li>
   </ul>
 </div><br><div id="mybody">

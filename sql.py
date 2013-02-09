@@ -36,8 +36,7 @@ def sqlRun(sql, t=-1, many=0):
         fa=rows.fetchall();
         conn.commit()
         conn.close()
-    except:
-            
+    except:            
         print "exception: %s" % sql
         pass
     return fa
@@ -52,13 +51,47 @@ def sqlDropAll():
     sqlRun(sql, -1, 1)
     return    
     
-def sqlCreateAll():
-    sql  = 'CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase UNIQUE, cpath TEXT, cenabled INTEGER);'
-    sql += 'CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER);'    
-    sql += 'CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT);'
-    sql += 'CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT);'
-    sql += 'CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT, g_stop TEXT, g_desc TEXT, PRIMARY KEY (g_id, g_start, g_stop));'
-    sql += 'CREATE TABLE IF NOT EXISTS config (param TEXT UNIQUE, desc TEXT, value TEXT);'
+def sqlCreateAll(version):
+    sql = ""
+    rows = sqlRun("select * from config")
+    if not rows:
+        sql += 'CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase UNIQUE, cpath TEXT, cenabled INTEGER);'
+        sql += 'CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER, rmask INTEGER);'    
+        sql += 'CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT);'
+        sql += 'CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT);'
+        sql += 'CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT, g_stop TEXT, g_desc TEXT, PRIMARY KEY (g_id, g_start, g_stop));'
+        sql += 'CREATE TABLE IF NOT EXISTS config (param TEXT UNIQUE, desc TEXT, value TEXT);'
+        sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version           
+    else: 
+        rows = sqlRun("select value from config where param='cfg_version'")
+        if not rows: # Version < 0.4.4
+            sql += 'ALTER TABLE records ADD COLUMN rmask INTEGER DEFAULT 0;'
+            sql += "INSERT INTO config VALUES ('cfg_version', 'Program version', '%s');" % version           
+        else: # Versioning
+            oldver = rows[0][0]
+            if oldver<>version:
+                print "funny...."
+            
+#            sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version           
+        #if version=='0.4.4':   # no version entry in the DB
+#            if not sqlRun("select value from config where param='cfg_version'"):
+      
+
+    #rows = sqlRun("select value from config where param='cfg_version'")
+    #sql = ""
+    #if not rows:
+    #    if version=='0.4.4':   # no version entry in the DB
+    #        if sqlRun("select * from config"): # still, db is alive
+    #            sql += 'ALTER TABLE records ADD COLUMN rmask INTEGER DEFAULT 0;'
+    #    else:
+    #        sql += 'CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase UNIQUE, cpath TEXT, cenabled INTEGER);'
+    #        sql += 'CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER, rmask INTEGER);'    
+    #        sql += 'CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT);'
+    #        sql += 'CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT);'
+    #        sql += 'CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT, g_stop TEXT, g_desc TEXT, PRIMARY KEY (g_id, g_start, g_stop));'
+    #        sql += 'CREATE TABLE IF NOT EXISTS config (param TEXT UNIQUE, desc TEXT, value TEXT);'
+    #    sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version           
+    
     sqlRun(sql, -1, 1)
     return
     

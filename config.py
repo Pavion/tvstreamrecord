@@ -73,7 +73,7 @@ def getDict():
 def loadConfig():
     from sql import sqlRun
     sqlRun("INSERT OR IGNORE INTO config VALUES (?, ?, ?)",configuration,1)
-    rows = sqlRun("SELECT param, value FROM config")
+    rows = sqlRun("SELECT param, value FROM config WHERE param<>'cfg_version'")
     setConfig(rows)
     return
         

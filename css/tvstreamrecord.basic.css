@@ -86,6 +86,7 @@ th.cid { width: 40px; }
 th.cname { width: 300px; }
 
 th.rcontrols { width: 180px; }
+th.rrecu { width: 100px; }
 th.rtill { width: 15%; }
 th.rat { width: 15%; }
 
@@ -97,5 +98,8 @@ th.lout { width: 30px; }
     top: 5px;    
     right: 5%;    
 }
+
+[id^=wwd] { width: 13.3%; }
+[id^=wwd].ui-state-active { background: #accccc; }
 
 

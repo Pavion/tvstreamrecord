@@ -247,11 +247,26 @@ $(function() {
         $(this).css("width", w);		
 	});
 	
+    $("[id^=wwd]").each(function() { 
+    	$(this).live("click", function(event) {
+    	/*	if ($(this).hasClass("ui-state-active")) {
+    			$(this).removeClass("ui-state-active");
+    			$(this).css("background", "#accccc");    			
+    			    			//console.log("test");
+    		} else {
+    			$(this).addClass("ui-state-active");
+    			$(this).css("background", "#e6e6e6");    			
+    			
+    		}*/
+//    		console.log( $("#wwd0").attr("aria-pressed")  );
+    	});
+    });
+
     $("li").live("click", function(event) {
    		$("li").siblings().removeClass("ui-selected");        
    		$(this).addClass("ui-selected");
    		var ft = $(this).attr("fulltext");
-   		console.log (ft);
+   		//console.log (ft);
    		if (ft)   {
 			document.getElementById("ret").value = $(this).attr("rid");             
 			$("#dialog_content").html ( ft );	
@@ -272,7 +287,7 @@ $(function() {
     }
     $( "#dialog-form" ).dialog({
         autoOpen: false,
-        height: 310,
+        height: 350,
         width: 350,
         modal: true,
         buttons: {
@@ -288,18 +303,26 @@ $(function() {
                 bValid = bValid && checkRegexp( "timepicker_inline_div1", /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/, "Please use HH:MM format for this field" );
                 bValid = bValid && checkLength( "timepicker_inline_div2", "end time", 5, 5 );
                 bValid = bValid && checkRegexp( "timepicker_inline_div2", /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/, "Please use HH:MM format for this field" );
+                var mask = 0;
+                for (var i=0; i<7; i++) {
+                	if ( $("#wwd" + i).hasClass("ui-state-active") ) {
+                		mask += Math.pow(2, i);
+                	} 
+                }
+                //console.log(mask);
                 if ( bValid ) {
                     $( this ).dialog( "close" );                    
                     var akt = 0;
                     if ($("#switch00").attr("checked") == "checked") {akt = 1;}
-                    //alert (document.getElementById("timepicker_inline_div1").value);
+                    //alert (document.getElementById("timepicker_inline_div1").value);                    
                     post("/create", { 
                         recname:document.getElementById("recname").value, 
                         Sender:document.getElementById("channel").value, 
                         von:document.getElementById("timepicker_inline_div1").value, 
                         bis:document.getElementById("timepicker_inline_div2").value, 
                         am:document.getElementById("datepicker").value, 
-                        aktiv:akt 
+                        aktiv:akt,
+                        recurr:mask//document.getElementById("recurrinp").value
                     }, 1); 
                 }
             },
@@ -434,6 +457,9 @@ $(function() {
             event.preventDefault();
         });
        
+
+ 	$( "#wday" ).button();
+	$( "#weekday" ).buttonset();
   
  	$('#clist').dataTable({
         "bJQueryUI": true,
@@ -457,9 +483,9 @@ $(function() {
         "sPaginationType": "full_numbers",
         "bProcessing": true,
         "sAjaxSource": "/getrecordlist",
-        "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 5,6,7,8 ] },
-        				  { "iDataSort": 7, "aTargets": [ 2 ] }, 
-        				  { "iDataSort": 8, "aTargets": [ 3 ] } ],
+        "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 6,7,8,9 ] },
+        				  { "iDataSort": 8, "aTargets": [ 2 ] }, 
+        				  { "iDataSort": 9, "aTargets": [ 3 ] } ],
         "fnDrawCallback": function( oSettings ) {
             initSwitch();
             initIcons();
@@ -468,11 +494,11 @@ $(function() {
         },
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {        
             var chk = "";
-            if (aData[4] == 1) chk = 'checked="checked"';
-            htmltext  = '<div id="progressbar' + aData[5] + '"></div>';
-            htmltext += '<input type="checkbox" class="switch icons" id="switch-' + aData[6] + '" ' + chk + ' />';  
-			htmltext += '<a href="#" id="icons-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>';                        
-            $('td:eq(4)', nRow).html(htmltext);            
+            if (aData[5] == 1) chk = 'checked="checked"';
+            htmltext  = '<div id="progressbar' + aData[6] + '"></div>';
+            htmltext += '<input type="checkbox" class="switch icons" id="switch-' + aData[7] + '" ' + chk + ' />';  
+			htmltext += '<a href="#" id="icons-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>';                        
+            $('td:eq(5)', nRow).html(htmltext);            
         },
         "fnInitComplete": function() {
 		 	this.fnSort([ [2,'desc'] ]);        	

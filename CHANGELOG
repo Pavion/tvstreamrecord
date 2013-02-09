@@ -1,5 +1,8 @@
-2013-02-06 0.4.3 About page and Wiki added, recorded file extension fixed and now changeable
+2013-02-06 0.4.3 Recurrent records are now available
+
+2013-02-06 0.4.3 About page and Wiki added, recorded file extension fixed and now configurable
 				 Default sorting column for all tables implemented				 
+				 Old records will be shown and must be purged manually
 				 
 2013-02-04 0.4.3 CherryPy Server implemented for better stability under load
  

@@ -33,7 +33,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.4.3' 
+version = '0.4.4' 
 
 @route('/log.txt')
 def server_static7():
@@ -53,6 +53,17 @@ def server_static4(filename):
 @route('/images/<filename>')
 def server_static5(filename):
     return static_file(filename, root='./images')
+
+#------------------------------- Recurring records -------------------------------
+weekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
+def getWeekdays(i):
+    if i==0: i=127
+    l = []
+    s = bin(i)[2:]
+    while len(s)<7: s = '0'+s
+    s = s[::-1]    
+    for c in s: l.append(c=='1')
+    return l
 
 #------------------------------- Main menu -------------------------------
 
@@ -167,7 +178,7 @@ def config_p():
 
 @route('/config')
 def config_s():    
-    return template('config', rows=sqlRun('SELECT * FROM config'))
+    return template('config', rows=sqlRun("SELECT * FROM config WHERE param<>'cfg_version'"))
 
 #------------------------------- EPG -------------------------------
     
@@ -240,9 +251,17 @@ def epg_s():
 @route('/getrecordlist')
 def getrecordlist():
     l = []
-    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis FROM channels, records where channels.rowid=records.cid ORDER BY rvon")     
+    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis FROM channels, records where channels.rowid=records.cid ORDER BY rvon")     
     for row in rows:
-        l.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]])
+        rec = ""
+        if row[4]==0: 
+            rec = "no"
+        else: 
+            wd = getWeekdays(row[4])
+            for index, item in enumerate(wd): 
+                if item: 
+                    rec += weekdays[index]
+        l.append([row[0], row[1], row[2], row[3], rec, row[5], row[6], row[7], row[8], row[9]])
     return json.dumps({"aaData": l } )
 
 @route('/records')
@@ -254,7 +273,7 @@ def records_p():
     what = request.forms.get("what")
     myid = request.forms.get("myid")
     if what=="-2":
-        sqlRun("DELETE FROM records WHERE datetime(rbis)<datetime('now', 'localtime')")
+        sqlRun("DELETE FROM records WHERE datetime(rbis)<datetime('now', 'localtime') AND NOT rmask>0")
     if what=="-1":
         sqlRun("DELETE FROM records WHERE records.rowid=%s" % (myid))
     else: 
@@ -266,7 +285,7 @@ def records_p():
     
 @post('/createepg')
 def createepg():
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
     setRecords()        
     redirect("/records")
     return 
@@ -279,6 +298,8 @@ def create_p():
     bis = request.forms.bis
     am = request.forms.am
     aktiv = getBool(request.forms.aktiv)    
+    recurr = request.forms.recurr
+    #print recurr
 
     d_von = datetime.strptime(am + " " + von, "%d.%m.%Y %H:%M")
     d_bis = datetime.strptime(am + " " + bis, "%d.%m.%Y %H:%M")
@@ -286,7 +307,7 @@ def create_p():
     if d_bis < d_von:
         d_bis = d_bis + delta         
     
-    sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, ?)", (recname, sender, d_von, d_bis, aktiv))
+    sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", (recname, sender, d_von, d_bis, aktiv, recurr))
     
     setRecords()
     
@@ -298,12 +319,14 @@ def getBool(stri):
         r = 1
     return r
 
+    
 class record(threading.Thread):
     running = 0
     id = -1
     stopflag = 0 
     timer = None
     name = ""
+    mask = 0
         
     def __init__(self, row):
         threading.Thread.__init__(self)
@@ -312,6 +335,17 @@ class record(threading.Thread):
         self.bis = datetime.strptime(row[3],"%Y-%m-%d %H:%M:%S")        
         self.name = row[5]        
         self.url = row[1]
+        self.mask = row[6]
+        if self.mask > 0:
+            w = self.bis.weekday()
+            if not (self.bis>=datetime.now() and getWeekdays(self.mask)[w]):
+                delta = timedelta(days=1)
+                while not (self.bis>=datetime.now() and getWeekdays(self.mask)[w]):
+                    self.von = self.von + delta
+                    self.bis = self.bis + delta
+                    w = self.bis.weekday()    
+                print "Recurrent record '%s' moved to %s" % (self.name, self.von)
+                sqlRun("UPDATE records SET rvon='%s', rbis='%s' WHERE rowid=%d" % (datetime.strftime(self.von,"%Y-%m-%d %H:%M:%S"), datetime.strftime(self.bis,"%Y-%m-%d %H:%M:%S"), self.id ) )    
     
     def run(self): 
         td = self.von-datetime.now()
@@ -342,6 +376,11 @@ class record(threading.Thread):
                 f.write(mybuffer)
             f.close()
             print "\nRecord: '%s' ended" % (self.name)
+            if self in records: records.remove(self) 
+            if self.mask > 0:
+                print (self in records)
+                rectimer = threading.Timer(5, setRecords)
+                rectimer.start()
     
     def stop(self):
         if self.running==0:
@@ -350,7 +389,8 @@ class record(threading.Thread):
         print "\nRecord: Stopflag for '%s' received" % (self.name)
    
 def setRecords():    
-    rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname FROM channels, records where channels.rowid=records.cid AND datetime(rbis)>=datetime('now', 'localtime') AND renabled = 1 ORDER BY datetime(rvon)")
+    #print "doof"
+    rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask FROM channels, records where channels.rowid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
     for row in rows: 
         chk = False
         for t in records:
@@ -372,8 +412,9 @@ def setRecords():
             t.stop()
             del records[index]
 
+           
 print "Initializing database..."
-sqlCreateAll()
+sqlCreateAll(version)
 purgeDB()          
 print "Initializing config..."
 config.loadConfig()
@@ -382,7 +423,6 @@ setRecords()
     
 print "Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port)
 run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
-
 
 print "Server aborted. Stopping all records before exiting"
 for t in records:

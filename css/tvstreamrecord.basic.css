@@ -84,6 +84,7 @@ div#about {font-size:150%;}
 th.ccontrols { width: 80px; }
 th.cid { width: 40px; }
 th.cname { width: 300px; }
+th.cext { width: 50px; }
 
 th.rcontrols { width: 180px; }
 th.rrecu { width: 100px; }

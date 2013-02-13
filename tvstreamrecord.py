@@ -27,13 +27,16 @@ import json
 import urllib2
 import threading 
 from mylogging import logInit, logRenew, logStop
+from rtmplite.rtmpclient import copy, setStop
+from rtmplite import multitask
+
 
 records = []    
 localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.4.4' 
+version = '0.4.4a' 
 
 @route('/log.txt')
 def server_static7():
@@ -107,9 +110,9 @@ def log_get():
 @route('/channellist')
 def chanlist():
     l = []
-    rows=sqlRun('SELECT channels.rowid, cname, cpath, cenabled FROM channels')    
+    rows=sqlRun('SELECT channels.rowid, cname, cpath, cext, cenabled FROM channels')    
     for row in rows:
-        l.append([row[0], row[1], row[2], row[3]])
+        l.append([row[0], row[1], row[2], row[3], row[4]])
     return json.dumps({"aaData": l } )
 
 @route('/list')
@@ -135,7 +138,11 @@ def createchannel():
     cname = request.forms.cname
     cpath = request.forms.cpath
     aktiv = getBool(request.forms.aktiv)
-    sqlRun("INSERT INTO channels VALUES (?, ?, ?)", (cname, cpath, aktiv))
+    cext = request.forms.cext
+    print cext
+    if not cext=='': 
+        if cext[0:1]<>'.': cext = '.' + cext
+    sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?)", (cname, cpath, aktiv, cext))
     return
     
 @post('/upload')
@@ -160,7 +167,7 @@ def upload_p():
                 if i % 2 == 1:
                     retl.append([name, line]) 
                     name = ""
-        sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1')", retl, 1)             
+        sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '')", retl, 1)             
             
     redirect("/list") 
 
@@ -327,6 +334,7 @@ class record(threading.Thread):
     timer = None
     name = ""
     mask = 0
+    ext = ""
         
     def __init__(self, row):
         threading.Thread.__init__(self)
@@ -336,6 +344,10 @@ class record(threading.Thread):
         self.name = row[5]        
         self.url = row[1]
         self.mask = row[6]
+        if row[7]=='':
+            self.ext = config.cfg_file_extension
+        else:
+            self.ext = row[7]
         if self.mask > 0:
             w = self.bis.weekday()
             if not (self.bis>=datetime.now() and getWeekdays(self.mask)[w]):
@@ -357,40 +369,54 @@ class record(threading.Thread):
         
     def doIt(self):
         self.running = 1
-        block_sz = 8192
-        print "\nRecord: '%s' started" % (self.name)
-        u = urllib2.urlopen(self.url)
         fn = config.cfg_recordpath+datetime.now().strftime("%Y%m%d%H%M%S") + " - "        
         fn = fn + "".join([x if x.isalnum() else "_" for x in self.name])
-        #print fn
-        try:
-            f = open(fn+config.cfg_file_extension, 'wb')
-        except:
-            print "\nOutput file %s can't be created. Please check your settings." % (fn+".mkv")  
-            pass
-        else:
-            while self.bis > datetime.now() and self.stopflag==0:
-                mybuffer = u.read(block_sz)
-                if not mybuffer:
-                    break
-                f.write(mybuffer)
-            f.close()
-            print "\nRecord: '%s' ended" % (self.name)
-            if self in records: records.remove(self) 
-            if self.mask > 0:
-                print (self in records)
-                rectimer = threading.Timer(5, setRecords)
-                rectimer.start()
+        fn = fn + self.ext
+        if self.url.lower()[0:4]=='rtmp':
+            delta = self.bis - datetime.now()
+            #experimental RTMP support
+            print "\nRTMP Record: '%s' started" % (self.name)
+            try:                
+                multitask.add(copy(self.url, fn))
+                multitask.run()
+                stoptimer = threading.Timer(delta.total_seconds(), setStop)
+                stoptimer.start()    
+            except:
+                pass
+            
+        else:        
+            block_sz = 8192
+            print "\nRecord: '%s' started" % (self.name)
+            u = urllib2.urlopen(self.url)
+            #print fn
+            try:
+                f = open(fn, 'wb')
+            except:
+                print "\nOutput file %s can't be created. Please check your settings." % (fn+".mkv")  
+                pass
+            else:
+                while self.bis > datetime.now() and self.stopflag==0:
+                    mybuffer = u.read(block_sz)
+                    if not mybuffer:
+                        break
+                    f.write(mybuffer)
+                f.close()
+                print "\nRecord: '%s' ended" % (self.name)
+                if self in records: records.remove(self) 
+                if self.mask > 0:
+                    print (self in records)
+                    rectimer = threading.Timer(5, setRecords)
+                    rectimer.start()
     
     def stop(self):
         if self.running==0:
             self.timer.cancel()
         self.stopflag = 1
+        setStop()
         print "\nRecord: Stopflag for '%s' received" % (self.name)
    
 def setRecords():    
-    #print "doof"
-    rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask FROM channels, records where channels.rowid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
+    rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.rowid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
     for row in rows: 
         chk = False
         for t in records:

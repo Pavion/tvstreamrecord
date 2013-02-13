@@ -379,7 +379,7 @@ $(function() {
     
     $( "#createchannel-form" ).dialog({
         autoOpen: false,
-        height: 195,
+        height: 240,
         width: 250,
         modal: true,
         buttons: {
@@ -389,7 +389,8 @@ $(function() {
                 if ($("#switch01").attr("checked") == "checked") {akt = 1;}
                 post("/create_channel", { 
                     cname:document.getElementById("cname").value, 
-                    cpath:document.getElementById("cpath").value, 
+                    cpath:document.getElementById("cpath").value,
+                    cext: document.getElementById("cext").value,
                     aktiv:akt 
                 }, 1);                                 
             },
@@ -473,8 +474,8 @@ $(function() {
         },
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {        
             var chk = "";
-            if (aData[3] == 1) chk = 'checked="checked"';
-            $('td:eq(3)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>');            
+            if (aData[4] == 1) chk = 'checked="checked"';
+            $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>');            
         }        
     }); 
     
@@ -516,11 +517,11 @@ $(function() {
         } 
     }); 
     
-    $(window).bind('resize', function () {
+/*    $(window).bind('resize', function () {
     	$('#loglist').dataTable().fnAdjustColumnSizing();
     	$('#recordlist').dataTable().fnAdjustColumnSizing();
     	$('#clist').dataTable().fnAdjustColumnSizing();
-  	} );
+  	} );*/
     
             
 });

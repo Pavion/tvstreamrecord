@@ -20,16 +20,15 @@ from bottle import CherryPyServer
 from bottle import route, run, template, post, request
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
+import subprocess
 import config
 from sql import sqlRun, sqlCreateAll, purgeDB
 import xmltv
 import json
 import urllib2
 import threading 
+import os
 from mylogging import logInit, logRenew, logStop
-from rtmplite.rtmpclient import copy, setStop
-from rtmplite import multitask
-
 
 records = []    
 localdatetime = "%d.%m.%Y %H:%M:%S"
@@ -70,10 +69,10 @@ def getWeekdays(i):
 
 #------------------------------- Main menu -------------------------------
 
-@route('/')
-def main_s():
-    return records_s()
+#def main_s():
+#    return about_s()
 
+@route('/')
 @route('/about')
 def about_s():    
     return template('about', ver = version)
@@ -139,7 +138,6 @@ def createchannel():
     cpath = request.forms.cpath
     aktiv = getBool(request.forms.aktiv)
     cext = request.forms.cext
-    print cext
     if not cext=='': 
         if cext[0:1]<>'.': cext = '.' + cext
     sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?)", (cname, cpath, aktiv, cext))
@@ -335,6 +333,7 @@ class record(threading.Thread):
     name = ""
     mask = 0
     ext = ""
+    process = None
         
     def __init__(self, row):
         threading.Thread.__init__(self)
@@ -342,7 +341,7 @@ class record(threading.Thread):
         self.von = datetime.strptime(row[2],"%Y-%m-%d %H:%M:%S")
         self.bis = datetime.strptime(row[3],"%Y-%m-%d %H:%M:%S")        
         self.name = row[5]        
-        self.url = row[1]
+        self.url = row[1].strip()
         self.mask = row[6]
         if row[7]=='':
             self.ext = config.cfg_file_extension
@@ -373,22 +372,25 @@ class record(threading.Thread):
         fn = fn + "".join([x if x.isalnum() else "_" for x in self.name])
         fn = fn + self.ext
         if self.url.lower()[0:4]=='rtmp':
-            delta = self.bis - datetime.now()
+            if (os.name == "posix"):
+                devnull = open('/dev/null', 'w')
+                #ffmpeg_path =  'ffmpeg'
+            elif (os.name == 'nt'):
+                devnull = open('nul', 'w')                               
+                #ffmpeg_path = 'c:/programmkopien/ffmpeg/ffmpeg'
             #experimental RTMP support
-            print "\nRTMP Record: '%s' started" % (self.name)
-            try:                
-                multitask.add(copy(self.url, fn))
-                multitask.run()
-                stoptimer = threading.Timer(delta.total_seconds(), setStop)
-                stoptimer.start()    
-            except:
-                pass
-            
+            delta = self.bis - datetime.now()
+            deltasec = '%d' % delta.total_seconds()
+            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-t', deltasec, '-acodec', 'copy', '-vcodec', 'copy',  fn] 
+            print 'RTMP record %s: ffmpeg called with:' % self.name
+            print attr
+            self.process = subprocess.Popen(attr, stdout=devnull, stderr=devnull)
+            self.process.wait()
+            print 'RTMP record %s ended' % self.name
         else:        
             block_sz = 8192
             print "\nRecord: '%s' started" % (self.name)
             u = urllib2.urlopen(self.url)
-            #print fn
             try:
                 f = open(fn, 'wb')
             except:
@@ -412,7 +414,10 @@ class record(threading.Thread):
         if self.running==0:
             self.timer.cancel()
         self.stopflag = 1
-        setStop()
+        if not self.process==None:
+            if self.process.poll()==None:            
+                self.process.terminate()
+        if self in records: records.remove(self)
         print "\nRecord: Stopflag for '%s' received" % (self.name)
    
 def setRecords():    
@@ -428,7 +433,8 @@ def setRecords():
             thread.start()
             records.append(thread)
         
-    for index, t in enumerate(records[:]):
+    #for index, t in enumerate(records[:]):
+    for t in records:
         chk = False
         for row in rows: 
             if t.id == row[0]:
@@ -436,7 +442,7 @@ def setRecords():
                 break
         if chk == False:
             t.stop()
-            del records[index]
+            #del records[index]
 
            
 print "Initializing database..."
@@ -448,7 +454,7 @@ print "Initializing records..."
 setRecords()
     
 print "Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port)
-run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
+run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=False)
 
 print "Server aborted. Stopping all records before exiting"
 for t in records:

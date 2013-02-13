@@ -56,8 +56,14 @@ configuration = [
 'cfg_file_extension',
 'File extension for the recorded stream (default=".ts")',
 '.ts'
-]
+],
                  
+[
+'cfg_ffmpeg_path',
+'Full path to ffmpeg for other streams support',
+'ffmpeg'
+]
+
 ]
 
 for config in configuration:

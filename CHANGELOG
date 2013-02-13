@@ -1,4 +1,8 @@
-2013-02-06 0.4.3 Recurrent records are now available
+2013-02-13 0.4.5 Channel file extension added
+                 Experimental ffmpeg support for rtmp streams
+                 Python check removed 
+
+2013-02-06 0.4.4 Recurrent records are now available
 
 2013-02-06 0.4.3 About page and Wiki added, recorded file extension fixed and now configurable
 				 Default sorting column for all tables implemented				 

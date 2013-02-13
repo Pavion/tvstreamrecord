@@ -28,7 +28,8 @@ You shouldn't need any special permissions.</p></li>
 <i>Path for your recordings</i> is a vital setting and should be set. On Synology DS you can use any shared folder, which can be accessed with the root user (e.g. /volume1/common/). On Windows systems you can use any path (e.g. d:\records\). Be sure to close your path string with an path char (/ or \), as the path string will be added to the filename. Otherwise you can use this to add prefixes to your recordings. As example, providing the path <i>/volume1/films/rec</i> will result in files with names: rec20130101000000<br />
 <i>Server bind address</i> is exactly what it says. Default 0.0.0.0 will make your server available from any local address. Any other choices (i.e. 127.0.0.1) may be used to limit the access. This setting should not normally be changed. Changing it requires restart.<br />
 <i>Server port</i> is the port the server runs on. You can change it, if you need it. Changing it requires restart.<br />
-<i>File extension for the recorded stream</i> will be added to the filename. Mostly it would be MPEG transport stream (.ts). Changing this parameter doesn't change anything beside filename.</p></li>
+<i>File extension for the recorded stream</i> will be added to the filename. Mostly it would be MPEG transport stream (.ts). Changing this parameter doesn't change anything beside filename.<br />
+<i>Full path to ffmpeg</i> is needed for experimental <i>ffmpeg</i> support. <i>ffmpeg</i> is not included within this software. On Synology DS is <i>ffmpeg</i> preinstalled.</p></li>
 <li><p><b>Channels adding and importing</b></p>
 <p>As for now you have two ways to add channels. You can normally add a channel by providing its name and URL or you can import an .m3u playlist. With Elgato EyeTV Netstream you can export your channel list from the device page and import the file in my software. You can also use other .m3u with following syntax:<br /><i>
 #EXTM3U<br />

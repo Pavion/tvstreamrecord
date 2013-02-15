@@ -35,7 +35,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.4.4a' 
+version = '0.4.5' 
 
 @route('/log.txt')
 def server_static7():
@@ -187,10 +187,16 @@ def config_s():
 
 #------------------------------- EPG -------------------------------
     
+epgrunning = False    
 @post('/getepg')
 def getepg():
-    thread = epgthread() 
-    thread.start()
+    global epgrunning
+    if not epgrunning:     
+        epgrunning = True  
+        mythread = epgthread()
+        mythread.start()
+    else:
+        print "EPG import already running, please be patient"
     return 
 
 class epgthread(threading.Thread):
@@ -199,7 +205,9 @@ class epgthread(threading.Thread):
 
     def run(self):
         xmltv.getProgList(version)
-
+        global epgrunning
+        epgrunning = False
+        
 @post('/epg')
 def epg_p():    
     day = request.forms.datepicker3
@@ -454,7 +462,7 @@ print "Initializing records..."
 setRecords()
     
 print "Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port)
-run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=False)
+run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
 
 print "Server aborted. Stopping all records before exiting"
 for t in records:

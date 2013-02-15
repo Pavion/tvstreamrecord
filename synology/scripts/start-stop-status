@@ -2,6 +2,21 @@
 
 [ ${SYNOPKG_PKGDEST} ] || SYNOPKG_PKGDEST=`ls -l /var/packages/tvstreamrecord/target | cut -d\> -f2 | cut -d\  -f2`
 
+findpython() {
+    TVSTREAMRECORD_PYTHON='python'
+    type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
+        TVSTREAMRECORD_PYTHON='/volume1/@appstore/python/bin/python'
+        type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
+            TVSTREAMRECORD_PYTHON='/usr/local/python26/bin/python'
+            type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
+                exit 1
+            }
+        }
+    }
+}
+
+
+
 stop() {
 	PID=`ps | grep 'python [t]vstreamrecord.py' | cut -c 1-5`
     kill ${PID}
@@ -15,7 +30,8 @@ stop() {
 case $1 in
 	start)
 		cd ${SYNOPKG_PKGDEST}
-        nohup python tvstreamrecord.py >/dev/null 2>&1 &
+        findpython        
+        nohup ${TVSTREAMRECORD_PYTHON} tvstreamrecord.py >/dev/null 2>&1 &
         exit 0
 	;;
 	stop)	stop

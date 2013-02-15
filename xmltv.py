@@ -32,7 +32,7 @@ def getProgList(ver=''):
     global version
     version = ver    
     print "tvstreamrecord v.%s / XMLTV import started" % version
-    stri = getFile(config.cfg_xmltvinitpath)
+    stri = getFile(config.cfg_xmltvinitpath, 1)
     if stri:    
         tree = et.fromstring(stri)
         for dict_el in tree.iterfind('channel'):
@@ -84,7 +84,7 @@ def getProg(p_id):
             sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
         sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
         
-def getFile(file_in):
+def getFile(file_in, override=0):
     rows=sqlRun("SELECT * FROM caching WHERE url='%s'" % file_in)    
     lastmod = ""
     etag = "" 
@@ -97,8 +97,9 @@ def getFile(file_in):
         httplib.HTTPConnection.debuglevel = 1                            
         request = urllib2.Request(file_in)
         request.add_header('User-Agent', 'tvstreamrecord/' + version)
-        request.add_header('If-Modified-Since', lastmod)
-        request.add_header('If-None-Match', etag)    
+        if override==0:
+            request.add_header('If-Modified-Since', lastmod)
+            request.add_header('If-None-Match', etag)                
         opener = urllib2.build_opener()
         response = opener.open(request)
         feeddata = response.read()        

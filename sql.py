@@ -71,8 +71,6 @@ def sqlCreateAll(version):
             oldver = rows[0][0]
             if oldver<>version:
                 if oldver < '0.4.4a':
-                    #extq = sqlRun("SELECT value FROM config WHERE param='cfg_file_extension'")
-                    #ext = extq[0][0]
                     sql += "ALTER TABLE channels ADD COLUMN cext TEXT DEFAULT '';" 
                 if oldver > version:
                     print "Critical error: Version mismatch!!!"     

@@ -1,6 +1,7 @@
 2013-02-13 0.4.5 Channel file extension added
                  Experimental ffmpeg support for rtmp streams
-                 Python check removed 
+                 Python check removed, support for other Pythons added
+                 EPG check for new added channels can be called anytime and has a running check  
 
 2013-02-06 0.4.4 Recurrent records are now available
 

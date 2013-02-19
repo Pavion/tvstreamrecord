@@ -18,7 +18,7 @@ findpython() {
 
 
 stop() {
-	PID=`ps | grep 'python [t]vstreamrecord.py' | cut -c 1-5`
+	PID=`ps -w | grep 'python [t]vstreamrecord.py' | cut -c 1-5`
     kill ${PID}
 	sleep 3
 	kill -2 ${PID}	

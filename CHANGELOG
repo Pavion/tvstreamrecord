@@ -1,3 +1,5 @@
+2013-02-19 0.4.6 Stream types, which should be forwarded to FFMPEG, are now configurable 
+
 2013-02-13 0.4.5 Channel file extension added
                  Experimental ffmpeg support for rtmp streams
                  Python check removed, support for other Pythons added

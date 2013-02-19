@@ -62,8 +62,14 @@ configuration = [
 'cfg_ffmpeg_path',
 'Full path to ffmpeg for other streams support',
 'ffmpeg'
-]
+],
 
+[
+'cfg_ffmpeg_types',
+'Stream types, which should be forwarded to ffmpeg (space separated)',
+'rtmp rtp'
+]
+                 
 ]
 
 for config in configuration:

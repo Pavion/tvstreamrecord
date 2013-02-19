@@ -35,7 +35,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.4.5' 
+version = '0.4.6' 
 
 @route('/log.txt')
 def server_static7():
@@ -379,22 +379,22 @@ class record(threading.Thread):
         fn = config.cfg_recordpath+datetime.now().strftime("%Y%m%d%H%M%S") + " - "        
         fn = fn + "".join([x if x.isalnum() else "_" for x in self.name])
         fn = fn + self.ext
-        if self.url.lower()[0:4]=='rtmp':
+        fftypes = config.cfg_ffmpeg_types
+        fftypes = fftypes.lower().split()
+        streamtype = self.url.lower().split(':', 1)[0]
+        if streamtype in fftypes: 
             if (os.name == "posix"):
                 devnull = open('/dev/null', 'w')
-                #ffmpeg_path =  'ffmpeg'
             elif (os.name == 'nt'):
                 devnull = open('nul', 'w')                               
-                #ffmpeg_path = 'c:/programmkopien/ffmpeg/ffmpeg'
-            #experimental RTMP support
             delta = self.bis - datetime.now()
             deltasec = '%d' % delta.total_seconds()
             attr = [config.cfg_ffmpeg_path,"-i", self.url, '-t', deltasec, '-acodec', 'copy', '-vcodec', 'copy',  fn] 
-            print 'RTMP record %s: ffmpeg called with:' % self.name
+            print "FFMPEG (%s) record '%s' called with:" % (streamtype, self.name)
             print attr
             self.process = subprocess.Popen(attr, stdout=devnull, stderr=devnull)
             self.process.wait()
-            print 'RTMP record %s ended' % self.name
+            print 'FFMPEG record %s ended' % self.name
         else:        
             block_sz = 8192
             print "\nRecord: '%s' started" % (self.name)

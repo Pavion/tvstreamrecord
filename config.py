@@ -68,7 +68,13 @@ configuration = [
 'cfg_ffmpeg_types',
 'Stream types, which should be forwarded to ffmpeg (space separated)',
 'rtmp rtp'
-]
+],
+                 
+[
+'cfg_ffmpeg_params',
+"Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')",
+'-acodec copy -vcodec copy'
+]                 
                  
 ]
 

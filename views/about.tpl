@@ -29,7 +29,23 @@ You shouldn't need any special permissions.</p></li>
 <i>Server bind address</i> is exactly what it says. Default 0.0.0.0 will make your server available from any local address. Any other choices (i.e. 127.0.0.1) may be used to limit the access. This setting should not normally be changed. Changing it requires restart.<br />
 <i>Server port</i> is the port the server runs on. You can change it, if you need it. Changing it requires restart.<br />
 <i>File extension for the recorded stream</i> will be added to the filename. Mostly it would be MPEG transport stream (.ts). Changing this parameter doesn't change anything beside filename.<br />
-<i>Full path to ffmpeg</i> is needed for experimental <i>ffmpeg</i> support. <i>ffmpeg</i> is not included within this software. On Synology DS is <i>ffmpeg</i> preinstalled and the default value should not be changed.</p></li>
+<i>Full path to ffmpeg</i> is needed for experimental <i>ffmpeg</i> support. <i>ffmpeg</i> is not included within this software. On Synology DS is <i>ffmpeg</i> preinstalled and the default value should not be changed.<br />
+<i>Stream types</i> would be forwarded to ffmpeg. If your stream can be recorded with, you can add its prefix here.<br />
+<i>Additional output arguments for ffmpeg</i> can be used to change your output. Please check next part for details.</p></li>
+<li><p><b>FFMPEG support</b></p>
+<p>This software can forward your streams to external software <a href='http://www.ffmpeg.org/'>ffmpeg</a> thus providing support for non-HTTP streams. If you can record your stream with ffmpeg, you can also do it through my software. On Synology systems ffmpeg is preinstalled, for other systems please check <a href='http://www.ffmpeg.org/'>ffmpeg</a> page. Here is a small tutorial for checking and adding your stream support:<br />
+<ul>
+<li>Make sure, that you have ffmpeg installed by running ffmpeg from the console. You should see no error but ffmpeg output. You may need to download and install ffmpeg for your operating system first and provide full path to this installation (e.g. c:\ffmpeg\ffmpeg.exe)</li>	
+<li>Check your stream foo://10.0.0.1:1000 with following command:<br />
+<i>ffmpeg -i foo://10.0.0.1:1000 -t 30 -acodec copy -vcodec copy out.mpg</i><br />
+If it works, you should be able to locate the generated file out.mpg in current folder. Else you should check for any errors in console output. Make sure that you've provided an correct extension for your stream (.ts, .mpg, .avi, .mk4, .mkv and such): ffmpeg uses this to determine output file type. Look into ffmpeg documentation and experiment with your stream till you get your file. I ask you to understand that I'm unable to test any possible stream myself or to provide any technical support for ffmpeg.</li>   
+<li>If you've got your file and can play it with your favorite media player, you can now add your stream type at the 'Config' page (e.g. rtmp rtm foo).</li>	
+<li>Check your ffmpeg path at config page.</li>	
+<li>If you want to provide additional output arguments for ffmpeg, you can also do it in config. First arguments are always <i>-i inputstreamname -t recordduration</i> and last argument <i>outputstreamname.extension</i> (you will see all arguments used in my log file after each ffmpeg recording).</li>	
+<li>You can now create a channel with some name, your stream address and your file extension.</li>
+<li>Congratulation, you can now start using this software.</li>
+</ul>          	
+</p>	
 <li><p><b>Channels adding and importing</b></p>
 <p>As for now you have two ways to add channels. You can normally add a channel by providing its name and URL or you can import an .m3u playlist. With Elgato EyeTV Netstream you can export your channel list from the device page and import the file in my software. You can also use other .m3u with following syntax:</p>
 <p><i>
@@ -43,7 +59,7 @@ You shouldn't need any special permissions.</p></li>
 </i></p>
 <p>
 Please note that for using XMLTV the channel names should be the same as those from your XMLTV provider (e.g. 'channel name 1' and not epg.channel1.com). <br />
-You can add an file extension while creating new channels. This file extension will be simply added at the end of the file name. While importing from .m3u you can't specify any file extension. In case of empty extension the default one from configuration will be used automatically. </p>
+You can add an file extension while creating new channels. This file extension will be simply added at the end of the file name. If you're using ffmpeg, file extension may be crucial for determining your output type. While importing from .m3u you can't specify any file extension. In case of empty extension the default one from configuration will be used automatically. </p>
 <li><p><b>EPG import</b></p>
 <p>If you have a free XMLTV provider from your region, you should add his address in config. Now you should be able to import EPG by pressing the corresponding button one time. Please just one time. As for now there is no direct feedback for this feature and full synchronisation takes some time, please check the log file for the progress or error status. The only provider tested is <a href="http://xmltv.spaetfruehstuecken.org/xmltv/">Egon zappt</a>. As I'm following <a href="http://www.oztivo.net/twiki/bin/view/TVGuide/StaticXMLGuideAPI">OzTiVo rules</a> to grab EPG data, you can receive new data only, which would normally be refreshed one time a day.</p>
 </li>
@@ -57,7 +73,7 @@ You can add an file extension while creating new channels. This file extension w
 <p><ul>
 <li>Flouwy for his support and inspiration</li>
 <li>Sideshowbob for his ffmpeg support idea and testing</li>
-<li>other supporters for their feedback and trust</li>
+<li>Honu, zamp411 and other supporters for their feedbacktrust</li>
 </ul>
 </p>
 </li>

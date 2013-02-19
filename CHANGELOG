@@ -1,4 +1,6 @@
-2013-02-19 0.4.6 Stream types, which should be forwarded to FFMPEG, are now configurable 
+2013-02-19 0.4.6 Stream types, which should be forwarded to ffmpeg, are now configurable
+                 ffmpeg output attributes now changeable
+                 Please check 'About' page for further info regarding ffmpeg support
 
 2013-02-13 0.4.5 Channel file extension added
                  Experimental ffmpeg support for rtmp streams

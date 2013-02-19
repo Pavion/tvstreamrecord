@@ -69,9 +69,6 @@ def getWeekdays(i):
 
 #------------------------------- Main menu -------------------------------
 
-#def main_s():
-#    return about_s()
-
 @route('/')
 @route('/about')
 def about_s():    
@@ -130,7 +127,6 @@ def list_p():
     return
 
 #------------------------------- Channel creation -------------------------------
-
 
 @post('/create_channel')
 def createchannel():
@@ -235,7 +231,6 @@ def epg_s():
     for row in rows:
         cid=row[1]
         rtemp = list()
-        #y+=1 
         c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid FROM guide WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND g_id='%s' ORDER BY g_start" % (todaysql, todaysql, row[0]))
         for event in c_rows:
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
@@ -312,7 +307,6 @@ def create_p():
     am = request.forms.am
     aktiv = getBool(request.forms.aktiv)    
     recurr = request.forms.recurr
-    #print recurr
 
     d_von = datetime.strptime(am + " " + von, "%d.%m.%Y %H:%M")
     d_bis = datetime.strptime(am + " " + bis, "%d.%m.%Y %H:%M")
@@ -382,6 +376,8 @@ class record(threading.Thread):
         fftypes = config.cfg_ffmpeg_types
         fftypes = fftypes.lower().split()
         streamtype = self.url.lower().split(':', 1)[0]
+        ffargs = config.cfg_ffmpeg_params
+        ffargs = ffargs.split()
         if streamtype in fftypes: 
             if (os.name == "posix"):
                 devnull = open('/dev/null', 'w')
@@ -389,12 +385,12 @@ class record(threading.Thread):
                 devnull = open('nul', 'w')                               
             delta = self.bis - datetime.now()
             deltasec = '%d' % delta.total_seconds()
-            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-t', deltasec, '-acodec', 'copy', '-vcodec', 'copy',  fn] 
+            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-t', deltasec] + ffargs + [fn] 
             print "FFMPEG (%s) record '%s' called with:" % (streamtype, self.name)
             print attr
             self.process = subprocess.Popen(attr, stdout=devnull, stderr=devnull)
             self.process.wait()
-            print 'FFMPEG record %s ended' % self.name
+            print "FFMPEG record '%s' ended" % self.name
         else:        
             block_sz = 8192
             print "\nRecord: '%s' started" % (self.name)
@@ -441,7 +437,6 @@ def setRecords():
             thread.start()
             records.append(thread)
         
-    #for index, t in enumerate(records[:]):
     for t in records:
         chk = False
         for row in rows: 
@@ -450,8 +445,6 @@ def setRecords():
                 break
         if chk == False:
             t.stop()
-            #del records[index]
-
            
 print "Initializing database..."
 sqlCreateAll(version)

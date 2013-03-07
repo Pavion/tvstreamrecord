@@ -35,7 +35,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.4.6' 
+version = '0.4.7' 
 
 @route('/log.txt')
 def server_static7():
@@ -388,9 +388,12 @@ class record(threading.Thread):
             attr = [config.cfg_ffmpeg_path,"-i", self.url, '-t', deltasec] + ffargs + [fn] 
             print "FFMPEG (%s) record '%s' called with:" % (streamtype, self.name)
             print attr
-            self.process = subprocess.Popen(attr, stdout=devnull, stderr=devnull)
-            self.process.wait()
-            print "FFMPEG record '%s' ended" % self.name
+            try:
+                self.process = subprocess.Popen(attr, stdout=devnull, stderr=devnull)
+                self.process.wait()
+                print "FFMPEG record '%s' ended" % self.name
+            except:
+                print "FFMPEG could not be started"
         else:        
             block_sz = 8192
             print "\nRecord: '%s' started" % (self.name)
@@ -409,10 +412,9 @@ class record(threading.Thread):
                 f.close()
                 print "\nRecord: '%s' ended" % (self.name)
                 if self in records: records.remove(self) 
-                if self.mask > 0:
-                    print (self in records)
-                    rectimer = threading.Timer(5, setRecords)
-                    rectimer.start()
+        if self.mask > 0:
+            rectimer = threading.Timer(5, setRecords)
+            rectimer.start()
     
     def stop(self):
         if self.running==0:
@@ -424,7 +426,7 @@ class record(threading.Thread):
         if self in records: records.remove(self)
         print "\nRecord: Stopflag for '%s' received" % (self.name)
    
-def setRecords():    
+def setRecords():
     rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.rowid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
     for row in rows: 
         chk = False

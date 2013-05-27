@@ -8,6 +8,7 @@
 <ol>
 <li><p><b>Introduction</b></p>
 <p>This software was designed to record http streams (TV and such). My goal was to be able to record streams from Elgato EyeTV Netstream with my NAS server so it's the primary objective of this software. Please note, that this software can't be used to record any videos from USB-based devices. A simply stream would be http://streamadress/stream000000 and will be recorded or grabbed as is. </p>
+<p>As reported, streams from Dreambox (800 HD) can also be used. Its stream URL should be like: <i>http://192.168.0.10:8001/1:0:1:6DCA:44D:1:C00000:0:0:0:</i></p>
 <p>Please note, that the recording of some streams may be forbidden by the law of your country or your local content provider. Author takes no responsibility for any records taken.</p>
 </li>
 <li><p><b>Installation on Synology DS systems</b></p>
@@ -73,6 +74,7 @@ You can add an file extension while creating new channels. This file extension w
 <p><ul>
 <li>Flouwy for his support and inspiration</li>
 <li>Sideshowbob for his ffmpeg support idea and testing</li>
+<li>plusulli for his Dreambox feedback</li>
 <li>Honu, zamp411 and other supporters for their feedbacktrust</li>
 </ul>
 </p>

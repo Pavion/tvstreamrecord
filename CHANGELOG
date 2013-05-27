@@ -1,3 +1,5 @@
+2013-05-27 0.4.8 URL length fixed / increased to 255
+
 2013-03-07 0.4.7 Recurrent FFMPEG records added/fixed 
 
 2013-02-19 0.4.6 Stream types, which should be forwarded to ffmpeg, are now configurable

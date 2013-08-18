@@ -3,6 +3,7 @@
 <h1>Channels:
 <button id="upload-user">Import</button>
 <button id="create-channel">Create</button>
+<button id="downcl">Download</button>
 </h1>
 <table id="clist"> <!-- <table id="users" class="ui-widget ui-widget-content">-->
 <thead>
@@ -11,19 +12,25 @@
 <th class="cname">Name</th>
 <th class="curl">URL</th>
 <th class="cext">Type</th>
-<th class="ccontrols">Active</th>
+<th class="ccontrols">Controls</th>
 </tr>
 </thead>
 <tbody>
 </tbody>
 </table>
 </div>
-<div id="dialog" title="Dialog Title">
+<div id="cldown" title="Channel list download">
+	<p><a href="channels.m3u">Download</a></p>
+</div>
+<div id="dialog" title="Options">
 	<p>Shall I delete this channel?</p>
 </div>
 <div id="createchannel-form" title="Create a new channel">
 <form>
 <fieldset>
+<label for="name">Channel ID</label>
+<input type="hidden" maxlength="5" id="prev" value=""/> 
+<input type="text" maxlength="5" id="ccid" class="text ui-widget-content ui-corner-all" name="ccid" value=""/> 
 <label for="name">Channel name</label>
 <input type="text" maxlength="30" id="cname" class="text ui-widget-content ui-corner-all" name="cname" value=""/> 
 <input type="checkbox" class="switch icons" id="switch01" checked="checked" />  

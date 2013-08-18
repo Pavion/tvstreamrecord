@@ -28,7 +28,7 @@ html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-si
 	}
 	[id^=icons-] span.ui-icon {
 		float: left;
-		margin: -1px -1px;
+		margin: -2px -2px;
 	}
 	.fakewindowcontain .ui-widget-overlay {
 		position: absolute;

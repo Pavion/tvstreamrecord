@@ -17,7 +17,7 @@
 """
 
 from bottle import CherryPyServer
-from bottle import route, run, template, post, request
+from bottle import route, run, template, post, request, response
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
 import subprocess
@@ -35,8 +35,11 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.4.8' 
+version = '0.5.0' 
 
+@route('/channels.m3u')
+def server_static8():
+    return static_file("/channels.m3u", root='')
 @route('/log.txt')
 def server_static7():
     return static_file("/log.txt", root='')
@@ -106,7 +109,7 @@ def log_get():
 @route('/channellist')
 def chanlist():
     l = []
-    rows=sqlRun('SELECT channels.rowid, cname, cpath, cext, cenabled FROM channels')    
+    rows=sqlRun('SELECT channels.cid, cname, cpath, cext, cenabled FROM channels')    
     for row in rows:
         l.append([row[0], row[1], row[2], row[3], row[4]])
     return json.dumps({"aaData": l } )
@@ -120,23 +123,72 @@ def list_p():
     what = request.forms.get("what")
     myid = request.forms.get("myid")
     if what=="-1":
-        sqlRun("DELETE FROM channels WHERE channels.rowid=%s" % (myid))
+        sqlRun("DELETE FROM channels WHERE channels.cid=%s" % (myid))
     else: 
-        sqlRun("UPDATE channels SET cenabled=%s WHERE channels.rowid=%s" % (what, myid))            
+        sqlRun("UPDATE channels SET cenabled=%s WHERE channels.cid=%s" % (what, myid))            
     setRecords()
     return
 
 #------------------------------- Channel creation -------------------------------
 
+@post('/clgen')
+def clgen_p():
+    #print "cccccccccccccc"
+    rows  = sqlRun("select cid, cname, cpath from channels where cenabled=1 ORDER BY cid")
+    #print "cccccccccccccc"
+    if rows:
+        print "cccccccccccccc"
+        f = open("channels.m3u", "w")
+        f.write("#EXTM3U\n")
+        for row in rows:
+            f.write("#EXTINF:0,"+row[1]+"\n")
+            f.write(row[2]+"\n")
+        f.close()
+        
+#        response.content_type = "application/force-download"
+#        response.add_header('Content-Disposition', 'attachment; filename="channels.m3u"')
+#        response.add_header("Content-Transfer-Encoding", "binary")
+#        response.content_length =9999
+#        
+    print "a"
+    redirect("/channels.m3u")
+    print "b"
+    return
+
 @post('/create_channel')
 def createchannel():
+    prev = request.forms.prev
+#    print prev
+    cid = request.forms.ccid
     cname = request.forms.cname
     cpath = request.forms.cpath
     aktiv = getBool(request.forms.aktiv)
     cext = request.forms.cext
     if not cext=='': 
         if cext[0:1]<>'.': cext = '.' + cext
-    sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?)", (cname, cpath, aktiv, cext))
+              
+       
+    rows3  = sqlRun("select cid from channels where cid=%s" % cid)
+    exists = False
+    if rows3: 
+        exists = True
+    
+    if prev!="":
+        if prev != cid and exists:
+            if prev < cid:          
+                sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))
+            else:            
+                sqlRun("UPDATE channels SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev))
+        sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s WHERE cid='%s'" % (cname, cid, cpath, cext, aktiv, prev))
+    else:
+        rows2 = sqlRun("select max(cid) from channels")
+        if rows2:
+            if exists:
+                sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s" % cid)            
+        else:
+            cid = 1
+        sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid))
+            
     return
     
 @post('/upload')
@@ -148,8 +200,14 @@ def upload_p():
     if header.startswith("#EXTM3U"):
         how = getBool(request.forms.get("switch00"))
         upfilecontent = upfile.file.read()        
+        rowid = 1
         if how==0:
             sqlRun('DELETE FROM channels')
+        else:
+            rows2 = sqlRun("select max(cid) from channels")
+            if rows2:
+                rowid = rows2[0][0]+1
+            
         lines = upfilecontent.splitlines()
         i = 0
         name = ""
@@ -159,9 +217,10 @@ def upload_p():
                 if i % 2 == 0: 
                     name = line.split(",",1)[1]
                 if i % 2 == 1:
-                    retl.append([name, line]) 
+                    retl.append([name, line, rowid])
+                    rowid = rowid + 1 
                     name = ""
-        sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '')", retl, 1)             
+        sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?)", retl, 1)             
             
     redirect("/list") 
 
@@ -227,7 +286,7 @@ def epg_s():
     global dayshown    
     todaysql = datetime.strftime(dayshown, "%Y-%m-%d %H:%M:%S")
     d_von = dayshown    
-    rows=sqlRun("SELECT guide.g_id, channels.rowid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY guide.g_id" % (todaysql, todaysql))
+    rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY guide.g_id" % (todaysql, todaysql))
     for row in rows:
         cid=row[1]
         rtemp = list()
@@ -259,7 +318,7 @@ def epg_s():
 @route('/getrecordlist')
 def getrecordlist():
     l = []
-    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis FROM channels, records where channels.rowid=records.cid ORDER BY rvon")     
+    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis FROM channels, records where channels.cid=records.cid ORDER BY rvon")     
     for row in rows:
         rec = ""
         if row[4]==0: 
@@ -274,7 +333,7 @@ def getrecordlist():
 
 @route('/records')
 def records_s():    
-    return template('records', rows2=sqlRun('SELECT rowid, cname FROM channels where cenabled=1'))
+    return template('records', rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1'))
 
 @post('/records')
 def records_p():
@@ -293,7 +352,7 @@ def records_p():
     
 @post('/createepg')
 def createepg():
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.rowid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
     setRecords()        
     redirect("/records")
     return 
@@ -427,7 +486,7 @@ class record(threading.Thread):
         print "\nRecord: Stopflag for '%s' received" % (self.name)
    
 def setRecords():
-    rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.rowid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
+    rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
     for row in rows: 
         chk = False
         for t in records:

@@ -55,7 +55,7 @@ def sqlCreateAll(version):
     sql = ""
     rows = sqlRun("select * from config")
     if not rows:
-        sql += 'CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase UNIQUE, cpath TEXT, cenabled INTEGER, cext TEXT);'
+        sql += 'CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase UNIQUE, cpath TEXT, cenabled INTEGER, cext TEXT, cid INTEGER);'
         sql += 'CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER, rmask INTEGER);'    
         sql += 'CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT);'
         sql += 'CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT);'
@@ -72,11 +72,15 @@ def sqlCreateAll(version):
             if oldver<>version:
                 if oldver < '0.4.4a':
                     sql += "ALTER TABLE channels ADD COLUMN cext TEXT DEFAULT '';" 
+                if oldver < '0.5.0':
+                    sql += "ALTER TABLE channels ADD COLUMN cid INTEGER;" 
+                    sql += "UPDATE channels SET cid=rowid;"
                 if oldver > version:
                     print "Critical error: Version mismatch!!!"     
 
                 
                 sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version           
+                print "New version %s was implemented" % version    
            
     
     sqlRun(sql, -1, 1)

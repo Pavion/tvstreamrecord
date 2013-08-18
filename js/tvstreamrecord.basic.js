@@ -64,7 +64,8 @@ function initIcons() {
 
 	$( "[id^=icons-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("icons-",""));
-		$( "#dialog" ).dialog( "open" );
+		//$( "#dialog" ).dialog( "open" );
+		$( "#createchannel-form" ).dialog( "open" );		
 		event.preventDefault();            
 	});
 	
@@ -182,6 +183,20 @@ $(function() {
 			}
 		]
 	});
+
+	$( "#cldown" ).dialog({
+		autoOpen: false,
+		width: 200,
+		buttons: [
+			{
+				text: "OK",
+				click: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		]
+	});
+
 
 	$( "#confirm01" ).dialog({
 		autoOpen: false,
@@ -379,15 +394,16 @@ $(function() {
     
     $( "#createchannel-form" ).dialog({
         autoOpen: false,
-        height: 240,
+        height: 280,
         width: 250,
         modal: true,
-        buttons: {
-            "Create channel": function() {
+/*        buttons: {
+            "Update channel": function() {
                 $( this ).dialog( "close" );    
                 var akt = 0;
                 if ($("#switch01").attr("checked") == "checked") {akt = 1;}
                 post("/create_channel", { 
+                    ccid:document.getElementById("ccid").value, 
                     cname:document.getElementById("cname").value, 
                     cpath:document.getElementById("cpath").value,
                     cext: document.getElementById("cext").value,
@@ -397,9 +413,96 @@ $(function() {
             Cancel: function() {
                 $( this ).dialog( "close" );
             }
-        },
+        },*/
         close: function() {
             allFields.val( "" ).removeClass( "ui-state-error" );
+        },
+        open: function( event, ui ) {
+        	if(dialognr!=-1) {
+        		$( this ).dialog( "option", "buttons", [ 
+        		{ 
+        			text: "Delete", click: function()  
+					{
+		                $( this ).dialog( "close" );    
+	                    var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
+	                    post(postto, { myid:dialognr, what:"-1" }, 1);
+						$( this ).dialog( "close" );                        
+		            }
+		        }, 
+        		{ 
+        			text: "Update", click: function()  
+					{
+		                $( this ).dialog( "close" );    
+		                var akt = 0;
+		                if ($("#switch01").attr("checked") == "checked") {akt = 1;}
+		                post("/create_channel", { 
+		                    prev:document.getElementById("prev").value, 
+		                    ccid:document.getElementById("ccid").value, 
+		                    cname:document.getElementById("cname").value, 
+		                    cpath:document.getElementById("cpath").value,
+		                    cext: document.getElementById("cext").value,
+		                    aktiv:akt 
+		                }, 1);                                 
+		            }
+		        }, 
+		        {
+        			text: "Cancel", click: function() {
+		                $( this ).dialog( "close" );
+        		    }		                                		
+        		}
+        		] );
+        		
+        		
+        		
+				oTable = $('#clist').dataTable();
+				var data = oTable.fnGetData(  );
+				var len = data.length;
+				if (len>0) {
+					for(var i=0;i<len;i++) {
+						if(data[i][0]==dialognr) {
+							document.getElementById("prev").value=data[i][0];			
+							document.getElementById("ccid").value=data[i][0];			
+							document.getElementById("cname").value=data[i][1];			
+							document.getElementById("cpath").value=data[i][2];	
+							document.getElementById("cext").value=data[i][3];								
+							break;
+						}
+					}					
+				}				        		
+        	} else {
+        		
+        		$( this ).dialog( "option", "buttons", [ 
+        		{ 
+        			text: "Create channel", click: function()  
+					{
+		                $( this ).dialog( "close" );    
+		                var akt = 0;
+		                if ($("#switch01").attr("checked") == "checked") {akt = 1;}
+		                post("/create_channel", { 
+		                    prev:document.getElementById("prev").value, 
+		                    ccid:document.getElementById("ccid").value, 
+		                    cname:document.getElementById("cname").value, 
+		                    cpath:document.getElementById("cpath").value,
+		                    cext: document.getElementById("cext").value,
+		                    aktiv:akt 
+		                }, 1);                                 
+		            }
+		        }, 
+		        {
+        			text: "Cancel", click: function() {
+		                $( this ).dialog( "close" );
+        		    }		                                		
+        		}
+        		] );
+        		
+        		
+				document.getElementById("prev").value="";			
+				document.getElementById("ccid").value="";			
+				document.getElementById("cname").value="";			
+				document.getElementById("cpath").value="";	
+				document.getElementById("cext").value="";								
+        	}
+        	
         }
     });
 
@@ -433,6 +536,8 @@ $(function() {
     $( "#create-channel" )
         .button()
         .click(function(event ) {
+        	dialognr=-1;
+        	//alert("hier");
             $( "#createchannel-form" ).dialog( "open" );
             event.preventDefault();
         });
@@ -458,6 +563,43 @@ $(function() {
             event.preventDefault();
         });
        
+    $( "#downcl" )
+        .button()
+        .click(function(event ) {
+
+        $( "#cldown" ).dialog( "open" );    			
+
+        $.ajax({
+	        type: "POST",
+	        url: "/clgen",
+	        data: {},
+	        dataType: "json",
+	        success: function(data, textStatus) {
+	        	alert("muh");
+	        	alert("muh2");
+    			//window.location = 'data:Application/octet-stream,' +
+        	}
+	    });                        
+
+
+/*			oTable = $('#clist').dataTable();
+			var data = oTable.fnGetData(  );
+			var len = data.length;
+			if (len>0) {
+				var fso = new ActiveXObject("Scripting.FileSystemObject");
+				var s = fso.CreateTextFile("./channels.m3u", true);
+				s.WriteLine("#EXTM3U");
+				for(var i=0;i<len;i++) {
+					s.WriteLine("#EXTINF:0,"+data[i][1]);
+					s.WriteLine(data[i][2]);
+				}
+
+				s.Close();
+    	        window.location = "./channels.m3u";
+	            event.preventDefault();
+			}*/        	
+        });
+
 
  	$( "#wday" ).button();
 	$( "#weekday" ).buttonset();
@@ -475,7 +617,7 @@ $(function() {
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {        
             var chk = "";
             if (aData[4] == 1) chk = 'checked="checked"';
-            $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>');            
+            $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');            
         }        
     }); 
     

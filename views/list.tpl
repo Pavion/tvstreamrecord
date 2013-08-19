@@ -1,9 +1,9 @@
 %include header 
 <div id="users-contain" class="ui-widget">
 <h1>Channels:
+<button id="create-channel">Create new</button>
 <button id="upload-user">Import</button>
-<button id="create-channel">Create</button>
-<button id="downcl">Download</button>
+<button id="downcl">Export</button>
 </h1>
 <table id="clist"> <!-- <table id="users" class="ui-widget ui-widget-content">-->
 <thead>
@@ -20,7 +20,8 @@
 </table>
 </div>
 <div id="cldown" title="Channel list download">
-	<p><a href="channels.m3u">Download</a></p>
+	<p align="center">Channel list export finished<br> 
+    <a href="channels.m3u">right click to save as</a></p>
 </div>
 <div id="dialog" title="Options">
 	<p>Shall I delete this channel?</p>

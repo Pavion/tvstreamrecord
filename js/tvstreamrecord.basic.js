@@ -64,8 +64,12 @@ function initIcons() {
 
 	$( "[id^=icons-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("icons-",""));
-		//$( "#dialog" ).dialog( "open" );
-		$( "#createchannel-form" ).dialog( "open" );		
+        var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
+        if (postto == "/records") {
+            $( "#dialog" ).dialog( "open" );
+        } else {
+            $( "#createchannel-form" ).dialog( "open" );		
+        }
 		event.preventDefault();            
 	});
 	
@@ -497,7 +501,7 @@ $(function() {
         		
         		
 				document.getElementById("prev").value="";			
-				document.getElementById("ccid").value="";			
+				document.getElementById("ccid").value="1";			
 				document.getElementById("cname").value="";			
 				document.getElementById("cpath").value="";	
 				document.getElementById("cext").value="";								
@@ -567,37 +571,15 @@ $(function() {
         .button()
         .click(function(event ) {
 
-        $( "#cldown" ).dialog( "open" );    			
-
-        $.ajax({
-	        type: "POST",
-	        url: "/clgen",
-	        data: {},
-	        dataType: "json",
-	        success: function(data, textStatus) {
-	        	alert("muh");
-	        	alert("muh2");
-    			//window.location = 'data:Application/octet-stream,' +
-        	}
-	    });                        
-
-
-/*			oTable = $('#clist').dataTable();
-			var data = oTable.fnGetData(  );
-			var len = data.length;
-			if (len>0) {
-				var fso = new ActiveXObject("Scripting.FileSystemObject");
-				var s = fso.CreateTextFile("./channels.m3u", true);
-				s.WriteLine("#EXTM3U");
-				for(var i=0;i<len;i++) {
-					s.WriteLine("#EXTINF:0,"+data[i][1]);
-					s.WriteLine(data[i][2]);
-				}
-
-				s.Close();
-    	        window.location = "./channels.m3u";
-	            event.preventDefault();
-			}*/        	
+            $.ajax({
+                type: "POST",
+                url: "/clgen",
+                data: {},
+                dataType: "json",
+                success: function(data, textStatus) {
+                    $( "#cldown" ).dialog( "open" );
+                }
+            });                        
         });
 
 

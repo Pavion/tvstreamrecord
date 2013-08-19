@@ -55,6 +55,7 @@ input#cname { width:75%; float:left; }
 
 [id=upload-user].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=create-channel].ui-button-text-only .ui-button-text { padding: 0px 3px; }
+[id=downcl].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=create-user].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=purge-records].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=submit_cfg].ui-button-text-only .ui-button-text { padding: 0px 3px; }

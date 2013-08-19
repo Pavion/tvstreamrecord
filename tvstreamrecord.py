@@ -137,7 +137,7 @@ def clgen_p():
     rows  = sqlRun("select cid, cname, cpath from channels where cenabled=1 ORDER BY cid")
     #print "cccccccccccccc"
     if rows:
-        print "cccccccccccccc"
+#        print "cccccccccccccc"
         f = open("channels.m3u", "w")
         f.write("#EXTM3U\n")
         for row in rows:
@@ -150,43 +150,57 @@ def clgen_p():
 #        response.add_header("Content-Transfer-Encoding", "binary")
 #        response.content_length =9999
 #        
-    print "a"
-    redirect("/channels.m3u")
-    print "b"
+#    print "a"
+#    redirect("/channels.m3u")
+#    print "b"
     return
 
 @post('/create_channel')
 def createchannel():
     prev = request.forms.prev
-#    print prev
-    cid = request.forms.ccid
+    cid =  request.forms.ccid
     cname = request.forms.cname
     cpath = request.forms.cpath
     aktiv = getBool(request.forms.aktiv)
     cext = request.forms.cext
-    if not cext=='': 
+    
+    if prev=="":
+        prev = -1
+    elif prev.isdigit():    
+        prev = int(prev)
+    else:
+        print "Wrong number found for the previous ID. Aborting creation/update."
+        return
+
+    if cid=="":
+        cid = 1
+    elif cid.isdigit():
+        cid = int(cid)
+    else:
+        print "Wrong number found for the new ID. Aborting creation/update."
+        return
+        
+    if cext!='': 
         if cext[0:1]<>'.': cext = '.' + cext
-              
-       
-    rows3  = sqlRun("select cid from channels where cid=%s" % cid)
+    
     exists = False
+    rows3  = sqlRun("select cid from channels where cid=%s" % cid)
     if rows3: 
         exists = True
     
-    if prev!="":
+    if prev!=-1:
+        sqlRun("UPDATE channels SET cid = -1 WHERE cid = %s" % (prev))
         if prev != cid and exists:
-            if prev < cid:          
-                sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))
+            if prev > cid:          
+                sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))                
             else:            
-                sqlRun("UPDATE channels SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev))
-        sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s WHERE cid='%s'" % (cname, cid, cpath, cext, aktiv, prev))
+                sqlRun("UPDATE channels SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev, cid))
+        sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s WHERE cid=-1" % (cname, cid, cpath, cext, aktiv))
     else:
         rows2 = sqlRun("select max(cid) from channels")
-        if rows2:
+        if rows2 and rows2[0][0] is not None:
             if exists:
                 sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s" % cid)            
-        else:
-            cid = 1
         sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid))
             
     return
@@ -333,7 +347,7 @@ def getrecordlist():
 
 @route('/records')
 def records_s():    
-    return template('records', rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1'))
+    return template('records', rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'))
 
 @post('/records')
 def records_p():

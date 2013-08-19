@@ -1,7 +1,7 @@
 %include header 
 
 <div id="about">
-<p><b>Tvstreamrecord v.{{ver}}</p></b>
+<p><b>Tvstreamrecord v.{{ver}}</b></p>
 
 <p><b>Quick guide</b></p>
 
@@ -63,7 +63,7 @@ With Elgato EyeTV Netstream you can export your channel list from the device pag
 <p>For using XMLTV the channel names should be the same as those from your XMLTV provider (e.g. 'channel name 1' and not epg.channel1.com). <br />
 You can add an file extension while creating new channels. This file extension will be simply added at the end of the file name. If you're using ffmpeg, file extension may be crucial for determining your output type. While importing from .m3u you can't specify any file extension. In case of empty extension the default one from configuration will be used automatically. </p>
 <p>Once added, you can edit and move your channels. To do this, please click on the gear symbol at the right of the table row. You're now able to edit the channel informations as well as to assign a new ID. Using an existing ID will insert the current record before this ID and renumerate the others. <br />
-You can also delete you channel from here. Please note, that deleting a channel will also delete all associated records. </p>
+You can also delete your channel from here. Please note, that deleting a channel will also delete all associated records. </p>
 <li><p><b>EPG import</b></p>
 <p>If you have a free XMLTV provider from your region, you should add his address in config. Now you should be able to import EPG by pressing the corresponding button one time. Please just one time. As for now there is no direct feedback for this feature and full synchronisation takes some time, please check the log file for the progress or error status. The only provider tested is <a href="http://xmltv.spaetfruehstuecken.org/xmltv/">Egon zappt</a>. As I'm following <a href="http://www.oztivo.net/twiki/bin/view/TVGuide/StaticXMLGuideAPI">OzTiVo rules</a> to grab EPG data, you can receive new data only, which would normally be refreshed one time a day.</p>
 </li>
@@ -78,7 +78,7 @@ You can also delete you channel from here. Please note, that deleting a channel 
 <li>Flouwy for his support and inspiration</li>
 <li>Sideshowbob for his ffmpeg support idea and testing</li>
 <li>plusulli for his Dreambox feedback</li>
-<li>Honu, zamp411 and other supporters for their feedback and trust</li>
+<li>Honu, zamp411, z-smoker and other supporters for their feedback and trust</li>
 </ul>
 </p>
 </li>

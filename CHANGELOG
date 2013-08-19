@@ -1,7 +1,8 @@
-2013-05-27 0.5.0 Channel editing and moving added, thanks to z-smoker
+2013-08-19 0.5.0 Channel editing and moving added
                  Channel list can now be exported and saved
-                 Small bug fixes & dialog optimisation
-                 Disabling channels also disable their records
+				 Record editing added
+                 Disabling/deleting channels also disable/delete all their records 
+                 Several bug fixes & dialog optimisation
 
 2013-05-27 0.4.8 URL length fixed / increased to 255
 

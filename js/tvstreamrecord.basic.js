@@ -18,6 +18,16 @@
 
 var dialognr = -1; 
 
+function updateTips( t ) {
+    $( ".validateTips" )
+    .text( t )
+    .addClass( "ui-state-highlight" );
+    setTimeout(function() {
+        $( ".validateTips" ).removeClass( "ui-state-highlight", 1500 );
+    }, 500 );
+}
+
+
 function checkLength( o, n, min, max ) {
     x = document.getElementById(o);
     if ( x.value.length > max || x.value.length < min ) {
@@ -42,7 +52,7 @@ function checkRegexp( o, regexp, n ) {
 }
 
 function initProgressbar() {
-	$( "[id^=progressbar]" ).each(function(i) {
+    $( "[id^=progressbar]" ).each(function(i) {
         $(this).progressbar({
             value: parseInt($(this).attr('id').replace("progressbar","")),
         });
@@ -53,27 +63,27 @@ function initProgressbar() {
 }
  
 function initIcons() {
-	$( "[id^=icons-]" ).hover(
-		function() {
-			$( this ).addClass( "ui-state-hover" );
-		},
-		function() {
-			$( this ).removeClass( "ui-state-hover" );
-		}
-	);
+    $( "[id^=icons-]" ).hover(
+        function() {
+            $( this ).addClass( "ui-state-hover" );
+        },
+        function() {
+            $( this ).removeClass( "ui-state-hover" );
+        }
+    );
 
-	$( "[id^=icons-]" ).click(function( event ) {
+    $( "[id^=icons-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("icons-",""));
         var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
         if (postto == "/records") {
             $( "#dialog" ).dialog( "open" );
         } else {
-            $( "#createchannel-form" ).dialog( "open" );		
+            $( "#createchannel-form" ).dialog( "open" );        
         }
-		event.preventDefault();            
-	});
-	
-	$( "[id^=icons-]" ).each(function(i) {
+        event.preventDefault();            
+    });
+    
+    $( "[id^=icons-]" ).each(function(i) {
         $(this).height(14);
         $(this).width(14);
         $(this).css("margin-left", "7px");
@@ -83,7 +93,7 @@ function initIcons() {
 
 function initSwitch() {
     $('[id^=switch-]').each(function() {
-    	//$(this).css("margin-top", "2px"); 
+        //$(this).css("margin-top", "2px"); 
         var switchnr = parseInt($(this).attr('id').replace("switch-",""));
         var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
         $(this).slickswitch({
@@ -116,44 +126,44 @@ function endsWith(str, suffix) {
 }
 
 $(function() {
-	
+    
     var pickerform = "dd.mm.yy";
 
-	$( "#accordion" ).accordion();
-	
-	var availableTags = [
-		"ActionScript",
-		"AppleScript",
-		"Asp",
-		"BASIC",
-		"C",
-		"C++",
-		"Clojure",
-		"COBOL",
-		"ColdFusion",
-		"Erlang",
-		"Fortran",
-		"Groovy",
-		"Haskell",
-		"Java",
-		"JavaScript",
-		"Lisp",
-		"Perl",
-		"PHP",
-		"Python",
-		"Ruby",
-		"Scala",
-		"Scheme"
-	];
-	$( "#autocomplete" ).autocomplete({
-		source: availableTags
-	});
-		
+    $( "#accordion" ).accordion();
+    
+    var availableTags = [
+        "ActionScript",
+        "AppleScript",
+        "Asp",
+        "BASIC",
+        "C",
+        "C++",
+        "Clojure",
+        "COBOL",
+        "ColdFusion",
+        "Erlang",
+        "Fortran",
+        "Groovy",
+        "Haskell",
+        "Java",
+        "JavaScript",
+        "Lisp",
+        "Perl",
+        "PHP",
+        "Python",
+        "Ruby",
+        "Scala",
+        "Scheme"
+    ];
+    $( "#autocomplete" ).autocomplete({
+        source: availableTags
+    });
+        
 
-		
-	//$( "#button" ).button();
-	$( "#radioset" ).buttonset();
-	
+        
+    //$( "#button" ).button();
+    $( "#radioset" ).buttonset();
+    
 
     $("#timepicker_inline_div1").timepicker({
         constrainInput: true,
@@ -167,71 +177,71 @@ $(function() {
     $( "#switch00" ).slickswitch();   
     $( "#switch01" ).slickswitch();
     
-	$( "#dialog" ).dialog({
-		autoOpen: false,
-		width: 300,
-		buttons: [
-			{
-				text: "Delete",
-				click: function() {
+    $( "#dialog" ).dialog({
+        autoOpen: false,
+        width: 300,
+        buttons: [
+            {
+                text: "Delete",
+                click: function() {
                     var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
                     post(postto, { myid:dialognr, what:"-1" }, 1);
-					$( this ).dialog( "close" );                        
-				}
-			},
-			{
-				text: "Cancel",
-				click: function() {
-					$( this ).dialog( "close" );
-				}
-			}
-		]
-	});
+                    $( this ).dialog( "close" );                        
+                }
+            },
+            {
+                text: "Cancel",
+                click: function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+        ]
+    });
 
-	$( "#cldown" ).dialog({
-		autoOpen: false,
-		width: 200,
-		buttons: [
-			{
-				text: "OK",
-				click: function() {
-					$( this ).dialog( "close" );
-				}
-			}
-		]
-	});
+    $( "#cldown" ).dialog({
+        autoOpen: false,
+        width: 200,
+        buttons: [
+            {
+                text: "OK",
+                click: function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+        ]
+    });
 
 
-	$( "#confirm01" ).dialog({
-		autoOpen: false,
-		width: 300,
-		buttons: [
-			{
-				text: "OK",
-				click: function() {
+    $( "#confirm01" ).dialog({
+        autoOpen: false,
+        width: 300,
+        buttons: [
+            {
+                text: "OK",
+                click: function() {
                     var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
                     post(postto, { myid:'-1', what:"-2" }, 1);
-					$( this ).dialog( "close" );                        
-				}
-			},
-			{
-				text: "Cancel",
-				click: function() {
-					$( this ).dialog( "close" );
-				}
-			}
-		]
-	});
+                    $( this ).dialog( "close" );                        
+                }
+            },
+            {
+                text: "Cancel",
+                click: function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+        ]
+    });
 
 
-	$( "#datepicker" ).datepicker({
+    $( "#datepicker" ).datepicker({
         constrainInput: true,
         minDate: -1,          
         defaultDate: 0,        
         dateFormat: pickerform
-	});
+    });
 
-	$( "#datepicker3" ).datepicker({
+    $( "#datepicker3" ).datepicker({
         constrainInput: true,
         minDate: -1,          
         defaultDate: 0,
@@ -239,14 +249,14 @@ $(function() {
             document.daychooser.submit();
         },
         dateFormat: pickerform
-	});
+    });
 
-	
-	$( "#slider" ).slider({
-		range: true,
-		values: [ 17, 67 ]
-	});
-	
+    
+    $( "#slider" ).slider({
+        range: true,
+        values: [ 17, 67 ]
+    });
+    
 
     var selcount = 0;
     $( "#selectabletitle" ).selectable({
@@ -258,52 +268,45 @@ $(function() {
     $(function() {
         $( document ).tooltip();
     });
-	
-	$( "[id=event]" ).each(function(i) {        
-		w = $(this).attr('width')+"%";
-		x = $(this).attr('x')+"%";
-        $(this).css("margin-left", x);		
-        $(this).css("width", w);		
-	});
-	
+    
+    $( "[id=event]" ).each(function(i) {        
+        w = $(this).attr('width')+"%";
+        x = $(this).attr('x')+"%";
+        $(this).css("margin-left", x);        
+        $(this).css("width", w);        
+    });
+    
     $("[id^=wwd]").each(function() { 
-    	$(this).live("click", function(event) {
-    	/*	if ($(this).hasClass("ui-state-active")) {
-    			$(this).removeClass("ui-state-active");
-    			$(this).css("background", "#accccc");    			
-    			    			//console.log("test");
-    		} else {
-    			$(this).addClass("ui-state-active");
-    			$(this).css("background", "#e6e6e6");    			
-    			
-    		}*/
-//    		console.log( $("#wwd0").attr("aria-pressed")  );
-    	});
+        $(this).live("click", function(event) {
+        /*    if ($(this).hasClass("ui-state-active")) {
+                $(this).removeClass("ui-state-active");
+                $(this).css("background", "#accccc");                
+                                //console.log("test");
+            } else {
+                $(this).addClass("ui-state-active");
+                $(this).css("background", "#e6e6e6");                
+                
+            }*/
+//            console.log( $("#wwd0").attr("aria-pressed")  );
+        });
     });
 
     $("li").live("click", function(event) {
-   		$("li").siblings().removeClass("ui-selected");        
-   		$(this).addClass("ui-selected");
-   		var ft = $(this).attr("fulltext");
-   		//console.log (ft);
-   		if (ft)   {
-			document.getElementById("ret").value = $(this).attr("rid");             
-			$("#dialog_content").html ( ft );	
-	        $( "#record_from_epg" ).dialog( "open" );
-   		}
+           $("li").siblings().removeClass("ui-selected");        
+           $(this).addClass("ui-selected");
+           var ft = $(this).attr("fulltext");
+           //console.log (ft);
+           if (ft)   {
+            document.getElementById("ret").value = $(this).attr("rid");             
+            $("#dialog_content").html ( ft );    
+            $( "#record_from_epg" ).dialog( "open" );
+           }
         
-	});
+    });
 
-	
-    var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" );
-    function updateTips( t ) {
-        $( ".validateTips" )
-        .text( t )
-        .addClass( "ui-state-highlight" );
-        setTimeout(function() {
-            $( ".validateTips" ).removeClass( "ui-state-highlight", 1500 );
-        }, 500 );
-    }
+    
+    var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" ).add("#cname").add("#ccid").add("#cpath");
+    
     $( "#dialog-form" ).dialog({
         autoOpen: false,
         height: 350,
@@ -324,9 +327,9 @@ $(function() {
                 bValid = bValid && checkRegexp( "timepicker_inline_div2", /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/, "Please use HH:MM format for this field" );
                 var mask = 0;
                 for (var i=0; i<7; i++) {
-                	if ( $("#wwd" + i).hasClass("ui-state-active") ) {
-                		mask += Math.pow(2, i);
-                	} 
+                    if ( $("#wwd" + i).hasClass("ui-state-active") ) {
+                        mask += Math.pow(2, i);
+                    } 
                 }
                 //console.log(mask);
                 if ( bValid ) {
@@ -362,16 +365,16 @@ $(function() {
         buttons: {
             "Record": function() {
                 $( this ).dialog( "close" );
-				$("#dialog_content").html("");
-	            document.returnform.submit();	            
+                $("#dialog_content").html("");
+                document.returnform.submit();                
             },
             Cancel: function() {
                 $( this ).dialog( "close" );
-				$("#dialog_content").html("");
+                $("#dialog_content").html("");
             }
         },
         close: function() {
-			$("#dialog_content").html("");
+            $("#dialog_content").html("");
         }
     });
 
@@ -396,117 +399,83 @@ $(function() {
         }
     });
     
+    
     $( "#createchannel-form" ).dialog({
         autoOpen: false,
-        height: 280,
+        height: 310,
         width: 250,
         modal: true,
-/*        buttons: {
-            "Update channel": function() {
-                $( this ).dialog( "close" );    
-                var akt = 0;
-                if ($("#switch01").attr("checked") == "checked") {akt = 1;}
-                post("/create_channel", { 
-                    ccid:document.getElementById("ccid").value, 
-                    cname:document.getElementById("cname").value, 
-                    cpath:document.getElementById("cpath").value,
-                    cext: document.getElementById("cext").value,
-                    aktiv:akt 
-                }, 1);                                 
-            },
-            Cancel: function() {
-                $( this ).dialog( "close" );
-            }
-        },*/
         close: function() {
             allFields.val( "" ).removeClass( "ui-state-error" );
         },
         open: function( event, ui ) {
-        	if(dialognr!=-1) {
-        		$( this ).dialog( "option", "buttons", [ 
-        		{ 
-        			text: "Delete", click: function()  
-					{
-		                $( this ).dialog( "close" );    
-	                    var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
-	                    post(postto, { myid:dialognr, what:"-1" }, 1);
-						$( this ).dialog( "close" );                        
-		            }
-		        }, 
-        		{ 
-        			text: "Update", click: function()  
-					{
-		                $( this ).dialog( "close" );    
-		                var akt = 0;
-		                if ($("#switch01").attr("checked") == "checked") {akt = 1;}
-		                post("/create_channel", { 
-		                    prev:document.getElementById("prev").value, 
-		                    ccid:document.getElementById("ccid").value, 
-		                    cname:document.getElementById("cname").value, 
-		                    cpath:document.getElementById("cpath").value,
-		                    cext: document.getElementById("cext").value,
-		                    aktiv:akt 
-		                }, 1);                                 
-		            }
-		        }, 
-		        {
-        			text: "Cancel", click: function() {
-		                $( this ).dialog( "close" );
-        		    }		                                		
-        		}
-        		] );
-        		
-        		
-        		
-				oTable = $('#clist').dataTable();
-				var data = oTable.fnGetData(  );
-				var len = data.length;
-				if (len>0) {
-					for(var i=0;i<len;i++) {
-						if(data[i][0]==dialognr) {
-							document.getElementById("prev").value=data[i][0];			
-							document.getElementById("ccid").value=data[i][0];			
-							document.getElementById("cname").value=data[i][1];			
-							document.getElementById("cpath").value=data[i][2];	
-							document.getElementById("cext").value=data[i][3];								
-							break;
-						}
-					}					
-				}				        		
-        	} else {
-        		
-        		$( this ).dialog( "option", "buttons", [ 
-        		{ 
-        			text: "Create channel", click: function()  
-					{
-		                $( this ).dialog( "close" );    
-		                var akt = 0;
-		                if ($("#switch01").attr("checked") == "checked") {akt = 1;}
-		                post("/create_channel", { 
-		                    prev:document.getElementById("prev").value, 
-		                    ccid:document.getElementById("ccid").value, 
-		                    cname:document.getElementById("cname").value, 
-		                    cpath:document.getElementById("cpath").value,
-		                    cext: document.getElementById("cext").value,
-		                    aktiv:akt 
-		                }, 1);                                 
-		            }
-		        }, 
-		        {
-        			text: "Cancel", click: function() {
-		                $( this ).dialog( "close" );
-        		    }		                                		
-        		}
-        		] );
-        		
-        		
-				document.getElementById("prev").value="";			
-				document.getElementById("ccid").value="1";			
-				document.getElementById("cname").value="";			
-				document.getElementById("cpath").value="";	
-				document.getElementById("cext").value="";								
-        	}
-        	
+                
+            var cancelbutton = {
+                text: "Cancel", click: function() {
+                    $( this ).dialog( "close" );
+                }                                                
+            };
+            var updatebutton = { 
+                text: (dialognr==-1?"Create channel":"Update"), click: function()  
+                {
+                    var bValid = true;
+                    allFields.removeClass( "ui-state-error" );
+                    bValid = bValid & checkRegexp( "ccid", /^[0-9]{1,5}$/, "Please enter a valid number" );
+                    bValid = bValid & checkRegexp( "cname", /^(?=\s*\S).*$/, "Please enter a valid name" );
+                    bValid = bValid & checkRegexp( "cpath", /^(?=\s*\S).*$/, "Please enter a valid URL" );
+                    if (bValid) {
+                        var akt = 0;
+                        if ($("#switch01").attr("checked") == "checked") {akt = 1;}
+                        post("/create_channel", { 
+                            prev:document.getElementById("prev").value, 
+                            ccid:document.getElementById("ccid").value, 
+                            cname:document.getElementById("cname").value, 
+                            cpath:document.getElementById("cpath").value,
+                            cext: document.getElementById("cext").value,
+                            aktiv:akt 
+                        }, 1);                                 
+                        $( this ).dialog( "close" );
+                    }
+                }
+            };
+            var deletebutton = { 
+                text: "Delete", click: function()  
+                {
+                    $( this ).dialog( "close" );    
+                    $( "#dialog" ).dialog( "open" );
+                }
+            };
+        
+        
+            if(dialognr!=-1) {
+                $( this ).dialog( "option", "buttons", [deletebutton, updatebutton, cancelbutton] );
+                
+                oTable = $('#clist').dataTable();
+                var data = oTable.fnGetData();
+                var len = data.length;
+                if (len>0) {
+                    for(var i=0;i<len;i++) {
+                        if(data[i][0]==dialognr) {
+                            document.getElementById("prev").value=data[i][0];
+                            document.getElementById("ccid").value=data[i][0];
+                            document.getElementById("cname").value=data[i][1];
+                            document.getElementById("cpath").value=data[i][2];
+                            document.getElementById("cext").value=data[i][3];
+                            break;
+                        }
+                    }
+                }
+            } else {
+                
+                $( this ).dialog( "option", "buttons", [updatebutton, cancelbutton] );   
+                
+                document.getElementById("prev").value="";            
+                document.getElementById("ccid").value="1";            
+                document.getElementById("cname").value="";            
+                document.getElementById("cpath").value="";    
+                document.getElementById("cext").value="";                                
+            }
+            
         }
     });
 
@@ -540,8 +509,7 @@ $(function() {
     $( "#create-channel" )
         .button()
         .click(function(event ) {
-        	dialognr=-1;
-        	//alert("hier");
+            dialognr=-1;
             $( "#createchannel-form" ).dialog( "open" );
             event.preventDefault();
         });
@@ -583,10 +551,10 @@ $(function() {
         });
 
 
- 	$( "#wday" ).button();
-	$( "#weekday" ).buttonset();
+     $( "#wday" ).button();
+    $( "#weekday" ).buttonset();
   
- 	$('#clist').dataTable({
+     $('#clist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bProcessing": true,
@@ -603,14 +571,14 @@ $(function() {
         }        
     }); 
     
- 	$('#recordlist').dataTable({
+     $('#recordlist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bProcessing": true,
         "sAjaxSource": "/getrecordlist",
         "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 6,7,8,9 ] },
-        				  { "iDataSort": 8, "aTargets": [ 2 ] }, 
-        				  { "iDataSort": 9, "aTargets": [ 3 ] } ],
+                          { "iDataSort": 8, "aTargets": [ 2 ] }, 
+                          { "iDataSort": 9, "aTargets": [ 3 ] } ],
         "fnDrawCallback": function( oSettings ) {
             initSwitch();
             initIcons();
@@ -622,30 +590,30 @@ $(function() {
             if (aData[5] == 1) chk = 'checked="checked"';
             htmltext  = '<div id="progressbar' + aData[6] + '"></div>';
             htmltext += '<input type="checkbox" class="switch icons" id="switch-' + aData[7] + '" ' + chk + ' />';  
-			htmltext += '<a href="#" id="icons-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>';                        
+            htmltext += '<a href="#" id="icons-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-trash"></span></a>';                        
             $('td:eq(5)', nRow).html(htmltext);            
         },
         "fnInitComplete": function() {
-		 	this.fnSort([ [2,'desc'] ]);        	
+             this.fnSort([ [2,'desc'] ]);            
         } 
         
     }); 
 
- 	$('#loglist').dataTable({
+     $('#loglist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bProcessing": true,
         "sAjaxSource": "/logget",
         "fnInitComplete": function() {
-		 	this.fnSort([ [0,'desc'] ]);        	
+             this.fnSort([ [0,'desc'] ]);            
         } 
     }); 
     
 /*    $(window).bind('resize', function () {
-    	$('#loglist').dataTable().fnAdjustColumnSizing();
-    	$('#recordlist').dataTable().fnAdjustColumnSizing();
-    	$('#clist').dataTable().fnAdjustColumnSizing();
-  	} );*/
+        $('#loglist').dataTable().fnAdjustColumnSizing();
+        $('#recordlist').dataTable().fnAdjustColumnSizing();
+        $('#clist').dataTable().fnAdjustColumnSizing();
+      } );*/
     
             
 });

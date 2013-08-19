@@ -1,3 +1,8 @@
+2013-05-27 0.5.0 Channel editing and moving added, thanks to z-smoker
+                 Channel list can now be exported and saved
+                 Small bug fixes & dialog optimisation
+                 Disabling channels also disable their records
+
 2013-05-27 0.4.8 URL length fixed / increased to 255
 
 2013-03-07 0.4.7 Recurrent FFMPEG records added/fixed 
@@ -14,9 +19,9 @@
 2013-02-06 0.4.4 Recurrent records are now available
 
 2013-02-06 0.4.3 About page and Wiki added, recorded file extension fixed and now configurable
-				 Default sorting column for all tables implemented				 
-				 Old records will be shown and must be purged manually
-				 
+                 Default sorting column for all tables implemented                 
+                 Old records will be shown and must be purged manually
+                 
 2013-02-04 0.4.3 CherryPy Server implemented for better stability under load
  
 2013-02-03 0.4.2a Syno-branch only: broken update script fixed. Sorry for inconvenience.

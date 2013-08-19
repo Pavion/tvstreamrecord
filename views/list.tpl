@@ -23,10 +23,11 @@
 	<p align="center">Channel list export finished<br> 
     <a href="channels.m3u">right click to save as</a></p>
 </div>
-<div id="dialog" title="Options">
+<div id="dialog" title="Confirmation request">
 	<p>Shall I delete this channel?</p>
 </div>
 <div id="createchannel-form" title="Create a new channel">
+<p class="validateTips"></p>
 <form>
 <fieldset>
 <label for="name">Channel ID</label>

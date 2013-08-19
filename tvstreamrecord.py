@@ -17,7 +17,7 @@
 """
 
 from bottle import CherryPyServer
-from bottle import route, run, template, post, request, response
+from bottle import route, run, template, post, request
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
 import subprocess
@@ -123,9 +123,11 @@ def list_p():
     what = request.forms.get("what")
     myid = request.forms.get("myid")
     if what=="-1":
-        sqlRun("DELETE FROM channels WHERE channels.cid=%s" % (myid))
+        sqlRun("DELETE FROM channels WHERE cid=%s" % (myid))
+        sqlRun("DELETE FROM records WHERE cid=%s" % (myid))
     else: 
-        sqlRun("UPDATE channels SET cenabled=%s WHERE channels.cid=%s" % (what, myid))            
+        sqlRun("UPDATE channels SET cenabled=%s WHERE cid=%s" % (what, myid))
+        sqlRun("UPDATE records SET renabled=%s WHERE cid=%s" % (what, myid))
     setRecords()
     return
 
@@ -133,26 +135,14 @@ def list_p():
 
 @post('/clgen')
 def clgen_p():
-    #print "cccccccccccccc"
     rows  = sqlRun("select cid, cname, cpath from channels where cenabled=1 ORDER BY cid")
-    #print "cccccccccccccc"
     if rows:
-#        print "cccccccccccccc"
         f = open("channels.m3u", "w")
         f.write("#EXTM3U\n")
         for row in rows:
             f.write("#EXTINF:0,"+row[1]+"\n")
             f.write(row[2]+"\n")
         f.close()
-        
-#        response.content_type = "application/force-download"
-#        response.add_header('Content-Disposition', 'attachment; filename="channels.m3u"')
-#        response.add_header("Content-Transfer-Encoding", "binary")
-#        response.content_length =9999
-#        
-#    print "a"
-#    redirect("/channels.m3u")
-#    print "b"
     return
 
 @post('/create_channel')
@@ -184,25 +174,31 @@ def createchannel():
         if cext[0:1]<>'.': cext = '.' + cext
     
     exists = False
-    rows3  = sqlRun("select cid from channels where cid=%s" % cid)
-    if rows3: 
+    if cid == prev:
         exists = True
+    else:
+        rows3  = sqlRun("select cid from channels where cid=%s" % cid)
+        if rows3: 
+            exists = True
     
     if prev!=-1:
-        sqlRun("UPDATE channels SET cid = -1 WHERE cid = %s" % (prev))
-        if prev != cid and exists:
-            if prev > cid:          
-                sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))                
-            else:            
-                sqlRun("UPDATE channels SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev, cid))
-        sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s WHERE cid=-1" % (cname, cid, cpath, cext, aktiv))
-    else:
-        rows2 = sqlRun("select max(cid) from channels")
-        if rows2 and rows2[0][0] is not None:
+        if cid == prev:  # editing/renaming only 
+            sqlRun("UPDATE channels SET cname='%s', cpath='%s', cext='%s', cenabled=%s WHERE cid=%s" % (cname, cpath, cext, aktiv, cid))
+        else: # also moving
             if exists:
-                sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s" % cid)            
+                sqlRun("UPDATE channels SET cid = -1 WHERE cid = %s" % (prev))
+                if prev > cid:          
+                    sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))                
+                else:            
+                    sqlRun("UPDATE channels SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev, cid))
+                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s WHERE cid=-1" % (cname, cid, cpath, cext, aktiv))
+            else:
+                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s WHERE cid=%s" % (cname, cid, cpath, cext, aktiv, prev))
+            sqlRun("UPDATE records SET cid=%s WHERE cid=%s" % (cid, prev))
+    else:
+        if exists:
+            sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s" % cid)            
         sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid))
-            
     return
     
 @post('/upload')
@@ -217,9 +213,11 @@ def upload_p():
         rowid = 1
         if how==0:
             sqlRun('DELETE FROM channels')
+            sqlRun('DELETE FROM records')
+            setRecords()
         else:
             rows2 = sqlRun("select max(cid) from channels")
-            if rows2:
+            if rows2 and not rows2[0][0] is None:
                 rowid = rows2[0][0]+1
             
         lines = upfilecontent.splitlines()

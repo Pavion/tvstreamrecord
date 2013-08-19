@@ -47,8 +47,9 @@ If it works, you should be able to locate the generated file out.mpg in current 
 <li>Congratulation, you can now start using this software.</li>
 </ul>          	
 </p>	
-<li><p><b>Channels adding and importing</b></p>
-<p>As for now you have two ways to add channels. You can normally add a channel by providing its name and URL or you can import an .m3u playlist. With Elgato EyeTV Netstream you can export your channel list from the device page and import the file in my software. You can also use other .m3u with following syntax:</p>
+<li><p><b>Channels manipulation</b></p>
+<p>As for now you have two ways to add channels. You can normally add a channel by providing its ID, name, URL and file extension or you can import an .m3u playlist. 
+With Elgato EyeTV Netstream you can export your channel list from the device page and import the file in my software. You can also use other .m3u with following syntax:</p>
 <p><i>
 <ul>
 <li>#EXTM3U</li>
@@ -58,9 +59,11 @@ If it works, you should be able to locate the generated file out.mpg in current 
 <li>http://192.168.0.10/stream/tunerequest000000000000000000000000000000000000000000000001</li>
 </ul>
 </i></p>
-<p>
-Please note that for using XMLTV the channel names should be the same as those from your XMLTV provider (e.g. 'channel name 1' and not epg.channel1.com). <br />
+<p><b>Please note, that adding a new playlist without appending will erase all the old channels and records as well, due to the possibility of ID conflict!</b></p>
+<p>For using XMLTV the channel names should be the same as those from your XMLTV provider (e.g. 'channel name 1' and not epg.channel1.com). <br />
 You can add an file extension while creating new channels. This file extension will be simply added at the end of the file name. If you're using ffmpeg, file extension may be crucial for determining your output type. While importing from .m3u you can't specify any file extension. In case of empty extension the default one from configuration will be used automatically. </p>
+<p>Once added, you can edit and move your channels. To do this, please click on the gear symbol at the right of the table row. You're now able to edit the channel informations as well as to assign a new ID. Using an existing ID will insert the current record before this ID and renumerate the others. <br />
+You can also delete you channel from here. Please note, that deleting a channel will also delete all associated records. </p>
 <li><p><b>EPG import</b></p>
 <p>If you have a free XMLTV provider from your region, you should add his address in config. Now you should be able to import EPG by pressing the corresponding button one time. Please just one time. As for now there is no direct feedback for this feature and full synchronisation takes some time, please check the log file for the progress or error status. The only provider tested is <a href="http://xmltv.spaetfruehstuecken.org/xmltv/">Egon zappt</a>. As I'm following <a href="http://www.oztivo.net/twiki/bin/view/TVGuide/StaticXMLGuideAPI">OzTiVo rules</a> to grab EPG data, you can receive new data only, which would normally be refreshed one time a day.</p>
 </li>

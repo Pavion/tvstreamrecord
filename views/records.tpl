@@ -3,6 +3,7 @@
 <p class="validateTips"></p>
 <form>
 <fieldset>
+<input type="hidden" maxlength="5" id="prev" value=""/> 
 <label for="channel">Name</label>
 <input type="text" maxlength="20" id="recname" class="text ui-widget-content ui-corner-all" name="recname" value=""/> 
 <label for="channel">Channel</label>
@@ -61,23 +62,5 @@
 <div id="confirm01" title="Purging records">
 	<p>All old records will be deleted! Are you sure?</p>
 </div>
-<script type="text/javascript">
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var hr = today.getHours();
-    var min = today.getMinutes();
-
-    var yyyy = today.getFullYear();
-    if(dd<10){dd='0'+dd} if(mm<10){mm='0'+mm} today = dd+'.'+mm+'.'+yyyy;
-    document.getElementById("datepicker").value = today;
-    if(hr<10){hr='0'+hr} if(min<10){min='0'+min} today = hr+':'+min;
-    document.getElementById("timepicker_inline_div1").value = today;
-    today = new Date();
-    hr = today.getHours() + 1;
-    if(hr==24) {hr=0} if(hr<10){hr='0'+hr} today = hr+':'+min;    
-    document.getElementById("timepicker_inline_div2").value = today;
-
-</script>
 %include footer
            

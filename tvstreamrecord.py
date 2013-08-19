@@ -371,6 +371,7 @@ def createepg():
 
 @post('/create')
 def create_p():
+    prev = request.forms.prev
     recname = request.forms.recname
     sender = request.forms.Sender
     von = request.forms.von
@@ -384,8 +385,11 @@ def create_p():
     delta = timedelta(days=1)
     if d_bis < d_von:
         d_bis = d_bis + delta         
-    
-    sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", (recname, sender, d_von, d_bis, aktiv, recurr))
+
+    if prev=="":        
+        sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", (recname, sender, d_von, d_bis, aktiv, recurr))
+    else:    
+        sqlRun("UPDATE records SET recname='%s', cid=%s, rvon='%s', rbis='%s', renabled=%s, rmask=%s WHERE rowid=%s" % (recname, sender, d_von, d_bis, aktiv, recurr,  prev))
     
     setRecords()
     
@@ -407,6 +411,7 @@ class record(threading.Thread):
     mask = 0
     ext = ""
     process = None
+    myrow = None
         
     def __init__(self, row):
         threading.Thread.__init__(self)
@@ -416,6 +421,7 @@ class record(threading.Thread):
         self.name = row[5]        
         self.url = row[1].strip()
         self.mask = row[6]
+        self.myrow = row
         if row[7]=='':
             self.ext = config.cfg_file_extension
         else:
@@ -503,7 +509,11 @@ def setRecords():
         chk = False
         for t in records:
             if t.id == row[0]:
-                chk = True
+                if t.myrow[1]!=row[1] or t.myrow[2]!=row[2] or t.myrow[3]!=row[3] or t.myrow[4]!=row[4] or t.myrow[5]!=row[5]  or t.myrow[6]!=row[6]  or t.myrow[7]!=row[7]:
+                    t.stop()
+                    chk = False
+                else:    
+                    chk = True
                 break
         if chk == False:
             thread = record(row) 

@@ -187,17 +187,22 @@ def createchannel():
         else: # also moving
             if exists:
                 sqlRun("UPDATE channels SET cid = -1 WHERE cid = %s" % (prev))
+                sqlRun("UPDATE records  SET cid = -1 WHERE cid = %s" % (prev))            
                 if prev > cid:          
                     sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))                
+                    sqlRun("UPDATE records  SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))            
                 else:            
                     sqlRun("UPDATE channels SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev, cid))
+                    sqlRun("UPDATE records  SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev, cid))
                 sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s WHERE cid=-1" % (cname, cid, cpath, cext, aktiv))
+                sqlRun("UPDATE records SET cid=%s WHERE cid=-1" % cid)
             else:
-                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s WHERE cid=%s" % (cname, cid, cpath, cext, aktiv, prev))
-            sqlRun("UPDATE records SET cid=%s WHERE cid=%s" % (cid, prev))
+                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s WHERE cid=%s" % (cname, cid, cpath, cext, aktiv, prev))                
+                sqlRun("UPDATE records SET cid=%s WHERE cid=%s" % (cid, prev))            
     else:
         if exists:
             sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s" % cid)            
+            sqlRun("UPDATE records SET cid = cid+1 WHERE cid >= %s" % cid)            
         sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid))
     return
     
@@ -520,7 +525,9 @@ def setRecords():
             thread.start()
             records.append(thread)
         
-    for t in records:
+        
+    for i in range(len(records)-1,-1,-1):
+        t = records[i]
         chk = False
         for row in rows: 
             if t.id == row[0]:

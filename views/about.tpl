@@ -68,7 +68,7 @@ You can also delete you channel from here. Please note, that deleting a channel 
 <p>If you have a free XMLTV provider from your region, you should add his address in config. Now you should be able to import EPG by pressing the corresponding button one time. Please just one time. As for now there is no direct feedback for this feature and full synchronisation takes some time, please check the log file for the progress or error status. The only provider tested is <a href="http://xmltv.spaetfruehstuecken.org/xmltv/">Egon zappt</a>. As I'm following <a href="http://www.oztivo.net/twiki/bin/view/TVGuide/StaticXMLGuideAPI">OzTiVo rules</a> to grab EPG data, you can receive new data only, which would normally be refreshed one time a day.</p>
 </li>
 <li><p><b>Records</b></p>
-<p>Here you can create a new record with channel and time provided. You can also pause and delete your recordings. You can also create recurrent records by providing weekdays. This would still be one record only, which can be paused/resumed/deleted. Unlike 'normal' records, which are done after completion, the next runtime will be automatically calculated and set there.</p>
+<p>Here you can create a new record with channel and time provided. You can also edit, pause and delete your recordings. You can also create recurrent records by providing weekdays. This would still be one record only, which can be paused/resumed/deleted. Unlike 'normal' records, which are done after completion, the next runtime will be automatically calculated and set there.</p>
 </li>
 <li><p><b>Feedback</b></p>
 <p>As I'm not able to test my software on every plattform of the world, I beg you for your feedback regarding any issues with my software. Thank you!</p>
@@ -78,7 +78,7 @@ You can also delete you channel from here. Please note, that deleting a channel 
 <li>Flouwy for his support and inspiration</li>
 <li>Sideshowbob for his ffmpeg support idea and testing</li>
 <li>plusulli for his Dreambox feedback</li>
-<li>Honu, zamp411 and other supporters for their feedbacktrust</li>
+<li>Honu, zamp411 and other supporters for their feedback and trust</li>
 </ul>
 </p>
 </li>

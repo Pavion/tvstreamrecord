@@ -402,12 +402,20 @@ $(function() {
                                         $("#wwd"+j).addClass("ui-state-active");
                                     }
                                 }
-                            }                   
-                                                        
+                            }        
+                            
+                            var kids = $("#channel").children();
+                            for (var j=0;j<kids.length;j++) {
+                            	if (kids[j].innerHTML==data[i][1]) { 
+
+									document.getElementById("channel").value=kids[j].value;                            
+                            		break;
+                            	}	
+                            }
+                                                                                   
                             switchMe("#switch00", ($("#switch-" + dialognr).attr("checked") == "checked") );
                             document.getElementById("prev").value=dialognr;
-                            document.getElementById("recname").value=data[i][0];
-                            document.getElementById("channel").value=data[i][1];
+                            document.getElementById("recname").value=data[i][0];                            
                             document.getElementById("timepicker_inline_div1").value=data[i][2].slice(11,16);
                             document.getElementById("timepicker_inline_div2").value=data[i][3].slice(11,16);
                             document.getElementById("datepicker").value=data[i][2].slice(0,10);
@@ -425,16 +433,18 @@ $(function() {
                 var min = today.getMinutes();
 
                 var yyyy = today.getFullYear();
-                if(dd<10){dd='0'+dd} if(mm<10){mm='0'+mm} today = dd+'.'+mm+'.'+yyyy;
+                if(dd<10){dd='0'+dd;} if(mm<10){mm='0'+mm;} today = dd+'.'+mm+'.'+yyyy;
                 document.getElementById("datepicker").value = today;
-                if(hr<10){hr='0'+hr} if(min<10){min='0'+min} today = hr+':'+min;
+                if(hr<10){hr='0'+hr;} if(min<10){min='0'+min;} today = hr+':'+min;
                 document.getElementById("timepicker_inline_div1").value = today;
                 today = new Date();
                 hr = today.getHours() + 1;
-                if(hr==24) {hr=0} if(hr<10){hr='0'+hr} today = hr+':'+min;    
+                if(hr==24) {hr=0;} if(hr<10){hr='0'+hr;} today = hr+':'+min;    
                 document.getElementById("timepicker_inline_div2").value = today;
                 
                 switchMe("#switch00", true);
+
+                document.getElementById("channel").value=0;
 
                 document.getElementById("prev").value="";            
                 document.getElementById("recname").value="";            
@@ -540,7 +550,6 @@ $(function() {
                     $( "#dialog" ).dialog( "open" );
                 }
             };
-        
         
             if(dialognr!=-1) {
                 $( this ).dialog( "option", "buttons", [deletebutton, updatebutton, cancelbutton] );

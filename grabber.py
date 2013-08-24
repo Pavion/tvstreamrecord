@@ -17,52 +17,73 @@
 """
 
 import urllib2
-from datetime import datetime, timedelta, time, date
+from datetime import datetime, timedelta#, time, date
 import time
+import sys
 
+# Debug only
+#def cls():
+#    from os import system, name
+#    system('cls' if name=='nt' else 'clear')
+    
 # converts string into time, i.e. 0x20 0x15 0x15 = 20:15:00 - what a funny way to encode time!
-def str_to_delta(str):
-    h = int(hex(ord(str[0])).replace("0x",""))
-    n = int(hex(ord(str[1])).replace("0x",""))
-    s = int(hex(ord(str[2])).replace("0x",""))
-    return timedelta(hours=h, minutes = n, seconds = s)
+def str_to_delta(strin):
+    try:
+        h = int(hex(ord(strin[0])).replace("0x",""))
+        n = int(hex(ord(strin[1])).replace("0x",""))
+        s = int(hex(ord(strin[2])).replace("0x",""))
+        return timedelta(hours=h, minutes = n, seconds = s)
+    except:
+        print "Wrong time detected"
+        return timedelta(0)
 
 # converts Modified Julian date to local date
-def mjd_to_local(str):
-                
-    MJD = ord(str[0]) * 256 + ord(str[1])
-    Yx = int ( (MJD - 15078.2) / 365.25 ) 
-    Mx = int ( (MJD - 14956.1 - int (Yx * 365.25) ) / 30.6001 )
-    D = MJD - 14956 - int (Yx * 365.25) - int (Mx * 30.6001)
-    K = 0
-    if Mx == 14 or Mx == 15:
-        K = 1
-    Y = Yx + K + 1900
-    M = Mx - 1 - K * 12
-
-    start = datetime(Y, M, D, 0, 0, 0)                
-
-    # UTC / daytime offset
-    is_dst = time.daylight and time.localtime().tm_isdst > 0
-    utc_offset = - (time.altzone if is_dst else time.timezone)
-    utc_off_delta = timedelta(seconds = utc_offset)
-
-    # time offset
-    t = str_to_delta(str[2:5]) 
+def mjd_to_local(strin):
+        
+    try:
+        MJD = ord(strin[0]) * 256 + ord(strin[1])
+        Yx = int ( (MJD - 15078.2) / 365.25 ) 
+        Mx = int ( (MJD - 14956.1 - int (Yx * 365.25) ) / 30.6001 )
+        D = MJD - 14956 - int (Yx * 365.25) - int (Mx * 30.6001)
+        K = 0
+        if Mx == 14 or Mx == 15:
+            K = 1
+        Y = Yx + K + 1900
+        M = Mx - 1 - K * 12
     
-    return start + utc_off_delta + t
+        start = datetime(Y, M, D, 0, 0, 0)                
+    
+        # UTC / daytime offset
+        is_dst = time.daylight and time.localtime().tm_isdst > 0
+        utc_offset = - (time.altzone if is_dst else time.timezone)
+        utc_off_delta = timedelta(seconds = utc_offset)
+    
+        # time offset
+        t = str_to_delta(strin[2:5])
+        
+        start = start + utc_off_delta + t
+    except:
+        start = datetime(1900,1,1,0,0,0) 
+    
+    return start 
 
 def read_stream(f_in):
+    # Possible package sizes of MPEG-TS (default = 188)
     packagesizes = [188, 204, 208]
-    size = -1
-    syncbyte = 'G'
+    size = -1        
+    
+    # Sync byte (default = 'G' or 0x47)
+    syncbyte = 'G' 
+    
+    # EPG data
     channel = [0x12]
+    
+    # Channel list & description
     channelinfo = [0x11]
 
+    # Analysing stream and step size
     block_sz = 1000
     mybuffer = f_in.read(block_sz)
-    
-    
     for i in range(0, 400): 
         if mybuffer[i] == syncbyte: 
             for s in packagesizes:
@@ -71,7 +92,6 @@ def read_stream(f_in):
                     break
             if size != -1:
                 break
-
     if size == -1:
         print "No sync byte found, probably not a MPEG2 stream. Aborting..."
         return
@@ -81,41 +101,39 @@ def read_stream(f_in):
     offset = r[len(r)-1]-1000
     f_in.read(offset)
     
-    # define number of blocks to be read
+    # define blocks 
     blocktoread = 100
     block_sz = size * blocktoread
+    blocksread = 0
+    maxblocksread = 10*1024*1024
     
-    # Continuity counter
-    
+    # Continuity counter    
     ccount = [-1, -1]
     ccount_new = [-1, -1]
+    
+    # Payload storing an controlling 
     payload = ["",""]
     myfirstpayload = ["", ""]
-    blocksread = 0
-    maxblocksread = 20*1024*1024
     ch = 0
-    maxpayload = ["",""]
+    maxlist = [list(),list()]
+    analyse = [False, False]
     
-    
-    # read until the end or payload match
-    match = [False, False]
-    
-    while False in match:
+    # read loop
+    while True:
         mybuffer = f_in.read(block_sz)
         blocksread = blocksread + block_sz  
-        if not mybuffer:
-            print "Buffer end encountered, data may be incomplete."
-            break
-        elif blocksread>maxblocksread: 
-            print "Timeout at %sMB, data may be incomplete. Largest available payload will be used. " % maxblocksread/1024/1024
-            if len(payload[ch])<len(maxpayload[ch]):
-                        payload[ch] = maxpayload[ch] 
+        if not mybuffer or blocksread>maxblocksread:
+            print "Read finished at %s/%s MB" % (blocksread/1024/1024, maxblocksread/1024/1024)            
+            for ch in range(0,2):
+                plist = getList(payloadSort(payload[ch], False), ch)
+                if len(plist)>len(maxlist[ch]):
+                    maxlist[ch] = plist
             break
         for i in range(0, len(mybuffer), size):
             pid1 = ord(mybuffer[i+1])
             pid2 = ord(mybuffer[i+2])
             pid3 = ord(mybuffer[i+3])            
-            if not (pid1 & 16 or pid1 & 8 or pid1 & 4 or pid1 & 2 or pid1 & 1) and ((pid2 in channel and not match[0]) or (pid2 in channelinfo and not match[1])):
+            if not (pid1 & 16 or pid1 & 8 or pid1 & 4 or pid1 & 2 or pid1 & 1) and (pid2 in channel  or pid2 in channelinfo):
                 
                 if pid2 in channel: 
                     ch = 0
@@ -125,13 +143,10 @@ def read_stream(f_in):
                 # Continuity control
                 ccount_new[ch] = pid3 - (pid3 >> 4 << 4)
                 if ccount[ch]!=-1 and not (ccount_new[ch] == ccount[ch] + 1 or (ccount_new[ch] == 0 and ccount[ch] == 15)):
-#                    print hex(pid2), "Out of sync at ID %s (%s/%s)" % (ch, ccount[ch],ccount_new[ch])
+                    print "out of sync at ID %s" % ch
                     # Out of sync! 
-                    if len(payload[ch])>len(maxpayload[ch]):
-                        maxpayload[ch] = payload[ch]
-                    myfirstpayload[ch] = ""
-                    payload[ch] = ""                                        
-                
+                    payload[ch] = payloadSort(payload[ch], False)
+                    analyse[ch] = True                                     
                 ccount[ch] = ccount_new[ch]
                 # Continuity control ends
                 
@@ -140,21 +155,41 @@ def read_stream(f_in):
                 if myfirstpayload[ch] == "": 
                     myfirstpayload[ch] = tmp
                 elif tmp == myfirstpayload[ch]:    
+                    # Payload match encountered
                     print "Payload %s match encountered" % ch
-                    match[ch] = True                    
+                    payload[ch] = payloadSort(payload[ch], True)
+                    analyse[ch] = True
+                 
+                # Data analyse and matching
+                if analyse[ch]:     
+                    plist = getList(payload[ch], ch)
+                    if len(plist)>len(maxlist[ch]):
+                        maxlist[ch] = plist
+                    myfirstpayload[ch] = tmp
+                    payload[ch] = ""                                        
+                    analyse[ch] = False
     
                 payload[ch] = payload[ch] + tmp
-
-    # shift or cut the payloads to get the package beginning 
-    for i in range(0,2):
-        pos = payload[i].find(chr(255)+chr(255)+chr(255)+chr(255))
-        if match[i]:
-            payload[i] = payload[i][pos:] + payload[i][:pos]
-        else:
-            payload[i] = payload[i][pos:] 
             
-    return payload    
+    return maxlist
 
+# shift or cut the payloads to get the package beginning 
+def payloadSort(payload, match):
+    pos = payload.find(chr(255)+chr(255)+chr(255)+chr(255))
+    if match:
+        payload = payload[pos:] + payload[:pos]
+    else:
+        payload = payload[pos:] 
+    return payload
+
+    
+def getList(payload, ch):
+    chl = list()
+    if ch == 1:
+        chl = getChannelList(payload)
+    else:
+        chl = getGuides(payload)
+    return chl
     
 ################################################################################
 # Beginning with the analyse of the binary data
@@ -191,6 +226,7 @@ def getGuides(pl):
                 #eid = ord(guide[pos])*256 + ord(guide[pos+1]) # Event ID 
                 start = mjd_to_local(guide[pos+2:pos+7])
                 duration = str_to_delta(guide[pos+7:pos+10]) 
+
                 
                 dlen = (  ord(guide[pos+10])  - (ord(guide[pos+10]) >> 4 << 4 ) )*256 + ord(guide[pos+11])
                 if dlen>0:
@@ -238,15 +274,21 @@ def getChannelList(pl):
         pos =  table.find(chr(255)+chr(255)+chr(255)+chr(255))
         if pos!=-1:
             table = table[:pos]
+        # avoid duplicate headers
+        header = table[0:10]
+        pos = table.find(header, 10)
+        if pos!=-1:
+            table = table[pos:]
+
         pos = 10
         
         dlen = 0                
         while pos < len(table)-4:
-            #print pos, len(table)-4
             cid = ord(table[pos])*256 + ord(table[pos+1])
             dlen = (  (ord(table[pos+3]) >> 4 << 4 )- ord(table[pos+3])  )*256 + ord(table[pos+4])
             if dlen < 0: 
                 break
+            #print pos, len(table)-4
             
             i = pos+6
 
@@ -255,8 +297,9 @@ def getChannelList(pl):
             clen = ord(table[i])
             provider = table[i+1: i+clen+1].replace(chr(0x86), "").replace(chr(0x87), "").replace(chr(0x05), "")
             i = i + clen + 1
-            clen = ord(table[i])            
-            channame = table[i+1: i+clen+1]
+            clen = ord(table[i]) 
+                      
+            channame = table[i+1: i+clen+1]            
             channame = channame.replace(chr(0x86), "").replace(chr(0x87), "").replace(chr(0x05), "")
                             
             if channame!=".":
@@ -265,62 +308,81 @@ def getChannelList(pl):
             pos = pos + 5 + dlen
     
     return channellist
-    
-
-          
-    
-                        
-#    f = open("out0.hex", "wb")
-#    f.write(payload[0])                    
-#    f.close()
-
-#    f = open("out1.hex", "wb")
-#    f.write(payload[1])                    
-#    f.close()
-
-#    f = open("out0-1.hex", "wb")
-#    f.write(guidetext)                    
-#    f.close()
-
    
-#
-   
-#f = open("o:/20130819195200 - Boerse.mpg", "rb")
-#f = open("o:/20130821195200 - Boerse.mpg", "rb")
-#break
-#print localtime()
+def savePayloads(payloads):
+    for i in range(0, 2):
+        f = open("out-%s.hex" % i, "wb")
+        f.write(payloads[i])                    
+        f.close()
 
+def loadPayloads():
+    payloads = ["",""]
+    for i in range(0, 2):
+        f = open("out-%s.hex" % i, "rb")
+        payloads[i] = f.read()                    
+        f.close()
+    return payloads    
 
+from operator import itemgetter
 def getFullList(f):
     fulllist = list()
     
-    payloads = read_stream(f)
-    
-    guides = getGuides(payloads[0])    
+    lists = read_stream(f)
+    guides = lists[0]
+    channellist = lists[1]
 
-    #print guides
+    print "guides %s" % (len(guides))
 #    for g in guides:
 #        print g[0], g[1], g[2], g[3]
-#    return None
-    
-    channellist = getChannelList(payloads[1])
+        
+
+    print "channellist %s" % (len(channellist))
+#    for g in channellist:
+#        print g[0], g[1], g[2]
 
     for l in guides:
         for c in channellist:
             if l[0] == c[0]:
                 fulllist.append([c[2], l[1], l[2], l[3]])
                 break
+    fulllist = sorted(fulllist, key=itemgetter(0,1,2))
+    
+#    for i in range(0, len(fulllist)-1):
+#        if fulllist[i][0]==fulllist[i+1][0]:
+#            if fulllist[i][1] + fulllist[i][2] != fulllist[i+1][0]:
+#                print "aha!"
+                
+#    for x in fulllist            
+#    fl2 = list()
     
     return fulllist
+  
+def main(argv=None):
+#    cls()
+    inp = None
+    if argv is None:
+        argv = sys.argv    
+    if len(argv)>1:
+        try:
+            if argv[1].find("://")!=-1: # URL
+                inp = urllib2.urlopen(argv[1]) 
+            else:
+                inp = open(argv[1], "rb")
+        except:
+            print "Supplied file/stream could not be found, aborting..."
+            return
+    else:  # default
+        #inp = open("test.mpg", "rb")
+        #inp = urllib2.urlopen("http://192.168.0.20/stream/tunerequest00040000C0FFFFFF00B82C70000100FF0085001B010102FF")
+        inp = urllib2.urlopen("http://192.168.0.20/stream/tunerequest00040000C0FFFFFF00B9F960044100FF00012F08010101FF") # RTL
+        
+    fullist = getFullList(inp)
 
-# using URL
-#f = urllib2.urlopen("http://192.168.0.20/stream/tunerequest00040000C0FFFFFF00AF5E8803FB00FF0001283D020301FF")
-# using file
-f = open("../test.mpg", "rb")
+    for l in fullist:
+        print "%s\t%s\t%s\t%s" % ('{0: <18}'.format(l[0]), l[1], l[2], l[3].split("\n")[0][0:20] )
+    #    print l[0], l[1], l[2], l[3]
 
-fullist = getFullList(f)
+    inp.close()
 
-for l in fullist:
-    print l[0], l[1], l[2], l[3]
-
-f.close()
+if __name__ == "__main__":
+    sys.exit(main())

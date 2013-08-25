@@ -26,6 +26,19 @@ import sys
 #    from os import system, name
 #    system('cls' if name=='nt' else 'clear')
     
+
+def unistr(strin):
+    strout = unicode('')
+    for s in strin:
+        try:
+            strout = strout + unicode(s)
+        except:
+            try:
+                strout = strout + s.decode('latin1')
+            except:
+                pass     
+    return strout
+
 # converts string into time, i.e. 0x20 0x15 0x15 = 20:15:00 - what a funny way to encode time!
 def str_to_delta(strin):
     try:
@@ -34,7 +47,7 @@ def str_to_delta(strin):
         s = int(hex(ord(strin[2])).replace("0x",""))
         return timedelta(hours=h, minutes = n, seconds = s)
     except:
-        print "Wrong time detected"
+        #print "Wrong time detected"
         return timedelta(0)
 
 # converts Modified Julian date to local date
@@ -105,7 +118,10 @@ def read_stream(f_in):
     blocktoread = 100
     block_sz = size * blocktoread
     blocksread = 0
-    maxblocksread = 10*1024*1024
+    maxblocksread = 150*1024*1024
+    # or
+    maxtimespend = timedelta(seconds=60)
+    starttime = datetime.now() 
     
     # Continuity counter    
     ccount = [-1, -1]
@@ -122,7 +138,7 @@ def read_stream(f_in):
     while True:
         mybuffer = f_in.read(block_sz)
         blocksread = blocksread + block_sz  
-        if not mybuffer or blocksread>maxblocksread:
+        if not mybuffer or blocksread>maxblocksread or datetime.now() -starttime>maxtimespend:
             print "Read finished at %s/%s MB" % (blocksread/1024/1024, maxblocksread/1024/1024)            
             for ch in range(0,2):
                 plist = getList(payloadSort(payload[ch], False), ch)
@@ -196,70 +212,73 @@ def getList(payload, ch):
 # Payload 0 = Guide information
     
 def getGuides(pl):                     
-    # Sorting the tables, taking 5* and 6* tables only.
-    guidetext = ""
-    pos0 = -1
-    pos1 = -1       
-    for i in range(0, len(pl)-4):
-        if ord(pl[i]) == 0xFF and ord(pl[i+1]) == 0xFF and ord(pl[i+2]) == 0x00:
-            pos1 = i + 2
-            if pos0 != -1:
-                guidetext = guidetext + "////" + ( pl[pos0+1:pos1] )
-                pos0 = -1 
-            if ord(pl[i+3]) >> 4 == 5  or ord(pl[i+3]) >> 4 == 6:
-                pos0 = i+2
-                
-    # Separating the tables into a list 
-    guidelist = guidetext.split("////")
     guides = list()
-#    print len(guidelist)
-    
-    for guide in guidelist:
-        if len(guide)>14:
-            pos = 0
-            slen = (  ord(guide[pos+1])  - (ord(guide[pos+1]) >> 4 << 4 ) )*256 + ord(guide[pos+2])
-            # Channel ID 
-            sid = ord(guide[pos+3])*256 + ord(guide[pos+4])                        
-            pos = pos + 14
-            while pos < slen-10:                
-                #try:
-                #eid = ord(guide[pos])*256 + ord(guide[pos+1]) # Event ID 
-                start = mjd_to_local(guide[pos+2:pos+7])
-                duration = str_to_delta(guide[pos+7:pos+10]) 
 
-                
-                dlen = (  ord(guide[pos+10])  - (ord(guide[pos+10]) >> 4 << 4 ) )*256 + ord(guide[pos+11])
-                if dlen>0:
-                    pos2 = pos + 17
-                    # Steuerbyte for several descriptions (?)
-                    stb = guide[pos2+1]
-                    if stb==chr(05): # several descriptions / lines available
-                        desc = ""
-                        desccnt = 0
-                        while pos2<pos+12+dlen-1: 
-                            if guide[pos2]==chr(0x4E):    
-                                pos2 = pos2 + 7
-                            elif guide[pos2]==chr(0x50) or guide[pos2]==chr(0x54) :    
-                                break;
-                            dlen2 = ord(guide[pos2])
-                            if dlen2<=0:
-                                break
-                                
-                            if desccnt == 1 or desccnt == 2:
-                                desc = desc + "\n" + guide[pos2+2:pos2+1+dlen2] 
-                            else:
-                                desc = desc + guide[pos2+2:pos2+1+dlen2] 
-                            
-                            desccnt = desccnt + 1
-                            pos2 = pos2+dlen2+1
-                    else: # only one description available
-                        dlen2 = ord(guide[pos2])
-                        desc = guide[pos2+1:pos2+1+dlen2]
-                        
- #                   print sid, start, duration, desc
-                    guides.append([sid, start, duration, desc])
-                pos = pos + dlen + 12                    
+    try:    
+        # Sorting the tables, taking 5* and 6* tables only.
+        guidetext = ""
+        pos0 = -1
+        pos1 = -1       
+        for i in range(0, len(pl)-4):
+            if ord(pl[i]) == 0xFF and ord(pl[i+1]) == 0xFF and ord(pl[i+2]) == 0x00:
+                pos1 = i + 2
+                if pos0 != -1:
+                    guidetext = guidetext + "////" + ( pl[pos0+1:pos1] )
+                    pos0 = -1 
+                if ord(pl[i+3]) >> 4 == 5  or ord(pl[i+3]) >> 4 == 6:
+                    pos0 = i+2
+                    
+        # Separating the tables into a list 
+        guidelist = guidetext.split("////")
+        
+        for guide in guidelist:
+            if len(guide)>14:
+                pos = 0
+                slen = (  ord(guide[pos+1])  - (ord(guide[pos+1]) >> 4 << 4 ) )*256 + ord(guide[pos+2])
+                # Channel ID 
+                sid = ord(guide[pos+3])*256 + ord(guide[pos+4])                        
+                pos = pos + 14
+                while pos < slen-10:                
+                    #try:
+                    #eid = ord(guide[pos])*256 + ord(guide[pos+1]) # Event ID 
+                    start = mjd_to_local(guide[pos+2:pos+7])
+                    duration = str_to_delta(guide[pos+7:pos+10]) 
     
+                    
+                    dlen = (  ord(guide[pos+10])  - (ord(guide[pos+10]) >> 4 << 4 ) )*256 + ord(guide[pos+11])
+                    if dlen>0:
+                        pos2 = pos + 17
+                        # Steuerbyte for several descriptions (?)
+                        stb = guide[pos2+1]
+                        if stb==chr(05): # several descriptions / lines available
+                            desc = ""
+                            desccnt = 0
+                            while pos2<pos+12+dlen-1: 
+                                if guide[pos2]==chr(0x4E):    
+                                    pos2 = pos2 + 7
+                                elif guide[pos2]==chr(0x50) or guide[pos2]==chr(0x54) :    
+                                    break;
+                                dlen2 = ord(guide[pos2])
+                                if dlen2<=0:
+                                    break
+                                    
+                                if desccnt == 1 or desccnt == 2:
+                                    desc = desc + "\n" + guide[pos2+2:pos2+1+dlen2] 
+                                else:
+                                    desc = desc + guide[pos2+2:pos2+1+dlen2] 
+                                
+                                desccnt = desccnt + 1
+                                pos2 = pos2+dlen2+1
+                        else: # only one description available
+                            dlen2 = ord(guide[pos2])
+                            desc = guide[pos2+1:pos2+1+dlen2]
+                            
+                        guides.append([sid, start, duration, unistr(desc)])                        
+                        
+                    pos = pos + dlen + 12                    
+        
+    except:
+        pass
     return guides
 
 ################################################################################
@@ -268,44 +287,46 @@ def getGuides(pl):
 
 def getChannelList(pl):
     channellist = list()
-        
-    splittables = pl.replace(chr(0xFF)+chr(0x00)+chr(0x46),chr(0xFF)+chr(0x00)+chr(0x42)).split(chr(0xFF)+chr(0x00)+chr(0x42))
-    for table in splittables:
-        pos =  table.find(chr(255)+chr(255)+chr(255)+chr(255))
-        if pos!=-1:
-            table = table[:pos]
-        # avoid duplicate headers
-        header = table[0:10]
-        pos = table.find(header, 10)
-        if pos!=-1:
-            table = table[pos:]
-
-        pos = 10
-        
-        dlen = 0                
-        while pos < len(table)-4:
-            cid = ord(table[pos])*256 + ord(table[pos+1])
-            dlen = (  (ord(table[pos+3]) >> 4 << 4 )- ord(table[pos+3])  )*256 + ord(table[pos+4])
-            if dlen < 0: 
-                break
-            #print pos, len(table)-4
+    try:    
+        splittables = pl.replace(chr(0xFF)+chr(0x00)+chr(0x46),chr(0xFF)+chr(0x00)+chr(0x42)).split(chr(0xFF)+chr(0x00)+chr(0x42))
+        for table in splittables:
+            pos =  table.find(chr(255)+chr(255)+chr(255)+chr(255))
+            if pos!=-1:
+                table = table[:pos]
+            # avoid duplicate headers
+            header = table[0:10]
+            pos = table.find(header, 10)
+            if pos!=-1:
+                table = table[pos:]
+    
+            pos = 10
             
-            i = pos+6
-
-            if table[i-1]=='V' or table[i-1]=='H':
-                i = i + 2
-            clen = ord(table[i])
-            provider = table[i+1: i+clen+1].replace(chr(0x86), "").replace(chr(0x87), "").replace(chr(0x05), "")
-            i = i + clen + 1
-            clen = ord(table[i]) 
-                      
-            channame = table[i+1: i+clen+1]            
-            channame = channame.replace(chr(0x86), "").replace(chr(0x87), "").replace(chr(0x05), "")
-                            
-            if channame!=".":
-                channellist.append([cid, provider, channame])
+            dlen = 0                
+            while pos < len(table)-4:
+                cid = ord(table[pos])*256 + ord(table[pos+1])
+                dlen = (  (ord(table[pos+3]) >> 4 << 4 )- ord(table[pos+3])  )*256 + ord(table[pos+4])
+                if dlen < 0: 
+                    break
+                #print pos, len(table)-4
                 
-            pos = pos + 5 + dlen
+                i = pos+6
+    
+                if table[i-1]=='V' or table[i-1]=='H':
+                    i = i + 2
+                clen = ord(table[i])
+                provider = table[i+1: i+clen+1].replace(chr(0x86), "").replace(chr(0x87), "").replace(chr(0x05), "")
+                i = i + clen + 1
+                clen = ord(table[i]) 
+                          
+                channame = table[i+1: i+clen+1]            
+                channame = channame.replace(chr(0x86), "").replace(chr(0x87), "").replace(chr(0x05), "")
+                                
+                if channame!=".":
+                    channellist.append([cid, provider, channame])
+                    
+                pos = pos + 5 + dlen
+    except:
+        pass
     
     return channellist
    
@@ -331,12 +352,12 @@ def getFullList(f):
     guides = lists[0]
     channellist = lists[1]
 
-    print "guides %s" % (len(guides))
+    #print "guides %s" % (len(guides))
 #    for g in guides:
 #        print g[0], g[1], g[2], g[3]
         
 
-    print "channellist %s" % (len(channellist))
+    #print "channellist %s" % ()
 #    for g in channellist:
 #        print g[0], g[1], g[2]
 
@@ -354,6 +375,8 @@ def getFullList(f):
                 
 #    for x in fulllist            
 #    fl2 = list()
+
+    print "EPG grab finished with %s channels, %s guide infos, joined amount: %s" % (len(channellist), len(guides), len(fulllist))
     
     return fulllist
   
@@ -363,8 +386,9 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv    
     if len(argv)>1:
-        try:
+        try:            
             if argv[1].find("://")!=-1: # URL
+                print "EPG grabbing started on %s" % argv[0]
                 inp = urllib2.urlopen(argv[1]) 
             else:
                 inp = open(argv[1], "rb")
@@ -376,13 +400,14 @@ def main(argv=None):
         #inp = urllib2.urlopen("http://192.168.0.20/stream/tunerequest00040000C0FFFFFF00B82C70000100FF0085001B010102FF")
         inp = urllib2.urlopen("http://192.168.0.20/stream/tunerequest00040000C0FFFFFF00B9F960044100FF00012F08010101FF") # RTL
         
-    fullist = getFullList(inp)
+    fulllist = getFullList(inp)
 
-    for l in fullist:
-        print "%s\t%s\t%s\t%s" % ('{0: <18}'.format(l[0]), l[1], l[2], l[3].split("\n")[0][0:20] )
+#    for l in fulllist:
+#        print "%s\t%s\t%s\t%s" % ('{0: <18}'.format(l[0]), l[1], l[2], l[3].split("\n")[0][0:20] )
     #    print l[0], l[1], l[2], l[3]
 
     inp.close()
+    return fulllist
 
 if __name__ == "__main__":
     sys.exit(main())

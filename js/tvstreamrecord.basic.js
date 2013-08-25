@@ -54,7 +54,7 @@ function checkLength( o, n, min, max ) {
     }
 }
 
-function checkRegexp( o, regexp, n ) {
+function checkRegexp(o, regexp, n ) {
     x = document.getElementById(o);
     if ( !( regexp.test( x.value ) ) ) {
         $("#"+o).addClass( "ui-state-error" );
@@ -190,6 +190,7 @@ $(function() {
     
     $( "#switch00" ).slickswitch();   
     $( "#switch01" ).slickswitch();
+    $( "#switch02" ).slickswitch();
     
     $( "#dialog" ).dialog({
         autoOpen: false,
@@ -507,7 +508,7 @@ $(function() {
     
     $( "#createchannel-form" ).dialog({
         autoOpen: false,
-        height: 310,
+        height: 340,
         width: 250,
         modal: true,
         close: function() {
@@ -525,19 +526,22 @@ $(function() {
                 {
                     var bValid = true;
                     allFields.removeClass( "ui-state-error" );
-                    bValid = bValid & checkRegexp( "ccid", /^[0-9]{1,5}$/, "Please enter a valid number" );
-                    bValid = bValid & checkRegexp( "cname", /^(?=\s*\S).*$/, "Please enter a valid name" );
-                    bValid = bValid & checkRegexp( "cpath", /^(?=\s*\S).*$/, "Please enter a valid URL" );
+                    bValid = bValid & checkRegexp(  "ccid", /^[0-9]{1,5}$/, "Please enter a valid number" );
+                    bValid = bValid & checkRegexp(  "cname", /^(?=\s*\S).*$/, "Please enter a valid name" );
+                    bValid = bValid & checkRegexp(  "cpath", /^(?=\s*\S).*$/, "Please enter a valid URL" );
                     if (bValid) {
                         var akt = 0;
+                        var epggrab = 0;
                         if ($("#switch01").attr("checked") == "checked") {akt = 1;}
+                        if ($("#switch02").attr("checked") == "checked") {epggrab = 1;}
                         post("/create_channel", { 
                             prev:document.getElementById("prev").value, 
                             ccid:document.getElementById("ccid").value, 
                             cname:document.getElementById("cname").value, 
                             cpath:document.getElementById("cpath").value,
                             cext: document.getElementById("cext").value,
-                            aktiv:akt 
+                            aktiv:akt,
+                            epggrab: epggrab                   
                         }, 1);                                 
                         $( this ).dialog( "close" );
                     }
@@ -562,6 +566,8 @@ $(function() {
                         if(data[i][0]==dialognr) {
                             
                             switchMe("#switch01", ($("#switch-" + data[i][0]).attr("checked") == "checked") );
+                            switchMe("#switch02", ( $("#iconsEPG-" + dialognr).children().attr("class").indexOf("plus") > 0) );
+
                             document.getElementById("prev").value=data[i][0];
                             document.getElementById("ccid").value=data[i][0];
                             document.getElementById("cname").value=data[i][1];
@@ -576,6 +582,7 @@ $(function() {
                 $( this ).dialog( "option", "buttons", [updatebutton, cancelbutton] );   
                 
                 switchMe("#switch01", true );
+                switchMe("#switch02", false );
                 document.getElementById("prev").value="";            
                 document.getElementById("ccid").value="1";            
                 document.getElementById("cname").value="";            
@@ -604,6 +611,13 @@ $(function() {
         .button()
         .click(function(event ) {
             post("/getepg", {}, 0);                  
+            event.preventDefault();
+        });
+
+    $( "#grabepg" )
+        .button()
+        .click(function(event ) {
+            post("/grabepg", {}, 0);                  
             event.preventDefault();
         });
 
@@ -669,13 +683,15 @@ $(function() {
         "sAjaxSource": "/channellist",
         "fnDrawCallback": function( oSettings ) {
             initSwitch();
-            initIcons();
-            
+            initIcons();            
         },
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {        
+            var data4 = ""; 
+            if (aData[4] == 1) data4 = "plus"; else data4="minus";
+            $('td:eq(4)', nRow).html('<a href="#" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-'+data4+'"></span></a>');            
             var chk = "";
-            if (aData[4] == 1) chk = 'checked="checked"';
-            $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');            
+            if (aData[5] == 1) chk = 'checked="checked"';
+            $('td:eq(5)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');            
         }        
     }); 
     

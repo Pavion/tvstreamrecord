@@ -12,6 +12,7 @@
 <th class="cname">Name</th>
 <th class="curl">URL</th>
 <th class="cext">Type</th>
+<th class="cepg">EPG Grab</th>
 <th class="ccontrols">Controls</th>
 </tr>
 </thead>
@@ -35,11 +36,18 @@
 <input type="text" maxlength="5" id="ccid" class="text ui-widget-content ui-corner-all" name="ccid" value=""/> 
 <label for="name">Channel name</label>
 <input type="text" maxlength="30" id="cname" class="text ui-widget-content ui-corner-all" name="cname" value=""/> 
-<input type="checkbox" class="switch icons" id="switch01" checked="checked" />  
 <label for="channel">Channel URL</label>
 <input type="text" maxlength="255" id="cpath" class="text ui-widget-content ui-corner-all" name="cpath" value=""/> 
 <label for="channel">File extension (i.e. .mpg)</label>
 <input type="text" maxlength="8" id="cext" class="text ui-widget-content ui-corner-all" name="cext" value=""/> 
+<div id="chb1">
+<label for="lactive" id="lactive">Enabled</label>
+<input type="checkbox" class="switch icons" id="switch01" checked="checked" />
+</div>  
+<div id="chb2">
+<label for="lepg" id="lepg">Grab EPG</label>
+<input type="checkbox" class="switch icons" id="switch02"  />  
+</div>  
 </fieldset>
 </form>
 </div>

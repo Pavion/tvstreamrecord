@@ -23,6 +23,7 @@ from datetime import datetime, timedelta, time, date
 import subprocess
 import config
 from sql import sqlRun, sqlCreateAll, purgeDB
+import grabber
 import xmltv
 import json
 import urllib2
@@ -35,7 +36,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.5.0' 
+version = '0.5.1' 
 
 @route('/channels.m3u')
 def server_static8():
@@ -109,9 +110,9 @@ def log_get():
 @route('/channellist')
 def chanlist():
     l = []
-    rows=sqlRun('SELECT channels.cid, cname, cpath, cext, cenabled FROM channels')    
+    rows=sqlRun('SELECT channels.cid, cname, cpath, cext, epgscan, cenabled FROM channels')    
     for row in rows:
-        l.append([row[0], row[1], row[2], row[3], row[4]])
+        l.append([row[0], row[1], row[2], row[3], row[4], row[5]])
     return json.dumps({"aaData": l } )
 
 @route('/list')
@@ -152,6 +153,7 @@ def createchannel():
     cname = request.forms.cname
     cpath = request.forms.cpath
     aktiv = getBool(request.forms.aktiv)
+    epggrab = getBool(request.forms.epggrab)
     cext = request.forms.cext
     
     if prev=="":
@@ -183,7 +185,7 @@ def createchannel():
     
     if prev!=-1:
         if cid == prev:  # editing/renaming only 
-            sqlRun("UPDATE channels SET cname='%s', cpath='%s', cext='%s', cenabled=%s WHERE cid=%s" % (cname, cpath, cext, aktiv, cid))
+            sqlRun("UPDATE channels SET cname='%s', cpath='%s', cext='%s', cenabled=%s, epgscan=%s WHERE cid=%s" % (cname, cpath, cext, aktiv, epggrab, cid))
         else: # also moving
             if exists:
                 sqlRun("UPDATE channels SET cid = -1 WHERE cid = %s" % (prev))
@@ -194,16 +196,16 @@ def createchannel():
                 else:            
                     sqlRun("UPDATE channels SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev, cid))
                     sqlRun("UPDATE records  SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev, cid))
-                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s WHERE cid=-1" % (cname, cid, cpath, cext, aktiv))
+                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s, epgscan=%s WHERE cid=-1" % (cname, cid, cpath, cext, aktiv, epggrab))
                 sqlRun("UPDATE records SET cid=%s WHERE cid=-1" % cid)
             else:
-                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s WHERE cid=%s" % (cname, cid, cpath, cext, aktiv, prev))                
+                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s, epgscan=%s WHERE cid=%s" % (cname, cid, cpath, cext, aktiv, epggrab, prev))                
                 sqlRun("UPDATE records SET cid=%s WHERE cid=%s" % (cid, prev))            
     else:
         if exists:
             sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s" % cid)            
             sqlRun("UPDATE records SET cid = cid+1 WHERE cid >= %s" % cid)            
-        sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid))
+        sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid, epggrab))
     return
     
 @post('/upload')
@@ -237,7 +239,7 @@ def upload_p():
                     retl.append([name, line, rowid])
                     rowid = rowid + 1 
                     name = ""
-        sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?)", retl, 1)             
+        sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?, 0)", retl, 1)             
             
     redirect("/list") 
 
@@ -269,6 +271,47 @@ def getepg():
         mythread.start()
     else:
         print "EPG import already running, please be patient"
+    return 
+
+@post('/grabepg')
+def grabepg():
+    rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
+    for row in rows:
+        fulllist = grabber.main(row)
+        sqllist = list()
+        prevname = ""
+        actname = "dummy"
+        cid = 0
+
+        for l in fulllist:
+            actname = l[0]
+            if actname!=prevname:
+                rows2 = sqlRun("SELECT cid FROM channels WHERE cenabled = 1 AND cname='%s' OR lower(cname)='%s'" % (actname, actname.lower()) )
+                if rows2:
+                    cid = rows2[0][0]
+                else:
+                    cid = -1
+                print actname, cid    
+                prevname=actname 
+
+            if cid!=-1:
+                dt1 = l[1]
+                dt2 = l[1] + l[2]         
+                pos = l[3].find("\n")
+                if pos!=-1: 
+                    title = l[3][0:pos]
+                    desc = l[3][pos+1:]
+                else:                  
+                    title = l[3]
+                    desc = ""
+            
+#                try:
+                sqllist.append([cid, unicode(title), datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), unicode(desc)])
+#                except:
+#                    print desc
+
+        if len(sqllist)>0:
+            sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
     return 
 
 class epgthread(threading.Thread):
@@ -303,7 +346,8 @@ def epg_s():
     global dayshown    
     todaysql = datetime.strftime(dayshown, "%Y-%m-%d %H:%M:%S")
     d_von = dayshown    
-    rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY guide.g_id" % (todaysql, todaysql))
+#    rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY guide.g_id" % (todaysql, todaysql))
+    rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND ((guide.g_id=channels.cid) OR (channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id)) AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY cname" % (todaysql, todaysql))
     for row in rows:
         cid=row[1]
         rtemp = list()
@@ -312,6 +356,7 @@ def epg_s():
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
             fulltext = "<b>"+event[0]+": "+datetime.strftime(d_von, localtime) + " - " + datetime.strftime(d_bis, localtime) + "</b><BR><BR>"+event[3]
+#            fulltext = fulltext.replace(chr(138), "").replace(chr(0xE4),"").replace(chr(0xF6),"").replace(chr(0xFC),"")
             title = fulltext
             if len(title)>300:
                 title = title[:297]+"..."
@@ -319,7 +364,12 @@ def epg_s():
                     title.decode("UTF-8")
                 except:
                     title = title[:296]+"..."
+                    #print title
+                    #print "haha"
+                    title = ""
+                    fulltext = ""
                     pass
+
             if d_von.date() < dayshown.date():
                 d_von = dayshown
             if d_bis.date() > dayshown.date():
@@ -329,6 +379,12 @@ def epg_s():
             rtemp.append ([cid, x.total_seconds()/86400.0*100.0*widthq, w.total_seconds()/86400.0*100.0*widthq, event[0], title, fulltext, event[4], row[2]])
         ret.append(rtemp)
     return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret)            
+
+# for s in ustr:
+# s += unicode(s)
+#
+#
+
 
 #------------------------------- Record List -------------------------------
 

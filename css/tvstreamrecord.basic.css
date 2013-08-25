@@ -19,6 +19,7 @@ html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-si
 	.demoHeaders {
 		margin-top: 2em;
 	}
+
 	[id^=icons-] {
 		margin: 0px 0px;
 		position: relative;
@@ -30,6 +31,19 @@ html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-si
 		float: left;
 		margin: -2px -2px;
 	}
+
+    [id^=iconsEPG-] {
+        margin: 0px 0px;
+        position: relative;
+        padding: 0px 0;
+        cursor: pointer;
+        float: left;
+    }
+    [id^=iconsEPG-] span.ui-icon {
+        float: left;
+        margin: -2px -2px;
+    }
+
 	.fakewindowcontain .ui-widget-overlay {
 		position: absolute;
 	}
@@ -49,7 +63,12 @@ div#users-contain table td, div#users-contain table th { border: 1px solid #eee;
 #timepicker_inline_div1 { width:45%; float:left; }
 #timepicker_inline_div2 { width:45%; float:left; margin-left:10px; }
 select#channel { width:85%; float:left; margin-bottom:8px; padding: .2em; } 
-input#cname { width:75%; float:left; }
+/*input#cname { width:75%; float:left; }*/
+/*label#lactive { width:30%;}
+label#lepg { width:30%;  }*/
+label#append {float: left; margin-top: 3px;}
+#chb1 { width:46%; float: left;}
+#chb2 { width:46%; float: right;}
 
 [id^=cfg_].text { margin-bottom:0px; width:95%; padding: 0.1em; }
 
@@ -60,9 +79,9 @@ input#cname { width:75%; float:left; }
 [id=purge-records].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=submit_cfg].ui-button-text-only .ui-button-text { padding: 0px 3px; }
 [id=getepg].ui-button-text-only .ui-button-text { padding: 1px 5px; }
+[id=grabepg].ui-button-text-only .ui-button-text { padding: 1px 5px; }
 [id=resetlog].ui-button-text-only .ui-button-text { padding: 1px 5px; }
 [id=downlog].ui-button-text-only .ui-button-text { padding: 1px 5px; }
-label#append {float: left; margin-top: 3px;}
 
 
 #feedback { font-size: 1.4em; }
@@ -86,6 +105,7 @@ th.ccontrols { width: 80px; }
 th.cid { width: 40px; }
 th.cname { width: 300px; }
 th.cext { width: 50px; }
+th.cepg { width: 60px; }
 
 th.rcontrols { width: 180px; }
 th.rrecu { width: 100px; }

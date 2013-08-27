@@ -38,9 +38,15 @@ class Logger(object):
         mylines = message.replace('\n', '')
         mylines = mylines.replace('\r', '')
         mylines = mylines.strip()
-        mylines = mylines.encode("UTF-8", errors='replace')
-        if mylines!="": 
-            self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + self.typ + " " + mylines + "\n")
+        try:
+            try:
+                mylines = mylines.encode("UTF-8", errors='replace')
+            except:
+                pass    
+            if mylines!="": 
+                self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + self.typ + " " + mylines + "\n")
+        except:
+            pass
     
     
 def logInit():        

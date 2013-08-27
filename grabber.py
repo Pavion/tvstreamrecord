@@ -24,7 +24,14 @@ import sys
 def unistr(strin):
     strout = unicode('', "UTF-8")
     for s in strin:
+#        if ord(s)<30 and not ord(s)==ord('\n'):
+#            break
         strout = strout + unichr(ord(s))
+    if len(strin) > len(strout) + 20:
+        print "++++++++++++++++++++++++++++++++++++++"    
+        print "I: " + strin
+        print "O: " + strout
+        print "--------------------------------------"    
     return strout
 
 # converts string into time, i.e. 0x20 0x15 0x15 = 20:15:15 - what a funny way to encode time!
@@ -109,7 +116,7 @@ def read_stream(f_in):
     f_in.read(offset)
     
     # define block amount to be read, can cause/fix performance issues 
-    blocktoread = 100
+    blocktoread = 200
     block_sz = size * blocktoread
     
     # Loop break if X bytes read  
@@ -156,7 +163,7 @@ def read_stream(f_in):
                 # Continuity control
                 ccount_new[ch] = pid3 - (pid3 >> 4 << 4)
                 if ccount[ch]!=-1 and not (ccount_new[ch] == ccount[ch] + 1 or (ccount_new[ch] == 0 and ccount[ch] == 15)):
-                    print "out of sync at ID %s" % ch
+                    # print "out of sync at ID %s" % ch
                     # Out of sync! 
                     payload[ch] = payloadSort(payload[ch], False)
                     analyse[ch] = True                                     
@@ -212,7 +219,8 @@ def getList(payload, ch):
 def getGuides(pl):                     
     guides = list()
 
-    try:    
+    #if True:
+    try:            
         # Sorting the tables, taking 5* and 6* tables only.
         guidetext = ""
         pos0 = -1
@@ -250,6 +258,7 @@ def getGuides(pl):
                         if stb==chr(05): # several descriptions / lines available
                             desc = ""
                             desccnt = 0
+                            
                             while pos2<pos+12+dlen-1: 
                                 if guide[pos2]==chr(0x4E):    
                                     pos2 = pos2 + 7
@@ -359,7 +368,7 @@ def getFullList(f):
 
     for l in guides:
         for c in channellist:
-            if l[0] == c[0]:
+            if l[0] == c[0] and l[1] > datetime.now() - timedelta(hours=8):                
                 fulllist.append([c[2], l[1], l[2], l[3]])
                 break
     fulllist = sorted(fulllist, key=itemgetter(0,1,2))

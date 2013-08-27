@@ -272,10 +272,16 @@ class epggrabthread(threading.Thread):
     def isRunning(self):
         return self.running
     
-    def __init__(self):
+    def setChannelCount(self):
+        self.epggrabberstate[1] = 0
         rows = sqlRun("SELECT count(cname) FROM channels WHERE epgscan = 1 AND cenabled = 1;")
         if rows:
             self.epggrabberstate[1] = rows[0][0]
+    
+    def __init__(self):
+        #rows = sqlRun("SELECT count(cname) FROM channels WHERE epgscan = 1 AND cenabled = 1;")
+        #if rows:
+        self.setChannelCount()
         threading.Thread.__init__(self)
 
     def run(self):
@@ -287,8 +293,8 @@ class epggrabthread(threading.Thread):
                 break
             self.epggrabberstate[0] = self.epggrabberstate[0] + 1
 ### DEBUG            
-    #        fulllist = grabber.main(row)
-            fulllist = grabber.main()
+            fulllist = grabber.main(row)
+    #        fulllist = grabber.main()
             sqllist = list()
             sqlchlist = list()
             prevname = ""
@@ -368,6 +374,14 @@ class epgthread(threading.Thread):
 
 #------------------------------- EPG painting part -------------------------------
         
+@post('/removeepg')
+def removeepg():    
+    sqlRun("DELETE FROM guide")
+    sqlRun("DELETE FROM guide_chan")
+    print "All EPG data was deleted"
+    return 
+
+
 @post('/epg')
 def epg_p():    
     day = request.forms.datepicker3
@@ -377,6 +391,8 @@ def epg_p():
 
 @route('/epg')
 def epg_s():    
+    grabthread.setChannelCount()
+    
     widthq = 0.8
     ret = list()
     rtemp = list()

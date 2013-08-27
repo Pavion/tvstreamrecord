@@ -627,6 +627,13 @@ $(function() {
             event.preventDefault();
         });
 
+    $( "#removeepg" )
+        .button()
+        .click(function(event ) {
+            post("/removeepg", {}, 1);                  
+            event.preventDefault();
+        });
+
     $( "#resetlog" )
         .button()
         .click(function(event ) {

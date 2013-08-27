@@ -12,8 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-    @author: pavion
-    @version: v0.4.1
+    @author: Pavion
 */
 
 var dialognr = -1; 
@@ -614,10 +613,17 @@ $(function() {
             event.preventDefault();
         });
 
-    $( "#grabepg" )
+    $( "#grabepgstart" )
         .button()
         .click(function(event ) {
-            post("/grabepg", {}, 0);                  
+            post("/grabepgstart", {}, 0);                  
+            event.preventDefault();
+        });
+
+    $( "#grabepgstop" )
+        .button()
+        .click(function(event ) {
+            post("/grabepgstop", {}, 0);                  
             event.preventDefault();
         });
 

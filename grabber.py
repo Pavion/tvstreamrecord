@@ -21,25 +21,13 @@ from datetime import datetime, timedelta#, time, date
 import time
 import sys
 
-# Debug only
-#def cls():
-#    from os import system, name
-#    system('cls' if name=='nt' else 'clear')
-    
-
 def unistr(strin):
-    strout = unicode('')
+    strout = unicode('', "UTF-8")
     for s in strin:
-        try:
-            strout = strout + unicode(s)
-        except:
-            try:
-                strout = strout + s.decode('latin1')
-            except:
-                pass     
+        strout = strout + unichr(ord(s))
     return strout
 
-# converts string into time, i.e. 0x20 0x15 0x15 = 20:15:00 - what a funny way to encode time!
+# converts string into time, i.e. 0x20 0x15 0x15 = 20:15:15 - what a funny way to encode time!
 def str_to_delta(strin):
     try:
         h = int(hex(ord(strin[0])).replace("0x",""))
@@ -79,6 +67,12 @@ def mjd_to_local(strin):
         start = datetime(1900,1,1,0,0,0) 
     
     return start 
+    
+def joinarrays(arr_max, arr_in):
+    for i in arr_in:
+        if not i in arr_max:
+            arr_max.append(i)       
+    return arr_max
 
 def read_stream(f_in):
     # Possible package sizes of MPEG-TS (default = 188)
@@ -114,13 +108,15 @@ def read_stream(f_in):
     offset = r[len(r)-1]-1000
     f_in.read(offset)
     
-    # define blocks 
+    # define block amount to be read, can cause/fix performance issues 
     blocktoread = 100
     block_sz = size * blocktoread
+    
+    # Loop break if X bytes read  
     blocksread = 0
     maxblocksread = 150*1024*1024
-    # or
-    maxtimespend = timedelta(seconds=60)
+    # or if Y seconds spend
+    maxtimespend = timedelta(seconds=60)    
     starttime = datetime.now() 
     
     # Continuity counter    
@@ -142,8 +138,9 @@ def read_stream(f_in):
             print "Read finished at %s/%s MB" % (blocksread/1024/1024, maxblocksread/1024/1024)            
             for ch in range(0,2):
                 plist = getList(payloadSort(payload[ch], False), ch)
-                if len(plist)>len(maxlist[ch]):
-                    maxlist[ch] = plist
+                maxlist[ch] = joinarrays(maxlist[ch], plist)
+                #if len(plist)>len(maxlist[ch]):
+                #    maxlist[ch] = plist
             break
         for i in range(0, len(mybuffer), size):
             pid1 = ord(mybuffer[i+1])
@@ -172,15 +169,16 @@ def read_stream(f_in):
                     myfirstpayload[ch] = tmp
                 elif tmp == myfirstpayload[ch]:    
                     # Payload match encountered
-                    print "Payload %s match encountered" % ch
+                    # print "Payload %s match encountered" % ch
                     payload[ch] = payloadSort(payload[ch], True)
                     analyse[ch] = True
                  
                 # Data analyse and matching
                 if analyse[ch]:     
                     plist = getList(payload[ch], ch)
-                    if len(plist)>len(maxlist[ch]):
-                        maxlist[ch] = plist
+                    maxlist[ch] = joinarrays(maxlist[ch], plist)
+#                    if len(plist)>len(maxlist[ch]):
+#                        maxlist[ch] = plist
                     myfirstpayload[ch] = tmp
                     payload[ch] = ""                                        
                     analyse[ch] = False
@@ -239,7 +237,6 @@ def getGuides(pl):
                 sid = ord(guide[pos+3])*256 + ord(guide[pos+4])                        
                 pos = pos + 14
                 while pos < slen-10:                
-                    #try:
                     #eid = ord(guide[pos])*256 + ord(guide[pos+1]) # Event ID 
                     start = mjd_to_local(guide[pos+2:pos+7])
                     duration = str_to_delta(guide[pos+7:pos+10]) 
@@ -272,7 +269,7 @@ def getGuides(pl):
                         else: # only one description available
                             dlen2 = ord(guide[pos2])
                             desc = guide[pos2+1:pos2+1+dlen2]
-                            
+                        
                         guides.append([sid, start, duration, unistr(desc)])                        
                         
                     pos = pos + dlen + 12                    
@@ -352,12 +349,11 @@ def getFullList(f):
     guides = lists[0]
     channellist = lists[1]
 
-    #print "guides %s" % (len(guides))
-    for g in guides:
-        print g[0], g[1], g[2], g[3]
-        
+#    print "guides %s" % (len(guides))
+#    for g in guides:
+#        print g[0], g[1], g[2], g[3].decode("UTF-8")
 
-    #print "channellist %s" % ()
+#    print "channellist %s" % ()
 #    for g in channellist:
 #        print g[0], g[1], g[2]
 
@@ -367,25 +363,23 @@ def getFullList(f):
                 fulllist.append([c[2], l[1], l[2], l[3]])
                 break
     fulllist = sorted(fulllist, key=itemgetter(0,1,2))
-    
-#    for i in range(0, len(fulllist)-1):
-#        if fulllist[i][0]==fulllist[i+1][0]:
-#            if fulllist[i][1] + fulllist[i][2] != fulllist[i+1][0]:
-#                print "aha!"
-                
-#    for x in fulllist            
-#    fl2 = list()
 
+    # remove duplicates
+    for i in range(len(fulllist)-1,0,-1):
+        if fulllist[i][0] == fulllist[i-1][0] and fulllist[i][1] == fulllist[i-1][1] and fulllist[i][2] == fulllist[i-1][2]:
+            if len(fulllist[i][3]) > len(fulllist[i-1][3]):
+                fulllist[i-1][3] = fulllist[i][3]
+            fulllist.pop(i)
+                
     print "EPG grab finished with %s channels, %s guide infos, joined amount: %s" % (len(channellist), len(guides), len(fulllist))
     
     return fulllist
   
 def main(argv=None):
-#    cls()
     inp = None
     if argv is None:
         argv = sys.argv    
-    if len(argv)>1:
+    if len(argv)>1:        
         try:            
             if argv[1].find("://")!=-1: # URL
                 print "EPG grabbing started on %s" % argv[0]
@@ -396,15 +390,9 @@ def main(argv=None):
             print "Supplied file/stream could not be found, aborting..."
             return
     else:  # default
-        #inp = open("test.mpg", "rb")
-        #inp = urllib2.urlopen("http://192.168.0.20/stream/tunerequest00040000C0FFFFFF00B82C70000100FF0085001B010102FF")
-        inp = urllib2.urlopen("http://192.168.0.20/stream/tunerequest00040000C0FFFFFF00B9F960044100FF00012F08010101FF") # RTL
+        inp = open("test.mpg", "rb")
         
     fulllist = getFullList(inp)
-
-#    for l in fulllist:
-#        print "%s\t%s\t%s\t%s" % ('{0: <18}'.format(l[0]), l[1], l[2], l[3].split("\n")[0][0:20] )
-    #    print l[0], l[1], l[2], l[3]
 
     inp.close()
     return fulllist

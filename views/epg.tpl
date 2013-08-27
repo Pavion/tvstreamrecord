@@ -6,7 +6,11 @@
 <h1><div id="float">Current date:</div>
 <input type="text" maxlength="10" id="datepicker3" class="text ui-widget-content ui-corner-all" name="datepicker3" value="{{curr}}"/> 
 <button id="getepg">Load XMLTV information</button>
-<button id="grabepg">Grab EPG from stream</button></h1>
+%if grabstate[0] == False:
+<button id="grabepgstart">Grab EPG from {{grabstate[2]}} streams</button></h1>
+%else:
+<button id="grabepgstop">Stop grabbing EPG (State: {{grabstate[1]}}/{{grabstate[2]}})</button></h1>
+%end
 </form>
 %for rows in rowss:
 %if rows[0][0] == -1:

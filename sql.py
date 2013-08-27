@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-    @author: pavion
+    @author: Pavion
 """
 
 import sqlite3
@@ -79,8 +79,7 @@ def sqlCreateAll(version):
                     sql += "ALTER TABLE channels ADD COLUMN epgscan INTEGER DEFAULT 0;" 
                 if oldver > version:
                     print "Critical error: Version mismatch!!!"     
-
-                
+               
                 sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version           
                 print "New version %s was implemented" % version    
            

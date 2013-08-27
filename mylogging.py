@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-    @author: pavion
+    @author: Pavion
 """
 
 import sys
@@ -38,25 +38,9 @@ class Logger(object):
         mylines = message.replace('\n', '')
         mylines = mylines.replace('\r', '')
         mylines = mylines.strip()
+        mylines = mylines.encode("UTF-8", errors='replace')
         if mylines!="": 
             self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + self.typ + " " + mylines + "\n")
-        
-#        mylines = message.splitlines()
-#        for myline in mylines:
-#            if myline!='':
-#                self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + self.typ + " " + myline + "\n")
-#    
-#        if len(message)==1:
-#            if (message=='\r' or message=='\n'):
-#                if self.msg!='':
-#                    mylines = self.msg.splitlines()
-#                    for myline in mylines:
-#                        if myline!='':
-#                            self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + self.typ + " " + myline + "\n")
-#                self.msg = ''
-#            else:
-#                self.msg += message
-#        else:
     
     
 def logInit():        

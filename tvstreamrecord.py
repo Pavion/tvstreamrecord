@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-    @author: pavion
+    @author: Pavion
 """
 
 from bottle import CherryPyServer
@@ -259,7 +259,91 @@ def config_p():
 def config_s():    
     return template('config', rows=sqlRun("SELECT * FROM config WHERE param<>'cfg_version'"))
 
-#------------------------------- EPG -------------------------------
+#------------------------------- EPG Grabbing part -------------------------------
+
+class epggrabthread(threading.Thread):
+    stopflag = False
+    running = False 
+    epggrabberstate = [0,0]
+    
+    def getState(self):
+        return [self.running, self.epggrabberstate[0], self.epggrabberstate[1]]
+    
+    def isRunning(self):
+        return self.running
+    
+    def __init__(self):
+        rows = sqlRun("SELECT count(cname) FROM channels WHERE epgscan = 1 AND cenabled = 1;")
+        if rows:
+            self.epggrabberstate[1] = rows[0][0]
+        threading.Thread.__init__(self)
+
+    def run(self):
+        self.running = True        
+        rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
+        self.epggrabberstate[1] = len(rows)        
+        for row in rows:
+            if self.stopflag: 
+                break
+            self.epggrabberstate[0] = self.epggrabberstate[0] + 1
+### DEBUG            
+    #        fulllist = grabber.main(row)
+            fulllist = grabber.main()
+            sqllist = list()
+            sqlchlist = list()
+            prevname = ""
+            actname = "dummy"
+            cid = 0
+
+            for l in fulllist:
+                actname = l[0]
+                if actname!=prevname:
+                    rows2 = sqlRun("SELECT cid FROM channels WHERE cenabled = 1 AND cname='%s' OR lower(cname)='%s'" % (actname, actname.lower()) )
+                    if rows2:
+                        cid = rows2[0][0]
+                        sqlchlist.append([cid, actname, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S") ] )
+                    else:
+                        cid = -1
+                    prevname=actname 
+
+                if cid!=-1:
+                    dt1 = l[1]
+                    dt2 = l[1] + l[2]         
+                    pos = l[3].find("\n")
+                    if pos!=-1:
+                        title = l[3][0:pos]
+                        desc = l[3][pos+1:]                        
+                    else:                  
+                        title = l[3]
+                        desc = ""
+                
+                    sqllist.append([cid, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
+
+            if len(sqllist)>0:
+                sqlRun("INSERT OR REPLACE INTO guide_chan VALUES (?, ?, ?)", sqlchlist, 1 )
+                sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
+        
+        self.epggrabberstate[0]=0
+        self.running = False
+    
+    def stop(self):
+        self.stopflag = True
+
+grabthread = epggrabthread()
+        
+@post('/grabepgstart')
+def grabepgstart():
+    if not grabthread.isRunning():
+        grabthread.run()
+    return 
+
+@post('/grabepgstop')
+def grabepgstop():
+    if grabthread.isRunning():
+        grabthread.stop()
+    return 
+
+#------------------------------- EPG XMLTV import -------------------------------
     
 epgrunning = False    
 @post('/getepg')
@@ -273,49 +357,6 @@ def getepg():
         print "EPG import already running, please be patient"
     return 
 
-@post('/grabepg')
-def grabepg():
-    rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
-    for row in rows:
-        fulllist = grabber.main(row)
-        sqllist = list()
-        prevname = ""
-        actname = "dummy"
-        cid = 0
-
-        for l in fulllist:
-            actname = l[0]
-            if actname!=prevname:
-                rows2 = sqlRun("SELECT cid FROM channels WHERE cenabled = 1 AND cname='%s' OR lower(cname)='%s'" % (actname, actname.lower()) )
-                if rows2:
-                    cid = rows2[0][0]
-                else:
-                    cid = -1
-                print actname, cid    
-                prevname=actname 
-
-            if cid!=-1:
-                dt1 = l[1]
-                dt2 = l[1] + l[2]         
-                pos = l[3].find("\n")
-                if pos!=-1:
-                    title = l[3][0:pos]
-                    desc = l[3][pos+1:]
-                    print "T ", title  
-                    print "D ", desc  
-                else:                  
-                    title = l[3]
-                    desc = ""
-            
-#                try:
-                sqllist.append([cid, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
-#                except:
-#                    print desc
-
-        if len(sqllist)>0:
-            sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
-    return 
-
 class epgthread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -324,6 +365,8 @@ class epgthread(threading.Thread):
         xmltv.getProgList(version)
         global epgrunning
         epgrunning = False
+
+#------------------------------- EPG painting part -------------------------------
         
 @post('/epg')
 def epg_p():    
@@ -348,8 +391,7 @@ def epg_s():
     global dayshown    
     todaysql = datetime.strftime(dayshown, "%Y-%m-%d %H:%M:%S")
     d_von = dayshown    
-#    rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY guide.g_id" % (todaysql, todaysql))
-    rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND ((guide.g_id=channels.cid) OR (channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id)) AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY cname" % (todaysql, todaysql))
+    rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY channels.cid ORDER BY channels.cid" % (todaysql, todaysql))
     for row in rows:
         cid=row[1]
         rtemp = list()
@@ -366,8 +408,6 @@ def epg_s():
                     title.decode("UTF-8")
                 except:
                     title = title[:296]+"..."
-                    #print title
-                    #print "haha"
                     title = ""
                     fulltext = ""
                     pass
@@ -380,13 +420,7 @@ def epg_s():
             w = d_bis - d_von
             rtemp.append ([cid, x.total_seconds()/86400.0*100.0*widthq, w.total_seconds()/86400.0*100.0*widthq, event[0], title, fulltext, event[4], row[2]])
         ret.append(rtemp)
-    return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret)            
-
-# for s in ustr:
-# s += unicode(s)
-#
-#
-
+    return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret, grabstate=grabthread.getState())            
 
 #------------------------------- Record List -------------------------------
 
@@ -611,9 +645,9 @@ for t in records:
 
 print "tvstreamrecord v.%s: bye-bye" % version
 logStop()
-    
-    
+        
 #todo:
-#epg index correction while moving channels
-#append lists while epg scanning
-# warning and progress indication while scanning
+#epg index correction while moving channels  -- OK / another way 'round
+#append lists while epg scanning -- OK / Positive
+# warning and progress indication while scanning -- OK / basic way
+#check purge -- OK / already good

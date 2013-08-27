@@ -298,15 +298,17 @@ def grabepg():
                 dt1 = l[1]
                 dt2 = l[1] + l[2]         
                 pos = l[3].find("\n")
-                if pos!=-1: 
+                if pos!=-1:
                     title = l[3][0:pos]
                     desc = l[3][pos+1:]
+                    print "T ", title  
+                    print "D ", desc  
                 else:                  
                     title = l[3]
                     desc = ""
             
 #                try:
-                sqllist.append([cid, unicode(title), datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), unicode(desc)])
+                sqllist.append([cid, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
 #                except:
 #                    print desc
 
@@ -610,3 +612,8 @@ for t in records:
 print "tvstreamrecord v.%s: bye-bye" % version
 logStop()
     
+    
+#todo:
+#epg index correction while moving channels
+#append lists while epg scanning
+# warning and progress indication while scanning

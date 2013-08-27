@@ -353,8 +353,8 @@ def getFullList(f):
     channellist = lists[1]
 
     #print "guides %s" % (len(guides))
-#    for g in guides:
-#        print g[0], g[1], g[2], g[3]
+    for g in guides:
+        print g[0], g[1], g[2], g[3]
         
 
     #print "channellist %s" % ()

@@ -12,7 +12,6 @@
 <th class="cname">Name</th>
 <th class="curl">URL</th>
 <th class="cext">Type</th>
-<th class="cepg">EPG Grab</th>
 <th class="ccontrols">Controls</th>
 </tr>
 </thead>

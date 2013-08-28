@@ -96,11 +96,11 @@ function initIcons() {
         event.preventDefault();            
     });
     
-    $( "[id^=icons-]" ).each(function(i) {
+/*    $( "[id^=icons-]" ).each(function(i) {
         $(this).height(14);
         $(this).width(14);
         $(this).css("margin-left", "7px");
-    });
+    });*/
 }
 
 function initSwitch() {
@@ -170,9 +170,7 @@ $(function() {
     $( "#autocomplete" ).autocomplete({
         source: availableTags
     });
-        
 
-        
     //$( "#button" ).button();
     $( "#radioset" ).buttonset();
 
@@ -199,7 +197,11 @@ $(function() {
                 text: "Delete",
                 click: function() {
                     var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
-                    post(postto, { myid:dialognr, what:"-1" }, 1);
+                    if (postto.slice(0,4)=="/epg") { 
+                        post("/removeepg", {}, 1);                  
+                    } else {
+                        post(postto, { myid:dialognr, what:"-1" }, 1);
+                    }
                     $( this ).dialog( "close" );                        
                 }
             },
@@ -246,8 +248,7 @@ $(function() {
             }
         ]
     });
-
-
+    
     $( "#datepicker" ).datepicker({
         constrainInput: true,
         minDate: -1,          
@@ -604,7 +605,6 @@ $(function() {
         .click(function() {
             $( "#confirm01" ).dialog( "open" );
         });
-
         
     $( "#getepg" )
         .button()
@@ -617,20 +617,26 @@ $(function() {
         .button()
         .click(function(event ) {
             post("/grabepgstart", {}, 0);                  
+            $(this).html('Please refresh to see progress');
+            $(this).css('height', "20px");
+            $(this).addClass( "ui-state-disabled" );
+
+//#            $(this).attr("aria-disabled", "true");
             event.preventDefault();
         });
 
     $( "#grabepgstop" )
         .button()
         .click(function(event ) {
-            post("/grabepgstop", {}, 0);                  
+            post("/grabepgstop", {}, 1);                  
             event.preventDefault();
         });
 
     $( "#removeepg" )
         .button()
         .click(function(event ) {
-            post("/removeepg", {}, 1);                  
+            $( "#dialog" ).dialog( "open" );
+            //post("/removeepg", {}, 1);                  
             event.preventDefault();
         });
 
@@ -701,10 +707,12 @@ $(function() {
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {        
             var data4 = ""; 
             if (aData[4] == 1) data4 = "plus"; else data4="minus";
-            $('td:eq(4)', nRow).html('<a href="#" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-'+data4+'"></span></a>');            
+//            $('td:eq(4)', nRow).html('<label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-'+data4+'"></span></label>');            
+//            $('td:eq(4)', nRow).html('<a href="#" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-'+data4+'"></span></a>');            
             var chk = "";
             if (aData[5] == 1) chk = 'checked="checked"';
-            $('td:eq(5)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');            
+            $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-'+data4+'"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');            
+//            $('td:eq(5)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');            
         }        
     }); 
     

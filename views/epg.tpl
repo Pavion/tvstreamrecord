@@ -26,7 +26,9 @@
 </ol>
 %end
 </div>
-
+<div id="dialog" title="Confirmation request">
+	<p>Do you want to delete all of your EPG data?</p>
+</div>
 <div id="record_from_epg" title="Detail view">
 <div id="dialog_content"></div></div>
 <form method='POST' enctype='multipart/form-data' action='/createepg' name='returnform'>

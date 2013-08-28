@@ -293,8 +293,9 @@ class epggrabthread(threading.Thread):
                 break
             self.epggrabberstate[0] = self.epggrabberstate[0] + 1
 ### DEBUG            
-            fulllist = grabber.main(row)
+    #        fulllist = grabber.main(row)
     #        fulllist = grabber.main()
+            fulllist = list()
             sqllist = list()
             sqlchlist = list()
             prevname = ""
@@ -663,7 +664,3 @@ print "tvstreamrecord v.%s: bye-bye" % version
 logStop()
         
 #todo:
-#epg index correction while moving channels  -- OK / another way 'round
-#append lists while epg scanning -- OK / Positive
-# warning and progress indication while scanning -- OK / basic way
-#check purge -- OK / already good

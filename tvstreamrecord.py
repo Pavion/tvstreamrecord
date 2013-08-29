@@ -293,9 +293,9 @@ class epggrabthread(threading.Thread):
                 break
             self.epggrabberstate[0] = self.epggrabberstate[0] + 1
 ### DEBUG            
-    #        fulllist = grabber.main(row)
+            fulllist = grabber.main(row)
     #        fulllist = grabber.main()
-            fulllist = list()
+    #        fulllist = list()
             sqllist = list()
             sqlchlist = list()
             prevname = ""

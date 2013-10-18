@@ -20,6 +20,7 @@ import urllib2
 from datetime import datetime, timedelta#, time, date
 import time
 import sys
+from sql import sqlRun
 
 def unistr(strin):
     strout = unicode('', "UTF-8")
@@ -27,11 +28,11 @@ def unistr(strin):
 #        if ord(s)<30 and not ord(s)==ord('\n'):
 #            break
         strout = strout + unichr(ord(s))
-    if len(strin) > len(strout) + 20:
-        print "++++++++++++++++++++++++++++++++++++++"    
-        print "I: " + strin
-        print "O: " + strout
-        print "--------------------------------------"    
+#    if len(strin) > len(strout) + 20:
+#        print "++++++++++++++++++++++++++++++++++++++"    
+#        print "I: " + strin
+#        print "O: " + strout
+#        print "--------------------------------------"    
     return strout
 
 # converts string into time, i.e. 0x20 0x15 0x15 = 20:15:15 - what a funny way to encode time!
@@ -191,7 +192,7 @@ def read_stream(f_in):
                     analyse[ch] = False
     
                 payload[ch] = payload[ch] + tmp
-            
+
     return maxlist
 
 # shift or cut the payloads to get the package beginning 
@@ -233,9 +234,13 @@ def getGuides(pl):
                     pos0 = -1 
                 if ord(pl[i+3]) >> 4 == 5  or ord(pl[i+3]) >> 4 == 6:
                     pos0 = i+2
-                    
+
         # Separating the tables into a list 
         guidelist = guidetext.split("////")
+#            print "hab dich!"
+#            f = open("out1.hex", "wb")
+#            f.write(guidetext)                    
+#            f.close()
         
         for guide in guidelist:
             if len(guide)>14:
@@ -262,16 +267,26 @@ def getGuides(pl):
                             while pos2<pos+12+dlen-1: 
                                 if guide[pos2]==chr(0x4E):    
                                     pos2 = pos2 + 7
-                                elif guide[pos2]==chr(0x50) or guide[pos2]==chr(0x54) :    
-                                    break;
+                                elif guide[pos2]==chr(0x50) or guide[pos2]==chr(0x54):    
+                                    break
+                                elif ord(guide[pos2])==0 and ord(guide[pos2+1])==0x54: # seems to be a delimiter between title and description 
+                                    pos2 = pos2 + 12
+#                                elif ord(guide[pos2])==0
+
                                 dlen2 = ord(guide[pos2])
-                                if dlen2<=0:
+                                
+                                if dlen2<=0 or pos2+dlen2+1>=pos+12+dlen-1: #dunno
                                     break
                                     
-                                if desccnt == 1 or desccnt == 2:
+#                                print guide[pos2+2:pos2+1+dlen2]     
+                                if desccnt == 1:# or desccnt == 2:
                                     desc = desc + "\n" + guide[pos2+2:pos2+1+dlen2] 
                                 else:
                                     desc = desc + guide[pos2+2:pos2+1+dlen2] 
+                                
+                                #if "Johannson" in guide:
+                                #    print "-->", dlen2, guide[pos2+2:pos2+1+dlen2]
+
                                 
                                 desccnt = desccnt + 1
                                 pos2 = pos2+dlen2+1
@@ -281,7 +296,14 @@ def getGuides(pl):
                         
                         guides.append([sid, start, duration, unistr(desc)])                        
                         
-                    pos = pos + dlen + 12                    
+                    pos = pos + dlen + 12        
+                    
+                #if "Johannson" in guide:
+                #    f = open("out2.hex", "wb")
+                #    f.write(guide)                    
+                #    f.close()
+                #    exit(0)
+            
         
     except:
         pass
@@ -360,26 +382,49 @@ def getFullList(f):
 
 #    print "guides %s" % (len(guides))
 #    for g in guides:
-#        print g[0], g[1], g[2], g[3].decode("UTF-8")
+#        print g[0], g[1], g[2]#, g[3].decode("UTF-8")
 
-#    print "channellist %s" % ()
+#    print "channellist %s" % (len(channellist))
 #    for g in channellist:
 #        print g[0], g[1], g[2]
 
+ 
+    if len(channellist)==0:     #experimental only
+        rows=sqlRun('SELECT cname, cpath FROM channels WHERE cenabled=1')    
+        if rows:
+            for row in rows: 
+                lastpart = row[1].split("/")[-1] 
+#                print lastpart
+                if lastpart.endswith("FF"): 
+                    sid = int(row[1][-12:-8], 16)
+                    channellist.append([sid, "SQL", row[0]])
+                else:
+                    spl = lastpart.split(":",7)
+                    #print spl
+                    if len(spl) == 8:
+                        if len(spl[3])==4:
+                            sid = int(spl[3], 16)
+                            #print lastpart, sid  
+                            channellist.append([sid, "SQL", row[0]])
+
+        if len(channellist) > 0: 
+            print "Could not extract a channel list from provided stream, trying to use URLs instead"
+            #print channellist
+   
     for l in guides:
         for c in channellist:
             if l[0] == c[0] and l[1] > datetime.now() - timedelta(hours=8):                
                 fulllist.append([c[2], l[1], l[2], l[3]])
                 break
     fulllist = sorted(fulllist, key=itemgetter(0,1,2))
-
+    
     # remove duplicates
     for i in range(len(fulllist)-1,0,-1):
         if fulllist[i][0] == fulllist[i-1][0] and fulllist[i][1] == fulllist[i-1][1] and fulllist[i][2] == fulllist[i-1][2]:
             if len(fulllist[i][3]) > len(fulllist[i-1][3]):
                 fulllist[i-1][3] = fulllist[i][3]
             fulllist.pop(i)
-                
+                    
     print "EPG grab finished with %s channels, %s guide infos, joined amount: %s" % (len(channellist), len(guides), len(fulllist))
     
     return fulllist
@@ -399,7 +444,8 @@ def main(argv=None):
             print "Supplied file/stream could not be found, aborting..."
             return
     else:  # default
-        inp = open("test.mpg", "rb")
+        inp = open("test-rtl2.ts", "rb")
+        print "Opening local file"
         
     fulllist = getFullList(inp)
 

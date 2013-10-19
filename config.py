@@ -74,8 +74,14 @@ configuration = [
 'cfg_ffmpeg_params',
 "Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')",
 '-acodec copy -vcodec copy'
-]                 
+],                 
                  
+[
+'cfg_grab_time',
+"Time to perform daily EPG grab on all marked channels (hh:mm format, 24h based, default '0' for manual only)",
+'0'
+]
+
 ]
 
 for config in configuration:

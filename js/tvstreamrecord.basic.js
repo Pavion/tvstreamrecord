@@ -137,8 +137,8 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+
 $(function() {
-    
     var pickerform = "dd.mm.yy";
 
     $( "#accordion" ).accordion();
@@ -258,7 +258,7 @@ $(function() {
 
     $( "#datepicker3" ).datepicker({
         constrainInput: true,
-        minDate: -1,          
+        minDate: 0,          
         defaultDate: 0,
         onSelect: function() {
             document.daychooser.submit();
@@ -287,6 +287,15 @@ $(function() {
     $( "[id=event]" ).each(function(i) {        
         w = $(this).attr('width')+"%";
         x = $(this).attr('x')+"%";
+        rec = $(this).attr('recording');
+        //console.log( rec );
+        
+        if(rec == 1) {
+        	$(this).css("background", "#98FB98");
+        	//alert("s");
+        	}                
+//        $(this).addClass("ui-selected");
+
         $(this).css("margin-left", x);        
         $(this).css("width", w);        
     });

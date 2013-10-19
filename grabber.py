@@ -237,10 +237,6 @@ def getGuides(pl):
 
         # Separating the tables into a list 
         guidelist = guidetext.split("////")
-#            print "hab dich!"
-#            f = open("out1.hex", "wb")
-#            f.write(guidetext)                    
-#            f.close()
         
         for guide in guidelist:
             if len(guide)>14:
@@ -284,10 +280,6 @@ def getGuides(pl):
                                 else:
                                     desc = desc + guide[pos2+2:pos2+1+dlen2] 
                                 
-                                #if "Johannson" in guide:
-                                #    print "-->", dlen2, guide[pos2+2:pos2+1+dlen2]
-
-                                
                                 desccnt = desccnt + 1
                                 pos2 = pos2+dlen2+1
                         else: # only one description available
@@ -297,13 +289,6 @@ def getGuides(pl):
                         guides.append([sid, start, duration, unistr(desc)])                        
                         
                     pos = pos + dlen + 12        
-                    
-                #if "Johannson" in guide:
-                #    f = open("out2.hex", "wb")
-                #    f.write(guide)                    
-                #    f.close()
-                #    exit(0)
-            
         
     except:
         pass
@@ -395,7 +380,7 @@ def getFullList(f):
             for row in rows: 
                 lastpart = row[1].split("/")[-1] 
 #                print lastpart
-                if lastpart.endswith("FF"): 
+                if lastpart.endswith("FF"):
                     sid = int(row[1][-12:-8], 16)
                     channellist.append([sid, "SQL", row[0]])
                 else:
@@ -429,7 +414,21 @@ def getFullList(f):
     
     return fulllist
   
+def startgrab(myrow):
+#    print myrow
+    fulllist = list() 
+    try:            
+        print "EPG grabbing started on %s" % myrow[0]
+        inp = urllib2.urlopen(myrow[1]) 
+        fulllist = getFullList(inp)
+        inp.close()
+    except:
+        print "Supplied stream could not be found or opened, aborting..."
+        #pass
+    return fulllist        
+  
 def main(argv=None):
+    fulllist = list() 
     inp = None
     if argv is None:
         argv = sys.argv    
@@ -442,14 +441,13 @@ def main(argv=None):
                 inp = open(argv[1], "rb")
         except:
             print "Supplied file/stream could not be found, aborting..."
-            return
+            return fulllist
     else:  # default
         inp = open("test-rtl2.ts", "rb")
         print "Opening local file"
         
     fulllist = getFullList(inp)
 
-    inp.close()
     return fulllist
 
 if __name__ == "__main__":

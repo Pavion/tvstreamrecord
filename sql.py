@@ -58,7 +58,8 @@ def sqlCreateAll(version):
         sql += 'CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase UNIQUE, cpath TEXT, cenabled INTEGER, cext TEXT, cid INTEGER, epgscan INTEGER);'
         sql += 'CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER, rmask INTEGER);'    
         sql += 'CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT);'
-        sql += 'CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT);'
+        sql += 'CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT UNIQUE, g_name TEXT collate nocase UNIQUE, g_lasttime TEXT);'
+#        sql += 'CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT, g_name TEXT collate nocase, g_lasttime TEXT);'
         sql += 'CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT, g_stop TEXT, g_desc TEXT, PRIMARY KEY (g_id, g_start, g_stop));'
         sql += 'CREATE TABLE IF NOT EXISTS config (param TEXT UNIQUE, desc TEXT, value TEXT);'
         sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version           
@@ -77,6 +78,11 @@ def sqlCreateAll(version):
                     sql += "UPDATE channels SET cid=rowid;"
                 if oldver < '0.5.1':
                     sql += "ALTER TABLE channels ADD COLUMN epgscan INTEGER DEFAULT 0;" 
+                if oldver < '0.5.2':
+                    sql += 'CREATE TABLE IF NOT EXISTS guide_chan_neu (g_id TEXT UNIQUE, g_name TEXT collate nocase UNIQUE, g_lasttime TEXT);'
+                    sql += 'INSERT OR IGNORE INTO guide_chan_neu SELECT * FROM guide_chan;'
+                    sql += 'DROP TABLE guide_chan;'
+                    sql += 'ALTER TABLE guide_chan_neu RENAME TO guide_chan;'
                 if oldver > version:
                     print "Critical error: Version mismatch!!!"     
                

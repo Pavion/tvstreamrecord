@@ -21,7 +21,7 @@
 <ol id="selectable">
 %end
 %for row in rows:
-<li class="ui-state-default" id="event" x="{{row[1]}}" width="{{row[2]}}" cid="{{row[0]}}" rid="{{row[6]}}" fulltext="{{row[5]}}" title="{{row[4]}}">{{row[3]}}</li>
+<li class="ui-state-default" id="event" x="{{row[1]}}" width="{{row[2]}}" cid="{{row[0]}}" rid="{{row[6]}}" fulltext="{{row[5]}}" recording="{{row[8]}}" title="{{row[4]}}">{{row[3]}}</li>
 %end
 </ol>
 %end
@@ -36,3 +36,4 @@
 </form>
 
 %include footer
+

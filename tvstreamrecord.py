@@ -20,6 +20,7 @@ from bottle import CherryPyServer
 from bottle import route, run, template, post, request
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
+from time import sleep
 import subprocess
 import config
 from sql import sqlRun, sqlCreateAll, purgeDB
@@ -36,7 +37,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.5.1' 
+version = '0.5.1f' 
 
 @route('/channels.m3u')
 def server_static8():
@@ -253,6 +254,7 @@ def config_p():
         val = request.forms.get(d)
         attrl.append([d, val])
     config.setConfig(attrl)
+    grabthread.run()
     redirect("/config") 
 
 @route('/config')
@@ -265,6 +267,7 @@ class epggrabthread(threading.Thread):
     stopflag = False
     running = False 
     epggrabberstate = [0,0]
+    timer = None
     
     def getState(self):
         return [self.running, self.epggrabberstate[0], self.epggrabberstate[1]]
@@ -283,8 +286,32 @@ class epggrabthread(threading.Thread):
         #if rows:
         self.setChannelCount()
         threading.Thread.__init__(self)
-
+    
+    def kill(self):
+        if not self.timer == None:             
+            self.timer.cancel()
+    
     def run(self):
+        self.kill()
+        if not config.cfg_grab_time == '0':
+            if len(config.cfg_grab_time)>=3 and len(config.cfg_grab_time)<=5:
+                try:
+#                print config.cfg_grab_time
+                    mytime = datetime.strptime(config.cfg_grab_time, "%H:%M").time()
+                    mydatetime = datetime.combine(datetime.now().date(), mytime)
+                    if mydatetime < datetime.now():
+                        mydatetime = mydatetime + timedelta(days=1)
+                    td = mydatetime-datetime.now()
+                    deltas = td.total_seconds()
+                    self.timer = threading.Timer(deltas, self.doIt)
+                    self.timer.start()
+                    if deltas>0:
+                        print "Thread timer for EPG grab waiting till %s (%d seconds)" % (config.cfg_grab_time, deltas)                        
+                except:
+                    print "Something went wrong with EPG grab thread. Please check your config settings regarding your start time"
+                    pass
+
+    def doIt(self):
         self.running = True        
         rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
         self.epggrabberstate[1] = len(rows)        
@@ -293,7 +320,7 @@ class epggrabthread(threading.Thread):
                 break
             self.epggrabberstate[0] = self.epggrabberstate[0] + 1
 ### DEBUG            
-            fulllist = grabber.main(row)
+            fulllist = grabber.startgrab(row)
     #        fulllist = grabber.main()
     #        fulllist = list()
             sqllist = list()
@@ -332,16 +359,16 @@ class epggrabthread(threading.Thread):
         
         self.epggrabberstate[0]=0
         self.running = False
+        sleep(61)
+        self.run()
     
     def stop(self):
         self.stopflag = True
-
-grabthread = epggrabthread()
         
 @post('/grabepgstart')
 def grabepgstart():
     if not grabthread.isRunning():
-        grabthread.run()
+        grabthread.doIt()
     return 
 
 @post('/grabepgstop')
@@ -393,27 +420,40 @@ def epg_p():
 @route('/epg')
 def epg_s():    
     grabthread.setChannelCount()
+
+    global dayshown    
+    todaysql = datetime.strftime(dayshown, "%Y-%m-%d %H:%M:%S")    
+    if dayshown == datetime.combine(date.today(), time.min): # really today
+        sthour = datetime.now().time().hour
+        daystart = datetime.combine(date.today(), time(sthour,0,0))
+        totalwidth = 86400 - (daystart - dayshown).total_seconds()
+    else:
+        sthour = 0
+        daystart = dayshown
+        totalwidth = 86400
+    
+    hours = int(totalwidth / 3600)
+    d_von = daystart
     
     widthq = 0.8
     ret = list()
     rtemp = list()
     w = 0.0
-    for i in range(24):
-        t = time(i)
-        x = i * 100.0 / 24.0 * widthq
-        w =  1.0 / 24.0 * widthq * 100.0 
-        rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", -1, ""])
+    for i in range(0, hours):
+        t = time(i+sthour)
+        x = i * 100.0 / hours * widthq
+        w =  1.0 / hours * widthq * 100.0 
+        rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", -1, "", 0])
     ret.append(rtemp)    
     
-    global dayshown    
-    todaysql = datetime.strftime(dayshown, "%Y-%m-%d %H:%M:%S")
-    d_von = dayshown    
     rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY channels.cid ORDER BY channels.cid" % (todaysql, todaysql))
     for row in rows:
         cid=row[1]
         rtemp = list()
-        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid FROM guide WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND g_id='%s' ORDER BY g_start" % (todaysql, todaysql, row[0]))
+        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=%s AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND julianday(datetime(g_stop, '+60 minutes'), 'localtime')>julianday('now', 'localtime') AND g_id='%s' ORDER BY g_start" % (cid, config.cfg_delta_for_epg, config.cfg_delta_for_epg, todaysql, todaysql, row[0]))
+        #c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid FROM guide WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND g_id='%s' ORDER BY g_start" % (todaysql, todaysql, row[0]))
         for event in c_rows:
+            
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
             fulltext = "<b>"+event[0]+": "+datetime.strftime(d_von, localtime) + " - " + datetime.strftime(d_bis, localtime) + "</b><BR><BR>"+event[3]
@@ -429,13 +469,17 @@ def epg_s():
                     fulltext = ""
                     pass
 
-            if d_von.date() < dayshown.date():
-                d_von = dayshown
+
+            #print d_von, d_bis
+            if d_von < daystart:
+                d_von = daystart
             if d_bis.date() > dayshown.date():
                 d_bis=datetime.combine(d_bis.date(),time.min)
-            x = d_von - datetime.combine(d_von.date(),time.min)
+            x = d_von - daystart#datetime.combine(d_von.date(),time.min)
             w = d_bis - d_von
-            rtemp.append ([cid, x.total_seconds()/86400.0*100.0*widthq, w.total_seconds()/86400.0*100.0*widthq, event[0], title, fulltext, event[4], row[2]])
+            if x.total_seconds()>=0 and w.total_seconds()>0:
+                rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], title, fulltext, event[4], row[2], event[5]])
+                #print event[5]
         ret.append(rtemp)
     return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret, grabstate=grabthread.getState())            
 
@@ -478,7 +522,8 @@ def records_p():
     
 @post('/createepg')
 def createepg():
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
+    #print "huhu" 
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s GROUP BY datetime(guide.g_start, '-3 minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
     setRecords()        
     redirect("/records")
     return 
@@ -557,7 +602,7 @@ class record(threading.Thread):
         self.timer = threading.Timer(deltas, self.doIt)
         self.timer.start()
         if deltas>0:
-            print "\nRecord: Thread timer for '%s' started for %d seconds" % (self.name, deltas)
+            print "Record: Thread timer for '%s' started for %d seconds" % (self.name, deltas)
         
     def doIt(self):
         self.running = 1
@@ -587,12 +632,12 @@ class record(threading.Thread):
                 print "FFMPEG could not be started"
         else:        
             block_sz = 8192
-            print "\nRecord: '%s' started" % (self.name)
+            print "Record: '%s' started" % (self.name)
             u = urllib2.urlopen(self.url)
             try:
                 f = open(fn, 'wb')
             except:
-                print "\nOutput file %s can't be created. Please check your settings." % (fn+".mkv")  
+                print "Output file %s can't be created. Please check your settings." % (fn+".mkv")  
                 pass
             else:
                 while self.bis > datetime.now() and self.stopflag==0:
@@ -601,7 +646,7 @@ class record(threading.Thread):
                         break
                     f.write(mybuffer)
                 f.close()
-                print "\nRecord: '%s' ended" % (self.name)
+                print "Record: '%s' ended" % (self.name)
                 if self in records: records.remove(self) 
         if self.mask > 0:
             rectimer = threading.Timer(5, setRecords)
@@ -615,7 +660,7 @@ class record(threading.Thread):
             if self.process.poll()==None:            
                 self.process.terminate()
         if self in records: records.remove(self)
-        print "\nRecord: Stopflag for '%s' received" % (self.name)
+        print "Record: Stopflag for '%s' received" % (self.name)
    
 def setRecords():
     rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
@@ -652,14 +697,21 @@ print "Initializing config..."
 config.loadConfig()
 print "Initializing records..."
 setRecords()
+print "Initializing EPG grab thread..."
+grabthread = epggrabthread()
+grabthread.run()
     
 print "Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port)
 run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
 
-print "Server aborted. Stopping all records before exiting"
+
+print "Server aborted. Stopping all records before exiting..."
 for t in records:
     t.stop()
 
+print "Stopping EPG grab thread..."    
+grabthread.kill()
+    
 print "tvstreamrecord v.%s: bye-bye" % version
 logStop()
         

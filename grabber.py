@@ -394,7 +394,6 @@ def getFullList(f):
 
         if len(channellist) > 0: 
             print "Could not extract a channel list from provided stream, trying to use URLs instead"
-            #print channellist
    
     for l in guides:
         for c in channellist:

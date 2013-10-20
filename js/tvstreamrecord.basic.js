@@ -139,6 +139,7 @@ function endsWith(str, suffix) {
 
 
 $(function() {
+
     var pickerform = "dd.mm.yy";
 
     $( "#accordion" ).accordion();

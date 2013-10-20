@@ -39,12 +39,24 @@ localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 version = '0.5.1f' 
 
+@route('/live/<filename>')
+def server_static9(filename):
+    rows = sqlRun("SELECT * FROM channels WHERE cid=%s" % filename.split(".")[0])
+    if rows:
+        f = open("live.m3u", "w")
+        f.write("#EXTM3U\n")
+        f.write("#EXTINF:0,"+rows[0][0]+"\n")
+        f.write(rows[0][1]+"\n")
+        f.close()
+        return static_file("live.m3u", root='', mimetype='video')
+    else:
+        redirect("/epg")
 @route('/channels.m3u')
 def server_static8():
     return static_file("/channels.m3u", root='')
 @route('/log.txt')
 def server_static7():
-    return static_file("/log.txt", root='')
+    return static_file("/log.txt", root='', download="log.txt")
 @route('/js/<filename>')
 def server_static1(filename):
     return static_file(filename, root='./js')
@@ -421,8 +433,13 @@ def epg_p():
 def epg_s():    
     grabthread.setChannelCount()
 
-    global dayshown    
-    todaysql = datetime.strftime(dayshown, "%Y-%m-%d %H:%M:%S")    
+    global dayshown
+    
+    if dayshown < datetime.combine(date.today(), time.min):
+        dayshown = datetime.combine(date.today(), time.min)    
+            
+    todaysql = datetime.strftime(dayshown, "%Y-%m-%d %H:%M:%S")
+
     if dayshown == datetime.combine(date.today(), time.min): # really today
         sthour = datetime.now().time().hour
         daystart = datetime.combine(date.today(), time(sthour,0,0))
@@ -473,7 +490,7 @@ def epg_s():
             #print d_von, d_bis
             if d_von < daystart:
                 d_von = daystart
-            if d_bis.date() > dayshown.date():
+            if d_bis.date() > daystart.date():
                 d_bis=datetime.combine(d_bis.date(),time.min)
             x = d_von - daystart#datetime.combine(d_von.date(),time.min)
             w = d_bis - d_von
@@ -522,7 +539,6 @@ def records_p():
     
 @post('/createepg')
 def createepg():
-    #print "huhu" 
     sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s GROUP BY datetime(guide.g_start, '-3 minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
     setRecords()        
     redirect("/records")

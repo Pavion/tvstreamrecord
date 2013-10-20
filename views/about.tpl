@@ -7,7 +7,7 @@
 
 <ol>
 <li><p><b>What's new</b></p>
-<p>With version 0.5.1 it should be possible to grab EPG data directly from TV stream. Please read the corresponding section to avoid performance issues.</p>
+<p>With version 0.5.2 it is possible to grab EPG data directly from your TV stream. Please read the corresponding section to avoid performance issues.</p>
 </li>
 <li><p><b>Introduction</b></p>
 <p>This software was designed to record http streams (TV and such). My goal was to be able to record streams from Elgato EyeTV Netstream with my NAS server so it's the primary objective of this software. Please note, that this software can't be used to record any videos from USB-based devices. A simply stream would be http://streamadress/stream000000 and will be recorded or grabbed as is. </p>
@@ -68,7 +68,9 @@ You can add an file extension while creating new channels. This file extension w
 <p>Once added, you can edit and move your channels. To do this, please click on the gear symbol at the right of the table row. You're now able to edit the channel informations as well as to assign a new ID. Using an existing ID will insert the current record before this ID and renumerate the others. <br />
 You can also delete your channel from here. Please note, that deleting a channel will also delete all associated records. </p>
 <li><p><b>Grabbing EPG (electronic program guide) from your TV stream</b></p>
-<p>If your streams are MPEG transport streams (such as those from network SAT tuners) you should be able to extract or grab EPG data directly from these streams. According to the specification, one channel can carry several other channels' info as well. So the best method is to enable grab on your favorite channels one by one to see, which EPG data would be provided by them. Grabbing one channel takes approximately one minute, so you should not use it on too many channels. To mark a channel for grabbing, you can edit it and use the provided switch. To avoid performance issues, no "take all" switch is provided. </p>
+<p>If your streams are MPEG transport streams (such as those from network SAT tuners) you should be able to extract or grab EPG data directly from these streams. According to the specification, one channel can carry several other channels' info as well. So the best method is to enable grab on your favorite channels one by one to see, which EPG data would be provided by them. Grabbing one channel takes approximately one minute, so you should not use it on too many channels. To mark a channel for grabbing, you can edit it and use the provided switch. To avoid performance issues, no "take all" switch is provided.  <br />
+As reported, several streams do not provide a channel list inside, so EPG data cannot be properly ordered. This can result in log entry "EPG grab finished with 0 channels, XYZ guide infos, joined amount: 0". In such cases your channel IDs may be carried as a part of your URL. Please contact me for further information. 
+</p>
 </li>
 <li><p><b>EPG import</b></p>
 <p>If you have a free XMLTV provider from your region, you should add his address in config. Now you should be able to import EPG by pressing the corresponding button one time. Please just one time. As for now there is no direct feedback for this feature and full synchronisation takes some time, please check the log file for the progress or error status. The only provider tested is <a href="http://xmltv.spaetfruehstuecken.org/xmltv/">Egon zappt</a>. As I'm following <a href="http://www.oztivo.net/twiki/bin/view/TVGuide/StaticXMLGuideAPI">OzTiVo rules</a> to grab EPG data, you can receive new data only, which would normally be refreshed one time a day.</p>
@@ -84,7 +86,7 @@ You can also delete your channel from here. Please note, that deleting a channel
 <li>Flouwy for his support and inspiration</li>
 <li>Sideshowbob for his ffmpeg support idea and testing</li>
 <li>plusulli for his Dreambox feedback</li>
-<li>zmueller for pushing me into EPG grabbing</li>
+<li>zmueller, DSL-Hexe for EPG grabbing ideas and testing</li>
 <li>Honu, zamp411, z-smoker and other supporters for their feedback and trust</li>
 </ul>
 </p>

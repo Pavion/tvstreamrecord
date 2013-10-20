@@ -14,16 +14,20 @@
 <button id="removeepg">Remove all EPG data</button></h1>
 </form>
 %for rows in rowss:
+%if len(rows)>0:
 %if rows[0][0] == -1:
 <ol id="selectabletitle">
 %else:
-<h1><b>{{rows[0][7]}}</b></h1>
+<!-- <object data="live.m3u" type="video/mpegurl"> -->
+<h1><b><a href="live/{{rows[0][0]}}.m3u">{{rows[0][7]}}</a></b></h1>
+<!-- </object> -->
 <ol id="selectable">
 %end
 %for row in rows:
 <li class="ui-state-default" id="event" x="{{row[1]}}" width="{{row[2]}}" cid="{{row[0]}}" rid="{{row[6]}}" fulltext="{{row[5]}}" recording="{{row[8]}}" title="{{row[4]}}">{{row[3]}}</li>
 %end
 </ol>
+%end
 %end
 </div>
 <div id="dialog" title="Confirmation request">

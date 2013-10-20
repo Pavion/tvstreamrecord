@@ -1,4 +1,10 @@
-2013-08-19 0.5.1 EPG Grabbing Beta
+2013-10-20 0.5.2 Extended EPG grab support. Please check About page
+                 Highlight events beeing recorded in EPG
+                 Automatic timed EPG grab (see config)
+                 Stream link at EPG page to use with video players and browser plugins
+                 Several bug fixes 
+
+2013-08-19 0.5.1 EPG grabbing beta
 
 2013-08-19 0.5.0 Channel editing and moving added
                  Channel list can now be exported and saved

@@ -359,7 +359,7 @@ $(function() {
                 {
                     var bValid = true;
                     allFields.removeClass( "ui-state-error" );
-                    bValid = bValid && checkLength( "recname", "record name", 1, 20 );
+                    bValid = bValid && checkLength( "recname", "record name", 1, 255 );
                     bValid = bValid && checkRegexp( "recname", /^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\";|//]+$/, "No special chars in this field please" );
                     bValid = bValid && checkLength( "channel", "channel", 1, 50 );
                     bValid = bValid && checkLength( "datepicker", "date", 10, 10 );
@@ -414,7 +414,7 @@ $(function() {
                             
                             var kids = $("#channel").children();
                             for (var j=0;j<kids.length;j++) {
-                            	if (kids[j].innerHTML==data[i][1]) { 
+                            	if (kids[j].innerHTML==data[i][1].replace(/<(?:.|\n)*?>/gm, '')) { 
 
 									document.getElementById("channel").value=kids[j].value;                            
                             		break;
@@ -577,8 +577,8 @@ $(function() {
 
                             document.getElementById("prev").value=data[i][0];
                             document.getElementById("ccid").value=data[i][0];
-                            document.getElementById("cname").value=data[i][1];
-                            document.getElementById("cpath").value=data[i][2];
+                            document.getElementById("cname").value=data[i][1].replace(/<(?:.|\n)*?>/gm, '');
+                            document.getElementById("cpath").value=data[i][2];                            
                             document.getElementById("cext").value=data[i][3];
                             break;
                         }

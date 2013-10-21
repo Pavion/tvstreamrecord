@@ -26,7 +26,7 @@
 <div id="dialog" title="Confirmation request">
 	<p>Shall I delete this channel?</p>
 </div>
-<div id="createchannel-form" title="Create a new channel">
+<div id="createchannel-form" title="Create/edit a channel">
 <p class="validateTips"></p>
 <form>
 <fieldset>

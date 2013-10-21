@@ -54,7 +54,7 @@ configuration = [
 
 [
 'cfg_file_extension',
-'File extension for the recorded stream (default=".ts")',
+"File extension for the recorded stream (default='.ts')",
 '.ts'
 ],
                  
@@ -80,6 +80,12 @@ configuration = [
 'cfg_grab_time',
 "Time to perform daily EPG grab on all marked channels (hh:mm format, 24h based, default '0' for manual only)",
 '0'
+],
+                 
+[
+'cfg_grab_max_duration',
+"Maximal EPG scan duration per channel, [seconds] (default '60')",
+'60'
 ]
 
 ]

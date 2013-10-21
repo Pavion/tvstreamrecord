@@ -309,7 +309,6 @@ class epggrabthread(threading.Thread):
         if not config.cfg_grab_time == '0':
             if len(config.cfg_grab_time)>=3 and len(config.cfg_grab_time)<=5:
                 try:
-#                print config.cfg_grab_time
                     mytime = datetime.strptime(config.cfg_grab_time, "%H:%M").time()
                     mydatetime = datetime.combine(datetime.now().date(), mytime)
                     if mydatetime < datetime.now():
@@ -325,6 +324,7 @@ class epggrabthread(threading.Thread):
                     pass
 
     def doIt(self):
+        self.kill()
         self.running = True        
         rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
         self.epggrabberstate[1] = len(rows)        
@@ -332,7 +332,6 @@ class epggrabthread(threading.Thread):
             if self.stopflag: 
                 break
             self.epggrabberstate[0] = self.epggrabberstate[0] + 1
-### DEBUG            
             fulllist = grabber.startgrab(row)
     #        fulllist = grabber.main()
     #        fulllist = list()
@@ -506,7 +505,7 @@ def epg_s():
 @route('/getrecordlist')
 def getrecordlist():
     l = []
-    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis FROM channels, records where channels.cid=records.cid ORDER BY rvon")     
+    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")     
     for row in rows:
         rec = ""
         if row[4]==0: 
@@ -516,7 +515,8 @@ def getrecordlist():
             for index, item in enumerate(wd): 
                 if item: 
                     rec += weekdays[index]
-        l.append([row[0], row[1], row[2], row[3], rec, row[5], row[6], row[7], row[8], row[9]])
+        m3u = "<a href=\"live/" + str(row[10]) + ".m3u\">" + row[1] + "</a>"
+        l.append([row[0], m3u, row[2], row[3], rec, row[5], row[6], row[7], row[8], row[9]])
     return json.dumps({"aaData": l } )
 
 @route('/records')

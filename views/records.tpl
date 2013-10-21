@@ -5,7 +5,7 @@
 <fieldset>
 <input type="hidden" maxlength="5" id="prev" value=""/> 
 <label for="channel">Name</label>
-<input type="text" maxlength="20" id="recname" class="text ui-widget-content ui-corner-all" name="recname" value=""/> 
+<input type="text" maxlength="255" id="recname" class="text ui-widget-content ui-corner-all" name="recname" value=""/> 
 <label for="channel">Channel</label>
 <select name='channel' id="channel" class="text ui-widget-content ui-corner-all">
 %for row in rows2:

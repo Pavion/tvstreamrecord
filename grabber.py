@@ -18,6 +18,7 @@
 
 import urllib2
 from datetime import datetime, timedelta
+import config
 import time
 import sys
 from sql import sqlRun
@@ -122,9 +123,14 @@ def read_stream(f_in):
     
     # Loop break if X bytes read  
     blocksread = 0
-    maxblocksread = 150*1024*1024
+    maxblocksread = 1024*1024*1024 # 1 GB
     # or if Y seconds spend
-    maxtimespend = timedelta(seconds=60)    
+    maxduration = 60
+    try: 
+        maxduration = int(config.cfg_grab_max_duration)
+    except:
+        pass    
+    maxtimespend = timedelta(seconds = maxduration)    
     starttime = datetime.now() 
     
     # Continuity counter    
@@ -411,8 +417,8 @@ def startgrab(myrow):
 #    print myrow
     fulllist = list() 
     try:            
-        print "EPG grabbing started on %s" % myrow[0]
-        inp = urllib2.urlopen(myrow[1]) 
+        print "EPG grabbing started on %s for %s seconds" % (myrow[0], config.cfg_grab_max_duration)
+        inp = urllib2.urlopen(myrow[1])
         fulllist = getFullList(inp)
         inp.close()
     except:
@@ -428,7 +434,7 @@ def main(argv=None):
     if len(argv)>1:        
         try:            
             if argv[1].find("://")!=-1: # URL
-                print "EPG grabbing started on %s" % argv[0]
+                print "EPG grabbing started on %s for %s seconds" % (argv[0], config.cfg_grab_max_duration)
                 inp = urllib2.urlopen(argv[1]) 
             else:
                 inp = open(argv[1], "rb")

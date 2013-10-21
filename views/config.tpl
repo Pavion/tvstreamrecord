@@ -3,6 +3,8 @@
 <div id="users-contain" class="ui-widget">
 <h1>Configuration:
 <button id="submit_cfg">Submit changes</button>
+<button id="removeepg">Remove all EPG data</button>
+<button id="resetlog">Reset log</button>
 </h1>
 <form method='POST' enctype='multipart/form-data' action='/config' name='submit_cfg_form'>
 <!--<table id="clist">  -->
@@ -25,6 +27,8 @@
 </table>
 </form>
 </div>
-
+<div id="dialog" title="Confirmation request">
+	<p>Do you want to delete all of your EPG data?</p>
+</div>
 %include footer
            

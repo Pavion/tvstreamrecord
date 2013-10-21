@@ -17,7 +17,7 @@
 """
 
 import urllib2
-from datetime import datetime, timedelta#, time, date
+from datetime import datetime, timedelta
 import time
 import sys
 from sql import sqlRun
@@ -164,7 +164,6 @@ def read_stream(f_in):
                 # Continuity control
                 ccount_new[ch] = pid3 - (pid3 >> 4 << 4)
                 if ccount[ch]!=-1 and not (ccount_new[ch] == ccount[ch] + 1 or (ccount_new[ch] == 0 and ccount[ch] == 15)):
-                    # print "out of sync at ID %s" % ch
                     # Out of sync! 
                     payload[ch] = payloadSort(payload[ch], False)
                     analyse[ch] = True                                     
@@ -185,8 +184,6 @@ def read_stream(f_in):
                 if analyse[ch]:     
                     plist = getList(payload[ch], ch)
                     maxlist[ch] = joinarrays(maxlist[ch], plist)
-#                    if len(plist)>len(maxlist[ch]):
-#                        maxlist[ch] = plist
                     myfirstpayload[ch] = tmp
                     payload[ch] = ""                                        
                     analyse[ch] = False
@@ -373,27 +370,24 @@ def getFullList(f):
 #    for g in channellist:
 #        print g[0], g[1], g[2]
 
- 
-    if len(channellist)==0:     #experimental only
+    # If there is no channel list contained within the stream, try to use URLs instead    
+    if len(channellist)==0:     
         rows=sqlRun('SELECT cname, cpath FROM channels WHERE cenabled=1')    
         if rows:
             for row in rows: 
                 lastpart = row[1].split("/")[-1] 
-#                print lastpart
                 if lastpart.endswith("FF"):
                     sid = int(row[1][-12:-8], 16)
                     channellist.append([sid, "SQL", row[0]])
                 else:
                     spl = lastpart.split(":",7)
-                    #print spl
                     if len(spl) == 8:
                         if len(spl[3])==4:
                             sid = int(spl[3], 16)
-                            #print lastpart, sid  
                             channellist.append([sid, "SQL", row[0]])
 
         if len(channellist) > 0: 
-            print "Could not extract a channel list from provided stream, trying to use URLs instead"
+            print "Could not extract a channel list from provided stream, tried to use URLs instead"
    
     for l in guides:
         for c in channellist:
@@ -423,7 +417,7 @@ def startgrab(myrow):
         inp.close()
     except:
         print "Supplied stream could not be found or opened, aborting..."
-        #pass
+        pass
     return fulllist        
   
 def main(argv=None):

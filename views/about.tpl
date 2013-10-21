@@ -35,7 +35,9 @@ You shouldn't need any special permissions.</p></li>
 <i>File extension for the recorded stream</i> will be added to the filename. Mostly it would be MPEG transport stream (.ts). Changing this parameter doesn't change anything beside filename.<br />
 <i>Full path to ffmpeg</i> is needed for experimental <i>ffmpeg</i> support. <i>ffmpeg</i> is not included within this software. On Synology DS is <i>ffmpeg</i> preinstalled and the default value should not be changed.<br />
 <i>Stream types</i> would be forwarded to ffmpeg. If your stream can be recorded with, you can add its prefix here.<br />
-<i>Additional output arguments for ffmpeg</i> can be used to change your output. Please check next part for details.</p></li>
+<i>Additional output arguments for ffmpeg</i> can be used to change your output. Please check next part for details.<br />
+<i>Time to perform daily EPG grab</i> can be used to automatically refresh your EPG guide using your streams. Please read the corresponding section for details.
+</p></li>
 <li><p><b>FFMPEG support</b></p>
 <p>This software can forward your streams to external software <a href='http://www.ffmpeg.org/'>ffmpeg</a> thus providing support for non-HTTP streams. If you can record your stream with ffmpeg, you can also do it through my software. On Synology systems ffmpeg is preinstalled, for other systems please check <a href='http://www.ffmpeg.org/'>ffmpeg</a> page. Here is a small tutorial for checking and adding your stream support:<br />
 <ul>
@@ -68,8 +70,8 @@ You can add an file extension while creating new channels. This file extension w
 <p>Once added, you can edit and move your channels. To do this, please click on the gear symbol at the right of the table row. You're now able to edit the channel informations as well as to assign a new ID. Using an existing ID will insert the current record before this ID and renumerate the others. <br />
 You can also delete your channel from here. Please note, that deleting a channel will also delete all associated records. </p>
 <li><p><b>Grabbing EPG (electronic program guide) from your TV stream</b></p>
-<p>If your streams are MPEG transport streams (such as those from network SAT tuners) you should be able to extract or grab EPG data directly from these streams. According to the specification, one channel can carry several other channels' info as well. So the best method is to enable grab on your favorite channels one by one to see, which EPG data would be provided by them. Grabbing one channel takes approximately one minute, so you should not use it on too many channels. To mark a channel for grabbing, you can edit it and use the provided switch. To avoid performance issues, no "take all" switch is provided.  <br />
-As reported, several streams do not provide a channel list inside, so EPG data cannot be properly ordered. This can result in log entry "EPG grab finished with 0 channels, XYZ guide infos, joined amount: 0". In such cases your channel IDs may be carried as a part of your URL. Please contact me for further information. 
+<p>If your streams are MPEG transport streams (such as those from network SAT tuners) you should be able to extract or grab EPG data directly from these streams. According to the specification, one channel can carry several other channels' info as well. So the best method is to enable grab on your favorite channels one by one to see, which EPG data would be provided by them. Grabbing one channel takes approximately one minute, so you should not use it on too many channels. To mark a channel for grabbing, edit it and use the provided switch. To avoid performance issues, no "grab all" switch is provided.  <br />
+As reported, several streams do not transport a channel list at all, so EPG data cannot be properly ordered. This can result in log entry "EPG grab finished with 0 channels, XYZ guide infos, joined amount: 0". In such cases your channel IDs may be carried as a part of your URL. Please contact me for further information. 
 </p>
 </li>
 <li><p><b>EPG import</b></p>

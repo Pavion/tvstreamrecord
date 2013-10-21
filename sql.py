@@ -77,7 +77,7 @@ def sqlCreateAll(version):
                     sql += "UPDATE channels SET cid=rowid;"
                 if oldver < '0.5.1':
                     sql += "ALTER TABLE channels ADD COLUMN epgscan INTEGER DEFAULT 0;" 
-                if oldver < '0.5.2':
+                if oldver < '0.5.1f':
                     sql += 'CREATE TABLE IF NOT EXISTS guide_chan_neu (g_id TEXT UNIQUE, g_name TEXT collate nocase UNIQUE, g_lasttime TEXT);'
                     sql += 'INSERT OR IGNORE INTO guide_chan_neu SELECT * FROM guide_chan;'
                     sql += 'DROP TABLE guide_chan;'
@@ -87,8 +87,7 @@ def sqlCreateAll(version):
                
                 sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version           
                 print "New version %s was implemented" % version    
-           
-    
+               
     sqlRun(sql, -1, 1)
     return
     

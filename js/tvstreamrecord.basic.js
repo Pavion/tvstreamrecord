@@ -67,7 +67,7 @@ function checkRegexp(o, regexp, n ) {
 function initProgressbar() {
     $( "[id^=progressbar]" ).each(function(i) {
         $(this).progressbar({
-            value: parseInt($(this).attr('id').replace("progressbar","")),
+            value: parseInt($(this).attr('id').replace("progressbar",""))
         });
         $(this).width(100);
         $(this).height(14);
@@ -172,10 +172,7 @@ $(function() {
         source: availableTags
     });
 
-    //$( "#button" ).button();
     $( "#radioset" ).buttonset();
-
-  
 
     $("#timepicker_inline_div1").timepicker({
         constrainInput: true,
@@ -198,7 +195,7 @@ $(function() {
                 text: "Delete",
                 click: function() {
                     var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
-                    if (postto.slice(0,4)=="/epg") { 
+                    if (postto.slice(0,7)=="/config") { 
                         post("/removeepg", {}, 1);                  
                     } else {
                         post(postto, { myid:dialognr, what:"-1" }, 1);
@@ -717,8 +714,6 @@ $(function() {
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {        
             var data4 = ""; 
             if (aData[4] == 1) data4 = "plus"; else data4="minus";
-//            $('td:eq(4)', nRow).html('<label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-'+data4+'"></span></label>');            
-//            $('td:eq(4)', nRow).html('<a href="#" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-'+data4+'"></span></a>');            
             var chk = "";
             if (aData[5] == 1) chk = 'checked="checked"';
             $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-'+data4+'"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');            

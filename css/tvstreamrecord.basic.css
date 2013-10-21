@@ -10,38 +10,38 @@ html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-si
     border-bottom:1px solid #BCD2E6;
 }
 
-	body{
-		font: 62.5% "Trebuchet MS", sans-serif;
-		margin-left: 5%;
+    body{
+        font: 62.5% "Trebuchet MS", sans-serif;
+        margin-left: 5%;
         margin-right: 5%;
         margin-top: 20px;
-	}
-	.demoHeaders {
-		margin-top: 2em;
-	}
+    }
+    .demoHeaders {
+        margin-top: 2em;
+    }
 
-	[id^=icons-], [id^=iconsEPG-] {
-		margin: 0px 0px;
-		position: relative;
-		padding: 0px 0;
-		cursor: pointer;
-		float: left;
+    [id^=icons-], [id^=iconsEPG-] {
+        margin: 0px 0px;
+        position: relative;
+        padding: 0px 0px;
+        cursor: pointer;
+        float: left;
         height: 14px;
         width: 14px;
         margin-left: 7px;
-	}
-	[id^=icons-] span.ui-icon  {
-		float: left;
-		margin: -2px -2px;
-	}
-	[id^=iconsEPG-] span.ui-icon  {
-		float: left;
-		margin: -2px -1px;
-	}
+    }
+    [id^=icons-] span.ui-icon  {
+        float: left;
+        margin: -2px -2px;
+    }
+    [id^=iconsEPG-] span.ui-icon  {
+        float: left;
+        margin: -2px -1px;
+    }
 
-	.fakewindowcontain .ui-widget-overlay {
-		position: absolute;
-	}
+    .fakewindowcontain .ui-widget-overlay {
+        position: absolute;
+    }
     
 label,option { display:block;}
 input#ret, select#channel { display:block;}

@@ -48,7 +48,7 @@ def server_static9(filename):
         f.write("#EXTINF:0,"+rows[0][0]+"\n")
         f.write(rows[0][1]+"\n")
         f.close()
-        return static_file("live.m3u", root='', mimetype='video')
+        return static_file("/live.m3u", root='', mimetype='video')
     else:
         redirect("/epg")
 @route('/channels.m3u')
@@ -125,7 +125,8 @@ def chanlist():
     l = []
     rows=sqlRun('SELECT channels.cid, cname, cpath, cext, epgscan, cenabled FROM channels')    
     for row in rows:
-        l.append([row[0], row[1], row[2], row[3], row[4], row[5]])
+        m3u = "<a href=\"live/" + str(row[0]) + ".m3u\">" + row[1] + "</a>"
+        l.append([row[0], m3u, row[2], row[3], row[4], row[5]])
     return json.dumps({"aaData": l } )
 
 @route('/list')

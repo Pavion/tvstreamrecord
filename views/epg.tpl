@@ -11,8 +11,7 @@
 %else:
 <button id="grabepgstop">Stop grabbing EPG (State: {{grabstate[1]}}/{{grabstate[2]}})</button>
 %end
-<button id="removeepg">Remove all EPG data</button></h1>
-</form>
+</h1></form>
 %for rows in rowss:
 %if len(rows)>0:
 %if rows[0][0] == -1:
@@ -29,9 +28,6 @@
 </ol>
 %end
 %end
-</div>
-<div id="dialog" title="Confirmation request">
-	<p>Do you want to delete all of your EPG data?</p>
 </div>
 <div id="record_from_epg" title="Detail view">
 <div id="dialog_content"></div></div>

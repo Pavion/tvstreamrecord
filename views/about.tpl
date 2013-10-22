@@ -11,7 +11,7 @@
 </li>
 <li><p><b>Introduction</b></p>
 <p>This software was designed to record http streams (TV and such). My goal was to be able to record streams from Elgato EyeTV Netstream with my NAS server so it's the primary objective of this software. Please note, that this software can't be used to record any videos from USB-based devices. A simply stream would be http://streamadress/stream000000 and will be recorded or grabbed as is. </p>
-<p>As reported, streams from Dreambox (800 HD) can also be used. Its stream URL should be like: <i>http://192.168.0.10:8001/1:0:1:6DCA:44D:1:C00000:0:0:0:</i></p>
+<p>As reported, streams from Dreambox (800 HD) can also be used. Its stream URL should be like this: <br /><i>http://192.168.0.10:8001/1:0:1:6DCA:44D:1:C00000:0:0:0:</i></p>
 <p>Please note, that the recording of some streams may be forbidden by the law of your country or your local content provider. Author takes no responsibility for any records taken.</p>
 </li>
 <li><p><b>Installation on Synology DS systems</b></p>
@@ -36,7 +36,8 @@ You shouldn't need any special permissions.</p></li>
 <i>Full path to ffmpeg</i> is needed for experimental <i>ffmpeg</i> support. <i>ffmpeg</i> is not included within this software. On Synology DS is <i>ffmpeg</i> preinstalled and the default value should not be changed.<br />
 <i>Stream types</i> would be forwarded to ffmpeg. If your stream can be recorded with, you can add its prefix here.<br />
 <i>Additional output arguments for ffmpeg</i> can be used to change your output. Please check next part for details.<br />
-<i>Time to perform daily EPG grab</i> can be used to automatically refresh your EPG guide using your streams. Please read the corresponding section for details.
+<i>Time to perform daily EPG grab</i> can be used to automatically refresh your EPG guide using your streams. Please read the corresponding section for details.<br />
+<i>Maximal EPG scan duration <b>per channel</b> in seconds</i>. Some channels resend all their EPG information each minute, some channels have much longer cycles. Increasing duration can result in receiving more guide information. 
 </p></li>
 <li><p><b>FFMPEG support</b></p>
 <p>This software can forward your streams to external software <a href='http://www.ffmpeg.org/'>ffmpeg</a> thus providing support for non-HTTP streams. If you can record your stream with ffmpeg, you can also do it through my software. On Synology systems ffmpeg is preinstalled, for other systems please check <a href='http://www.ffmpeg.org/'>ffmpeg</a> page. Here is a small tutorial for checking and adding your stream support:<br />
@@ -70,15 +71,20 @@ You can add an file extension while creating new channels. This file extension w
 <p>Once added, you can edit and move your channels. To do this, please click on the gear symbol at the right of the table row. You're now able to edit the channel informations as well as to assign a new ID. Using an existing ID will insert the current record before this ID and renumerate the others. <br />
 You can also delete your channel from here. Please note, that deleting a channel will also delete all associated records. </p>
 <li><p><b>Grabbing EPG (electronic program guide) from your TV stream</b></p>
-<p>If your streams are MPEG transport streams (such as those from network SAT tuners) you should be able to extract or grab EPG data directly from these streams. According to the specification, one channel can carry several other channels' info as well. So the best method is to enable grab on your favorite channels one by one to see, which EPG data would be provided by them. Grabbing one channel takes approximately one minute, so you should not use it on too many channels. To mark a channel for grabbing, edit it and use the provided switch. To avoid performance issues, no "grab all" switch is provided.  <br />
-As reported, several streams do not transport a channel list at all, so EPG data cannot be properly ordered. This can result in log entry "EPG grab finished with 0 channels, XYZ guide infos, joined amount: 0". In such cases your channel IDs may be carried as a part of your URL. Please contact me for further information. 
-</p>
+<p>If your streams are MPEG transport streams (such as those from network SAT tuners) you should be able to extract or grab EPG data directly from these streams. According to the specification, one channel can carry several other channels' info as well. So the best method is to enable grab on your favorite channels one by one to see, which EPG data would be provided by them. You can change the maximal grabbing duration per channel in the configuration. To mark a channel for grabbing, edit it and use the provided switch. To avoid performance issues, no "grab all" switch is provided.  <br />
+As reported, several streams do not transport a channel list at all, so EPG data cannot be properly ordered. This can result in log entry "EPG grab finished with 0 channels, XYZ guide infos, joined amount: 0". In such cases your channel IDs may be carried as a part of your URL. Already implemented examples: <br />
+<i>http://192.168.0.10:8001/1:0:1:<b>6DCA</b>:44D:1:C00000:0:0:0:<br />
+http://192.168.0.10/stream/tunerequest00040000C0FFFFFF00B49A60044D00FF0001<b>6DCA</b>010101FF</i><br />
+Please contact me if you have a same issue with a different URL.</p>
 </li>
 <li><p><b>EPG import</b></p>
 <p>If you have a free XMLTV provider from your region, you should add his address in config. Now you should be able to import EPG by pressing the corresponding button one time. Please just one time. As for now there is no direct feedback for this feature and full synchronisation takes some time, please check the log file for the progress or error status. The only provider tested is <a href="http://xmltv.spaetfruehstuecken.org/xmltv/">Egon zappt</a>. As I'm following <a href="http://www.oztivo.net/twiki/bin/view/TVGuide/StaticXMLGuideAPI">OzTiVo rules</a> to grab EPG data, you can receive new data only, which would normally be refreshed one time a day.</p>
 </li>
 <li><p><b>Records</b></p>
 <p>Here you can create a new record with channel and time provided. You can also edit, pause and delete your recordings. You can also create recurrent records by providing weekdays. This would still be one record only, which can be paused/resumed/deleted. Unlike 'normal' records, which are done after completion, the next runtime will be automatically calculated and set there.</p>
+</li>
+<li><p><b>Troubleshooting</b></p>
+<p>If you encounter an issue with 'EPG' or 'Log' pages, you can reset both at the config page.</p>
 </li>
 <li><p><b>Feedback</b></p>
 <p>As I'm not able to test my software on every plattform of the world, I beg you for your feedback regarding any issues with my software. Thank you!</p>

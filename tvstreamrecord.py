@@ -37,7 +37,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.5.1f' 
+version = '0.5.2' 
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -372,6 +372,8 @@ class epggrabthread(threading.Thread):
         self.epggrabberstate[0]=0
         self.running = False
         sleep(61)
+        
+        self.stopflag = False
         self.run()
     
     def stop(self):

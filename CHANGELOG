@@ -1,8 +1,9 @@
 2013-10-20 0.5.2 Extended EPG grab support. Please check About page
-                 Highlight events beeing recorded in EPG
+                 Highlight events being recorded in EPG
                  Automatic timed EPG grab (see config)
-                 Stream link at EPG page to use with video players and browser plugins
-                 Several bug fixes 
+                 Stream link at every page to use with video players and browser plugins
+                 Several bug fixes
+                 Debug buttons moved to config page 
 
 2013-08-19 0.5.1 EPG grabbing beta
 

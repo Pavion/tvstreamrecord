@@ -188,7 +188,7 @@ def read_stream(f_in):
                  
                 # Data analyse and matching
                 if analyse[ch]:     
-                    plist = getList(payload[ch], ch)
+                    plist = getList(payload[ch], ch)                    
                     maxlist[ch] = joinarrays(maxlist[ch], plist)
                     myfirstpayload[ch] = tmp
                     payload[ch] = ""                                        
@@ -222,79 +222,102 @@ def getList(payload, ch):
     
 def getGuides(pl):                     
     guides = list()
-
-    #if True:
+        
     try:            
-        # Sorting the tables, taking 5* and 6* tables only.
+        # Sorting the tables, taking 4*, 5* and 6* tables only.
         guidetext = ""
         pos0 = -1
-        pos1 = -1       
+        pos1 = -1
         for i in range(0, len(pl)-4):
             if ord(pl[i]) == 0xFF and ord(pl[i+1]) == 0xFF and ord(pl[i+2]) == 0x00:
                 pos1 = i + 2
-                if pos0 != -1:
+                if pos0 != -1:                    
                     guidetext = guidetext + "////" + ( pl[pos0+1:pos1] )
                     pos0 = -1 
-                if ord(pl[i+3]) >> 4 == 5  or ord(pl[i+3]) >> 4 == 6:
+                if ord(pl[i+3]) >> 4 == 4 or ord(pl[i+3]) >> 4 == 5 or ord(pl[i+3]) >> 4 == 6:
                     pos0 = i+2
-
-        # Separating the tables into a list 
+        if pos0!=-1: #end of string
+            guidetext = guidetext + "////" + ( pl[pos0+1:] )
+            
+        
+    
+        # Separating the tables into a list
         guidelist = guidetext.split("////")
         
         for guide in guidelist:
             if len(guide)>14:
+                lenpos = 0
+                slen = 0
                 pos = 0
-                slen = (  ord(guide[pos+1])  - (ord(guide[pos+1]) >> 4 << 4 ) )*256 + ord(guide[pos+2])
-                # Channel ID 
-                sid = ord(guide[pos+3])*256 + ord(guide[pos+4])                        
-                pos = pos + 14
-                while pos < slen-10:                
-                    #eid = ord(guide[pos])*256 + ord(guide[pos+1]) # Event ID 
-                    start = mjd_to_local(guide[pos+2:pos+7])
-                    duration = str_to_delta(guide[pos+7:pos+10]) 
-    
-                    
-                    dlen = (  ord(guide[pos+10])  - (ord(guide[pos+10]) >> 4 << 4 ) )*256 + ord(guide[pos+11])
-                    if dlen>0:
-                        pos2 = pos + 17
-                        # Steuerbyte for several descriptions (?)
-                        stb = guide[pos2+1]
-                        if stb==chr(05): # several descriptions / lines available
-                            desc = ""
-                            desccnt = 0
+                slen = (  ord(guide[1])  - (ord(guide[1]) >> 4 << 4 ) )*256 + ord(guide[2])
+                while True:
+                    tid = (ord(guide[lenpos]) >> 4)
+                    if tid==5 or tid == 6:
+                        pos = lenpos
+                        # Channel ID 
+                        sid = ord(guide[pos+3])*256 + ord(guide[pos+4])                        
                             
-                            while pos2<pos+12+dlen-1: 
-                                if guide[pos2]==chr(0x4E):    
-                                    pos2 = pos2 + 7
-                                elif guide[pos2]==chr(0x50) or guide[pos2]==chr(0x54):    
-                                    break
-                                elif ord(guide[pos2])==0 and ord(guide[pos2+1])==0x54: # seems to be a delimiter between title and description 
-                                    pos2 = pos2 + 12
-#                                elif ord(guide[pos2])==0
-
-                                dlen2 = ord(guide[pos2])
-                                
-                                if dlen2<=0 or pos2+dlen2+1>=pos+12+dlen-1: #dunno
-                                    break
+                        pos = pos + 14
+                        while pos - lenpos < slen-10:
+    
+                            #eid = ord(guide[pos])*256 + ord(guide[pos+1]) # Event ID 
+                            start = mjd_to_local(guide[pos+2:pos+7])
+                            duration = str_to_delta(guide[pos+7:pos+10]) 
+            
+                            
+                            if pos+11>=len(guide): 
+                                break
+    
+                            dlen = (  ord(guide[pos+10])  - (ord(guide[pos+10]) >> 4 << 4 ) )*256 + ord(guide[pos+11])
+                            if dlen>0:
+                                pos2 = pos + 17
+                                # Steuerbyte for several descriptions (?)
+                                stb = guide[pos2+1]
+                                if stb==chr(05): # several descriptions / lines available
+                                    desc = ""
+                                    desccnt = 0
                                     
-#                                print guide[pos2+2:pos2+1+dlen2]     
-                                if desccnt == 1:# or desccnt == 2:
-                                    desc = desc + "\n" + guide[pos2+2:pos2+1+dlen2] 
-                                else:
-                                    desc = desc + guide[pos2+2:pos2+1+dlen2] 
+                                    while pos2<pos+12+dlen-1 and pos2<=len(guide): 
+                                        if guide[pos2]==chr(0x4E):    
+                                            pos2 = pos2 + 7
+                                        elif guide[pos2]==chr(0x50) or guide[pos2]==chr(0x54):    
+                                            break
+                                        elif ord(guide[pos2])==0 and ord(guide[pos2+1])==0x54: # seems to be a delimiter between title and description 
+                                            pos2 = pos2 + 12
+    
+                                        dlen2 = ord(guide[pos2])
+                                        
+                                        if dlen2<=0 or pos2+dlen2+1>=pos+12+dlen-1: #dunno
+                                            break
+                                            
+                                        if desccnt == 1:# or desccnt == 2:
+                                            desc = desc + "\n" + guide[pos2+2:pos2+1+dlen2] 
+                                        else:
+                                            desc = desc + guide[pos2+2:pos2+1+dlen2] 
+                                        
+                                        desccnt = desccnt + 1
+                                        pos2 = pos2+dlen2+1
+                                else: # only one description available
+                                    dlen2 = ord(guide[pos2])
+                                    desc = guide[pos2+1:pos2+1+dlen2]
                                 
-                                desccnt = desccnt + 1
-                                pos2 = pos2+dlen2+1
-                        else: # only one description available
-                            dlen2 = ord(guide[pos2])
-                            desc = guide[pos2+1:pos2+1+dlen2]
-                        
-                        guides.append([sid, start, duration, unistr(desc)])                        
-                        
-                    pos = pos + dlen + 12        
-        
+                                guides.append([sid, start, duration, unistr(desc)])                        
+                                
+                                
+                                
+                            pos = pos + dlen + 12        
+                    lenpos = lenpos + slen + 4
+                    if lenpos+2>=len(guide): 
+                        break
+                    if ord(guide[lenpos-1]) == 0x50: # dunno
+                        lenpos = lenpos - 1
+                    slen = (  ord(guide[lenpos+1])  - (ord(guide[lenpos+1]) >> 4 << 4 ) )*256 + ord(guide[lenpos+2])
+                    tid = (ord(guide[lenpos]) >> 4)
+    
     except:
+        #print "Unexpected error with EPG grab, you may need to try again."        
         pass
+
     return guides
 
 ################################################################################
@@ -323,7 +346,6 @@ def getChannelList(pl):
                 dlen = (  (ord(table[pos+3]) >> 4 << 4 )- ord(table[pos+3])  )*256 + ord(table[pos+4])
                 if dlen < 0: 
                     break
-                #print pos, len(table)-4
                 
                 i = pos+6
     
@@ -394,6 +416,8 @@ def getFullList(f):
 
         if len(channellist) > 0: 
             print "Could not extract a channel list from provided stream, tried to use URLs instead"
+        else:
+            print "Could not also extract a channel list from your URLs. Please check the About page for more details"
    
     for l in guides:
         for c in channellist:
@@ -414,7 +438,6 @@ def getFullList(f):
     return fulllist
   
 def startgrab(myrow):
-#    print myrow
     fulllist = list() 
     try:            
         print "EPG grabbing started on %s for %s seconds" % (myrow[0], config.cfg_grab_max_duration)
@@ -442,12 +465,18 @@ def main(argv=None):
             print "Supplied file/stream could not be found, aborting..."
             return fulllist
     else:  # default
-        inp = open("test-rtl2.ts", "rb")
+        inp = open("d:/temp/20131021195900 - Tagesschau.mpg", "rb")
+        #inp = open("d:/temp/test-rtl2.ts", "rb")
         print "Opening local file"
         
     fulllist = getFullList(inp)
 
-    return fulllist
+    #out = open("d:/temp/out.txt", "w")
+    #for f in fulllist:
+    #    out.write(repr(f[0]) + '\t' + datetime.strftime((f[1]),  "%d.%m.%Y %H:%M:%S")  + '\t' + str(f[2].total_seconds()) + '\t' + repr(f[3]) + '\n')
+    #out.close()    
+        
+    return #fulllist
 
 if __name__ == "__main__":
     sys.exit(main())

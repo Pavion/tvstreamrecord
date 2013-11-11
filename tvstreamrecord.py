@@ -454,15 +454,14 @@ def epg_s():
     hours = int(totalwidth / 3600)
     d_von = daystart
 
-    #zoom = 4
-    widthq = 0.8
+    widthq = 1
     ret = list()
     rtemp = list()
     w = 0.0
     for i in range(0, hours):
         t = time(i+sthour)
-        x = i * 100.0 / hours * widthq  #* zoom
-        w =  1.0 / hours * widthq * 100.0# * zoom
+        x = i * 100.0 / hours * widthq
+        w =  1.0 / hours * widthq * 100.0
         rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", -1, "", 0])
     ret.append(rtemp)    
     
@@ -501,7 +500,7 @@ def epg_s():
                 rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], title, fulltext, event[4], row[2], event[5]])
                 #print event[5]
         ret.append(rtemp)
-    return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret, grabstate=grabthread.getState())            
+    return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret, grabstate=grabthread.getState(), zoom=config.cfg_grab_zoom)            
 
 #------------------------------- Record List -------------------------------
 

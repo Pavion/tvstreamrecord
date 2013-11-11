@@ -1,6 +1,6 @@
 %# coding=UTF-8
 %include header 
-
+<div id="zoom" zoom="{{zoom}}"></div>
 <div id="users-contain" class="ui-widget">
 <form method='POST' enctype='multipart/form-data' action='/epg' name='daychooser'>
 <h1><div id="float">Current date:</div>

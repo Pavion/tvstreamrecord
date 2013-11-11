@@ -70,12 +70,12 @@ label#append {float: left; margin-top: 3px;}
 #feedback { font-size: 1.4em; }
 #selectable .ui-selecting { background: #FECA40; }
 #selectable .ui-selected { background: #F39814; color: white; }
-#selectable { list-style-type: none; margin: 0; padding: 0 0 70px 0; width: 80%; position: absolute; }
+#selectable { list-style-type: none; margin: 0; padding: 0 0 70px 0; width: 90%; position: absolute; }
 #selectable li { height: 60px; font-size: 7px; text-align: center; position: absolute;  font-size: 1em; }
 
 #selectabletitle .ui-selecting { background: #FECA40; }
 #selectabletitle .ui-selected { background: #F39814; color: white; }
-#selectabletitle { list-style-type: none; margin: 0; padding: 0 0 30px 0; width: 100%; }
+#selectabletitle { list-style-type: none; margin: 0; padding: 0 0 30px 0; width: 90%; position: absolute; }
 #selectabletitle li { height: 20px; font-size: 1.2em; text-align: center; position: absolute; }
 
 #datepicker1, #datepicker3  { width: 100px; float:left; margin-left: 5px; margin-right: 5px;}

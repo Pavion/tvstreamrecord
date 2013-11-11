@@ -282,21 +282,64 @@ $(function() {
         $( document ).tooltip();
     });
     
+    var zoom = 1;
+    
     $( "[id=event]" ).each(function(i) {        
-        w = $(this).attr('width')+"%";
-        x = $(this).attr('x')+"%";
+        w = +$(this).attr('width');
+        x = +$(this).attr('x');
+        cnt = +$(this).attr('cnt');
         rec = $(this).attr('recording');
-        //console.log( rec );
-        
-        if(rec == 1) {
-        	$(this).css("background", "#98FB98");
-        	//alert("s");
-        	}                
-//        $(this).addClass("ui-selected");
+        if(rec == 1) $(this).css("background", "#98FB98");
 
-        $(this).css("margin-left", x);        
-        $(this).css("width", w);        
+        if (zoom>0) {
+            w = w*zoom;
+            x = x*zoom;
+
+            $(this).css("margin-left", x+'%');        
+            $(this).css("width", w+'%');
+
+        } else {
+            w = w*5*-zoom;
+            x = x*5*-zoom+60;
+            //console.log('calc(' + x + '%+50px)');
+            $(this).css("position", 'absolute');        
+            $(this).css("margin-left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');        
+            $(this).css("margin-top", x+'px');        
+            $(this).css("width", cnt==0?'50px':'240px');
+            $(this).css("height", w + "px");
+        }
     });
+
+    $( "[id=epg_cname]" ).each(function(i) {        
+        cnt = +$(this).attr('cnt');
+        if (zoom>0) {
+            $(this).css("position", 'relative');        
+            $(this).css("margin-top", (10+(cnt-1)*40) + 'px' );        
+            $("#mybody").css("width", "calc((" +(zoom*80)+ "% + 50px)*1.111)");
+            $("#mybody").css("height", (160+cnt*40) + 'px');
+            //$("#selectable").css("width", "100%");
+        
+        } else {
+            $(this).css("position", 'absolute');        
+            $(this).css("width", cnt==0?'50px':'240px');
+            $(this).css("margin-top", '10px');        
+            $(this).css("margin-left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');        
+            $(this).css("z-index", '1');        
+            
+
+            $("#mybody").css("height", (80*5*-zoom+150)+"px");
+            $("#selectabletitle").css("padding", "0px");
+            
+        }
+    });
+
+/*    $( "[id=selectable]" ).each(function(i) {        
+        if(zoom>0) {
+            $(this).css("width", '100%');
+        }
+    });*/
+    
+    
     
     $("[id^=wwd]").each(function() { 
         $(this).live("click", function(event) {

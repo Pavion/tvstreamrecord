@@ -453,15 +453,16 @@ def epg_s():
     
     hours = int(totalwidth / 3600)
     d_von = daystart
-    
+
+    #zoom = 4
     widthq = 0.8
     ret = list()
     rtemp = list()
     w = 0.0
     for i in range(0, hours):
         t = time(i+sthour)
-        x = i * 100.0 / hours * widthq
-        w =  1.0 / hours * widthq * 100.0 
+        x = i * 100.0 / hours * widthq  #* zoom
+        w =  1.0 / hours * widthq * 100.0# * zoom
         rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", -1, "", 0])
     ret.append(rtemp)    
     

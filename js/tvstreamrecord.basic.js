@@ -272,104 +272,111 @@ $(function() {
     
 
     var selcount = 0;
-    $( "#selectabletitle" ).selectable({
+/*    $( "#selectabletitle" ).selectable({
         disabled: true,
         autoRefresh: false
-    });
-    $( "#selectable" ).selectable({ distance: 99999 } );
+    });*/
+//    $( "#selectable" ).selectable({ distance: 99999 } );
    
     $(function() {
         $( document ).tooltip();
     });
     
-    var zoom = +$("#zoom").attr('zoom');
+    var zoom = +$("#zoom").attr('zoom');    
     if (zoom==0) zoom=1;
-    
+    var maxcnt=0;
+            
     $( "[id=event]" ).each(function(i) {        
         w = +$(this).attr('width');
         x = +$(this).attr('x');
         cnt = +$(this).attr('cnt');
         rec = $(this).attr('recording');
         if(rec == 1) $(this).css("background", "#98FB98");
-        $(this).css("position", 'absolute');    
+        $(this).css("font-size", ((cnt==0?11:7)+Math.round(Math.abs(zoom*2))) + 'px');            
         
         if (zoom>0) {
-            w = w*zoom;
-            x = x*zoom;
-
+            $(this).css("height", cnt==0?'20px':'60px');
             $(this).css("margin-top", cnt==0?10:(80+(cnt-1)*100) + 'px');        
             $(this).css("margin-left", x+'%');        
             $(this).css("width", w+'%');
-
         } else {
-            w = w*5*-zoom;
-            x = x*5*-zoom+60;
-            //console.log('calc(' + x + '%+50px)');
-            $(this).css("margin-left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');        
-            $(this).css("margin-top", x+'px');        
+            $(this).css("left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');        
+            $(this).css("top", x+'%');        
             $(this).css("width", cnt==0?'50px':'240px');
-            $(this).css("height", w + "px");
+            $(this).css("height", w + "%");
         }
 
     });
 
     $( "[id=epg_cname]" ).each(function(i) {        
         cnt = +$(this).attr('cnt');
-        $(this).css("position", 'absolute');        
+        if (cnt>maxcnt) maxcnt=cnt; 
         if (zoom>0) {
             $(this).css("margin-top", (50+(cnt-1)*100) + 'px' );
-            //var mywidth = $("#selectable").width()+150;
-            //console.log(mywidth);        
-            //$("#mybody").css("width", mywidth + "px");            
-            $("#mybody").css("height", (160+cnt*100) + 'px');
-            //$("#selectable").css("width", "80%");
-        
         } else {
             $(this).css("width", cnt==0?'50px':'240px');
-            $(this).css("margin-top", '10px');        
+            $(this).css("margin-top", '-10px');        
             $(this).css("margin-left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');        
             $(this).css("z-index", '1');        
             
-
-            $("#mybody").css("width", (cnt * 250 + 60 + 100) + 'px');
-            $("#mybody").css("height", (80*5*-zoom+150)+"px");
-            $("#selectabletitle").css("padding", "0px");
-            
         }
     });
+    
+    if(!isNaN(zoom)) {
+        if (zoom>0) {
+            if(zoom!=1) $("body").css("width", (zoom*100)+"%");
+            $("#mybody").css("height", (maxcnt * 100 + 100) +"px");
+            $("[id=selectable]").each(function(i) { $(this).css("clear", "left"); });
+        } else {
+            $("[id=selectable]").each(function(i) { 
+                $(this).css("float", "left");
+                $(this).css("height", (-zoom*800)+"px");
+            });
+            $("body").css("width", (250*maxcnt+100)+"px");
+            $("#mybody").css("height", (-zoom*800+80)+"px");
+        } 
+    }
 
-/*    $( "[id=selectable]" ).each(function(i) {        
-        if(zoom>0) {
-            $(this).css("width", '100%');
+    $( "#searchepg" ).change(function() {
+        //alert( "Handler for .change() called." );
+        var tofind = $(this).val().toLowerCase();
+        if (tofind.length>0) {
+
+            $( "[id=event]" ).each(function(i) {
+                var text = $(this).attr('fulltext').toLowerCase();
+                if(text.indexOf(tofind)!=-1) {
+                    $(this).addClass("ui-selected");
+                } else {
+                    $(this).removeClass("ui-selected");
+                }
+            });        
         }
-    });*/
-    
-    
-    
-    $("[id^=wwd]").each(function() { 
-        $(this).live("click", function(event) {
-        /*    if ($(this).hasClass("ui-state-active")) {
-                $(this).removeClass("ui-state-active");
-                $(this).css("background", "#accccc");                
-                                //console.log("test");
-            } else {
-                $(this).addClass("ui-state-active");
-                $(this).css("background", "#e6e6e6");                
-                
-            }*/
-//            console.log( $("#wwd0").attr("aria-pressed")  );
+        
+    });
+
+    $( "#searchepgbutton" )
+        .button()
+        .click(function(event ) {            
+            $( "#searchepg" ).change();
+            event.preventDefault();
         });
-    });
 
-    $("li").live("click", function(event) {
-           $("li").siblings().removeClass("ui-selected");        
+    
+/*    $("[id^=wwd]").each(function() { 
+        $(this).live("click", function(event) {
+
+        });
+    });*/
+
+    $("[id=event]").live("click", function(event) {
+           $("[id=event]").siblings().removeClass("ui-selected");        
            $(this).addClass("ui-selected");
            var ft = $(this).attr("fulltext");
-           //console.log (ft);
-           if (ft)   {
+           if (ft)  {
             document.getElementById("ret").value = $(this).attr("rid");             
             $("#dialog_content").html ( ft );    
             $( "#record_from_epg" ).dialog( "open" );
+            $(this).removeClass("ui-selected");
            }
         
     });
@@ -675,8 +682,6 @@ $(function() {
             $(this).html('Please refresh to see progress');
             $(this).css('height', "20px");
             $(this).addClass( "ui-state-disabled" );
-
-//#            $(this).attr("aria-disabled", "true");
             event.preventDefault();
         });
 

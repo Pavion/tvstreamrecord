@@ -292,7 +292,7 @@ $(function() {
         cnt = +$(this).attr('cnt');
         rec = $(this).attr('recording');
         if(rec == 1) $(this).css("background", "#98FB98");
-        $(this).css("font-size", ((cnt==0?11:7)+Math.round(Math.abs(zoom*2))) + 'px');            
+        $(this).css("font-size", ((cnt==0?11:8)+Math.round(Math.abs(zoom*2))) + 'px');
         
         if (zoom>0) {
             $(this).css("height", cnt==0?'20px':'60px');
@@ -305,7 +305,6 @@ $(function() {
             $(this).css("width", cnt==0?'50px':'240px');
             $(this).css("height", w + "%");
         }
-
     });
 
     $( "[id=epg_cname]" ).each(function(i) {        
@@ -338,7 +337,6 @@ $(function() {
     }
 
     $( "#searchepg" ).change(function() {
-        //alert( "Handler for .change() called." );
         var tofind = $(this).val().toLowerCase();
         if (tofind.length>0) {
 
@@ -350,8 +348,7 @@ $(function() {
                     $(this).removeClass("ui-selected");
                 }
             });        
-        }
-        
+        }        
     });
 
     $( "#searchepgbutton" )

@@ -37,7 +37,8 @@ You shouldn't need any special permissions.</p></li>
 <i>Stream types</i> would be forwarded to ffmpeg. If your stream can be recorded with, you can add its prefix here.<br />
 <i>Additional output arguments for ffmpeg</i> can be used to change your output. Please check next part for details.<br />
 <i>Time to perform daily EPG grab</i> can be used to automatically refresh your EPG guide using your streams. Please read the corresponding section for details.<br />
-<i>Maximal EPG scan duration <b>per channel</b> in seconds</i>. Some channels resend all their EPG information each minute, some channels have much longer cycles. Increasing duration can result in receiving more guide information. 
+<i>Maximal EPG scan duration <b>per channel</b> in seconds</i>. Some channels resend all their EPG information each minute, some channels have much longer cycles. Increasing duration can result in receiving more guide information.<br /> 
+<i>Zoom level for EPG view</i>. You can change your default EPG view here. Enter negative values for vertical and positive values for default horizontal view (i.e. 2=200% horizontal, -3=300% vertical). Default is '1' for classic horizontal one-page view. 
 </p></li>
 <li><p><b>FFMPEG support</b></p>
 <p>This software can forward your streams to external software <a href='http://www.ffmpeg.org/'>ffmpeg</a> thus providing support for non-HTTP streams. If you can record your stream with ffmpeg, you can also do it through my software. On Synology systems ffmpeg is preinstalled, for other systems please check <a href='http://www.ffmpeg.org/'>ffmpeg</a> page. Here is a small tutorial for checking and adding your stream support:<br />

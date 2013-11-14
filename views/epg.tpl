@@ -21,11 +21,10 @@
 %if len(rows)>0:
 %if rows[0][0] == -1:
 <div id="epg_cname" cnt="{{cnt}}"></div>
-<div id="selectable">
 %else:
 <div id="epg_cname" cnt="{{cnt}}"><h1><b><a href="live/{{rows[0][0]}}.m3u">{{rows[0][7]}}</a></b></h1></div>
-<div id="selectable">
 %end
+<div id="selectable">
 %for row in rows:
 <div class="ui-state-default" id="event" cnt="{{cnt}}" x="{{row[1]}}" width="{{row[2]}}" cid="{{row[0]}}" rid="{{row[6]}}" fulltext="{{row[5]}}" recording="{{row[8]}}" title="{{row[4]}}">{{row[3]}}</div>
 %end

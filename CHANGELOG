@@ -1,3 +1,5 @@
+2013-11-13 0.5.2a EPG view is now configurable. Please check the 'Config' page for this option
+
 2013-10-20 0.5.2 Extended EPG grab support. Please check About page
                  Highlight events being recorded in EPG
                  Automatic timed EPG grab (see config)

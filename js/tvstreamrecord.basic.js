@@ -15,9 +15,16 @@
     @author: Pavion
 */
 
-var dialognr = -1; 
-
+var dialognr = -1;
 var weekdays = new Array('Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su');
+
+function where() {
+    return window.location.href.slice(window.location.href.lastIndexOf("/"));
+}
+function here(url) {
+    var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
+    return (postto == "/"+url || postto.startsWith("/"+url));
+}
 
 function switchMe(sw,  how) {
     if (how) {
@@ -74,9 +81,9 @@ function initProgressbar() {
         $(this).css("float", "left");
     });
 }
- 
+
 function initIcons() {
-    $( "[id^=icons-]" ).hover(
+    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-]" ).hover(
         function() {
             $( this ).addClass( "ui-state-hover" );
         },
@@ -85,35 +92,48 @@ function initIcons() {
         }
     );
 
+    $( "[id^=iconsEPG-]" ).click(function( event ) {
+        dialognr = parseInt($(this).attr('id').replace("iconsEPG-",""));
+        post('/grab_channel', { myid:dialognr }, 0);
+        if($( this ).children().hasClass( "ui-icon-plus" )) {
+             $( this ).children().removeClass( "ui-icon-plus" );
+             $( this ).children().addClass( "ui-icon-minus" );
+        } else {
+             $( this ).children().removeClass( "ui-icon-minus" );
+             $( this ).children().addClass( "ui-icon-plus" );
+        }
+    });
+
+    $( "[id^=iconsRec-]" ).click(function( event ) {
+        dialognr = parseInt($(this).attr('id').replace("iconsRec-",""));
+        $( "#dialog-form" ).dialog( "open" );
+        event.preventDefault();
+    });
+
     $( "[id^=icons-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("icons-",""));
-        var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
-        if (postto.slice(0,8) == "/records") {
-            $( "#dialog-form" ).dialog( "open" );        
+//        var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
+//        if (postto.slice(0,8) == "/records") {
+        if (here("records")) {
+            $( "#dialog-form" ).dialog( "open" );
         } else {
-            $( "#createchannel-form" ).dialog( "open" );        
+            $( "#createchannel-form" ).dialog( "open" );
         }
-        event.preventDefault();            
+        event.preventDefault();
     });
-    
-/*    $( "[id^=icons-]" ).each(function(i) {
-        $(this).height(14);
-        $(this).width(14);
-        $(this).css("margin-left", "7px");
-    });*/
+
 }
 
 function initSwitch() {
     $('[id^=switch-]').each(function() {
-        //$(this).css("margin-top", "2px"); 
         var switchnr = parseInt($(this).attr('id').replace("switch-",""));
-        var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
+//        var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
         $(this).slickswitch({
-            toggledOn: function() {            
-                post(postto, { myid:switchnr, what:"1" }, 0); 
+            toggledOn: function() {
+                post(where(), { myid:switchnr, what:"1" }, 0);
             },
-            toggledOff: function() {  
-                post(postto, { myid:switchnr, what:"0" }, 0); 
+            toggledOff: function() {
+                post(where(), { myid:switchnr, what:"0" }, 0);
             }
         });
     });
@@ -126,11 +146,11 @@ function post(dest1, data1, rel) {
         data: data1,
         dataType: "json",
         success: function(data, textStatus) {
-            if(rel==1) { 
-                window.location.reload(false);                            
+            if(rel==1) {
+                window.location.reload(false);
             }
         }
-    });                        
+    });
 }
 
 function endsWith(str, suffix) {
@@ -139,40 +159,9 @@ function endsWith(str, suffix) {
 
 
 $(function() {
+    $(document).tooltip();
 
     var pickerform = "dd.mm.yy";
-
-    $( "#accordion" ).accordion();
-    
-    var availableTags = [
-        "ActionScript",
-        "AppleScript",
-        "Asp",
-        "BASIC",
-        "C",
-        "C++",
-        "Clojure",
-        "COBOL",
-        "ColdFusion",
-        "Erlang",
-        "Fortran",
-        "Groovy",
-        "Haskell",
-        "Java",
-        "JavaScript",
-        "Lisp",
-        "Perl",
-        "PHP",
-        "Python",
-        "Ruby",
-        "Scala",
-        "Scheme"
-    ];
-    $( "#autocomplete" ).autocomplete({
-        source: availableTags
-    });
-
-    $( "#radioset" ).buttonset();
 
     $("#timepicker_inline_div1").timepicker({
         constrainInput: true,
@@ -182,11 +171,11 @@ $(function() {
         constrainInput: true,
         showPeriodLabels: false
     });
-    
-    $( "#switch00" ).slickswitch();   
+
+    $( "#switch00" ).slickswitch();
     $( "#switch01" ).slickswitch();
     $( "#switch02" ).slickswitch();
-    
+
     $( "#dialog" ).dialog({
         autoOpen: false,
         width: 300,
@@ -194,13 +183,14 @@ $(function() {
             {
                 text: "Delete",
                 click: function() {
-                    var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
-                    if (postto.slice(0,7)=="/config") { 
-                        post("/removeepg", {}, 1);                  
+//                    var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
+//                    if (postto.slice(0,7)=="/config") {
+                    if (here("/config")) {
+                        post("/removeepg", {}, 1);
                     } else {
-                        post(postto, { myid:dialognr, what:"-1" }, 1);
+                        post(where(), { myid:dialognr, what:"-1" }, 1);
                     }
-                    $( this ).dialog( "close" );                        
+                    $( this ).dialog( "close" );
                 }
             },
             {
@@ -225,7 +215,6 @@ $(function() {
         ]
     });
 
-
     $( "#confirm01" ).dialog({
         autoOpen: false,
         width: 300,
@@ -233,9 +222,9 @@ $(function() {
             {
                 text: "OK",
                 click: function() {
-                    var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
-                    post(postto, { myid:'-1', what:"-2" }, 1);
-                    $( this ).dialog( "close" );                        
+//                    var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
+                    post(where(), { myid:'-1', what:"-2" }, 1);
+                    $( this ).dialog( "close" );
                 }
             },
             {
@@ -246,17 +235,17 @@ $(function() {
             }
         ]
     });
-    
+
     $( "#datepicker" ).datepicker({
         constrainInput: true,
-        minDate: -1,          
-        defaultDate: 0,        
+        minDate: -1,
+        defaultDate: 0,
         dateFormat: pickerform
     });
 
     $( "#datepicker3" ).datepicker({
         constrainInput: true,
-        minDate: 0,          
+        minDate: 0,
         defaultDate: 0,
         onSelect: function() {
             document.daychooser.submit();
@@ -264,76 +253,66 @@ $(function() {
         dateFormat: pickerform
     });
 
-    
+
     $( "#slider" ).slider({
         range: true,
         values: [ 17, 67 ]
     });
-    
 
     var selcount = 0;
-/*    $( "#selectabletitle" ).selectable({
-        disabled: true,
-        autoRefresh: false
-    });*/
-//    $( "#selectable" ).selectable({ distance: 99999 } );
-   
-    $(function() {
-        $( document ).tooltip();
-    });
-    
-    var zoom = +$("#zoom").attr('zoom');    
+
+    var zoom = +$("#zoom").attr('zoom');
     if (zoom==0) zoom=1;
     var maxcnt=0;
-            
-    $( "[id=event]" ).each(function(i) {        
+
+    $( "[id=event]" ).each(function(i) {
         w = +$(this).attr('width');
         x = +$(this).attr('x');
         cnt = +$(this).attr('cnt');
         rec = $(this).attr('recording');
         if(rec == 1) $(this).css("background", "#98FB98");
         $(this).css("font-size", ((cnt==0?11:8)+Math.round(Math.abs(zoom*2))) + 'px');
-        
+
         if (zoom>0) {
             $(this).css("height", cnt==0?'20px':'60px');
-            $(this).css("margin-top", cnt==0?10:(80+(cnt-1)*100) + 'px');        
-            $(this).css("margin-left", x+'%');        
+            $(this).css("margin-top", cnt==0?10:(80+(cnt-1)*100) + 'px');
+            $(this).css("margin-left", x+'%');
             $(this).css("width", w+'%');
         } else {
-            $(this).css("left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');        
-            $(this).css("top", x+'%');        
+            $(this).css("left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');
+            $(this).css("top", x+'%');
             $(this).css("width", cnt==0?'50px':'240px');
             $(this).css("height", w + "%");
         }
     });
 
-    $( "[id=epg_cname]" ).each(function(i) {        
+    $( "[id=epg_cname]" ).each(function(i) {
         cnt = +$(this).attr('cnt');
-        if (cnt>maxcnt) maxcnt=cnt; 
+        if (cnt>maxcnt) maxcnt=cnt;
         if (zoom>0) {
             $(this).css("margin-top", (50+(cnt-1)*100) + 'px' );
         } else {
             $(this).css("width", cnt==0?'50px':'240px');
-            $(this).css("margin-top", '-10px');        
-            $(this).css("margin-left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');        
-            $(this).css("z-index", '1');        
-            
+            $(this).css("margin-top", '-10px');
+            $(this).css("margin-left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');
+            $(this).css("z-index", '1');
+
         }
     });
-    
+
     if(!isNaN(zoom)) {
         if (zoom>0) {
             if(zoom!=1) $("body").css("width", (zoom*100)+"%");
             $("#mybody").css("height", (maxcnt * 100 + 100) +"px");
             $("[id=selectable]").each(function(i) { $(this).css("clear", "left"); });
         } else {
-            $("[id=selectable]").each(function(i) { 
+            $("[id=selectable]").each(function(i) {
                 $(this).css("float", "left");
                 $(this).css("height", (-zoom*800)+"px");
             });
             $("body").css("width", (250*maxcnt+100)+"px");
             $("#mybody").css("height", (-zoom*800+80)+"px");
-        } 
+        }
     }
 
     $( "#searchepg" ).change(function() {
@@ -347,67 +326,60 @@ $(function() {
                 } else {
                     $(this).removeClass("ui-selected");
                 }
-            });        
-        }        
+            });
+        }
     });
 
     $( "#searchepgbutton" )
         .button()
-        .click(function(event ) {            
+        .click(function(event ) {
             $( "#searchepg" ).change();
             event.preventDefault();
         });
 
-    
-/*    $("[id^=wwd]").each(function() { 
-        $(this).live("click", function(event) {
-
-        });
-    });*/
-
     $("[id=event]").live("click", function(event) {
-           $("[id=event]").siblings().removeClass("ui-selected");        
+           $("[id=event]").siblings().removeClass("ui-selected");
            $(this).addClass("ui-selected");
            var ft = $(this).attr("fulltext");
            if (ft)  {
-            document.getElementById("ret").value = $(this).attr("rid");             
-            $("#dialog_content").html ( ft );    
+            $("#ret").val($(this).attr("rid"));
+            $("#dialog_content").html ( ft );
             $( "#record_from_epg" ).dialog( "open" );
             $(this).removeClass("ui-selected");
            }
-        
+
     });
 
-    
+
     var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" ).add("#cname").add("#ccid").add("#cpath");
-    
+
     $( "#dialog-form" ).dialog({
         autoOpen: false,
         height: 350,
         width: 350,
         modal: true,
         open: function( event, ui ) {
-            
+
             for(var i=0;i<7;i++) {
                 $("#wwd"+i).removeClass("ui-state-active");
             }
-            
+
             var cancelbutton = {
                 text: "Cancel", click: function() {
                     $( this ).dialog( "close" );
-                }                                                
+                }
             };
-            
-            var deletebutton = { 
-                text: "Delete", click: function()  
+
+            var deletebutton = {
+                text: "Delete", click: function()
                 {
-                    $( this ).dialog( "close" );    
+                    $( this ).dialog( "close" );
                     $( "#dialog" ).dialog( "open" );
                 }
             };
 
-            var updatebutton = { 
-                text: (dialognr==-1?"Schedule a record":"Change a record"), click: function() 
+            var updatebutton = {
+                text: ((dialognr==-1 || here('list'))?"Schedule a record":"Change a record"), click: function()
                 {
                     var bValid = true;
                     allFields.removeClass( "ui-state-error" );
@@ -424,30 +396,29 @@ $(function() {
                     for (var i=0; i<7; i++) {
                         if ( $("#wwd" + i).hasClass("ui-state-active") ) {
                             mask += Math.pow(2, i);
-                        } 
+                        }
                     }
-                    //console.log(mask);
                     if ( bValid ) {
-                        $( this ).dialog( "close" );                    
+                        $( this ).dialog( "close" );
                         var akt = 0;
                         if ($("#switch00").attr("checked") == "checked") {akt = 1;}
-                        post("/create", { 
-                            prev:document.getElementById("prev").value, 
-                            recname:document.getElementById("recname").value, 
-                            Sender:document.getElementById("channel").value, 
-                            von:document.getElementById("timepicker_inline_div1").value, 
-                            bis:document.getElementById("timepicker_inline_div2").value, 
-                            am:document.getElementById("datepicker").value, 
+                        post("/create", {
+                            prev:$("#prev").val(),
+                            recname:$("#recname").val(),
+                            Sender:$("#channel").val(),
+                            von:$("#timepicker_inline_div1").val(),
+                            bis:$("#timepicker_inline_div2").val(),
+                            am:$("#datepicker").val(),
                             aktiv:akt,
-                            recurr:mask//document.getElementById("recurrinp").value
-                        }, 1); 
+                            recurr:mask
+                        }, 1);
                     }
                 }
-            }; 
+            };
 
-            if(dialognr!=-1) {
+            if((dialognr!=-1 && !here('list'))) {
                 $( this ).dialog( "option", "buttons", [deletebutton, updatebutton, cancelbutton] );
-                
+
                 oTable = $('#recordlist').dataTable();
                 var data = oTable.fnGetData();
                 var len = data.length;
@@ -462,29 +433,29 @@ $(function() {
                                         $("#wwd"+j).addClass("ui-state-active");
                                     }
                                 }
-                            }        
-                            
+                            }
+
                             var kids = $("#channel").children();
                             for (var j=0;j<kids.length;j++) {
-                            	if (kids[j].innerHTML==data[i][1].replace(/<(?:.|\n)*?>/gm, '')) { 
+                            	if (kids[j].innerHTML==data[i][1].replace(/<(?:.|\n)*?>/gm, '')) {
 
-									document.getElementById("channel").value=kids[j].value;                            
+									$("#channel").val(kids[j].value);
                             		break;
                             	}	
                             }
-                                                                                   
+
                             switchMe("#switch00", ($("#switch-" + dialognr).attr("checked") == "checked") );
-                            document.getElementById("prev").value=dialognr;
-                            document.getElementById("recname").value=data[i][0];                            
-                            document.getElementById("timepicker_inline_div1").value=data[i][2].slice(11,16);
-                            document.getElementById("timepicker_inline_div2").value=data[i][3].slice(11,16);
-                            document.getElementById("datepicker").value=data[i][2].slice(0,10);
+                            $("#prev").val(dialognr);
+                            $("#recname").val(data[i][0]);
+                            $("#timepicker_inline_div1").val(data[i][2].slice(11,16));
+                            $("#timepicker_inline_div2").val(data[i][3].slice(11,16));
+                            $("#datepicker").val(data[i][2].slice(0,10));
                             break;
                         }
                     }
                 }
             } else {
-                $( this ).dialog( "option", "buttons", [updatebutton, cancelbutton] );   
+                $( this ).dialog( "option", "buttons", [updatebutton, cancelbutton] );
 
                 var today = new Date();
                 var dd = today.getDate();
@@ -494,31 +465,29 @@ $(function() {
 
                 var yyyy = today.getFullYear();
                 if(dd<10){dd='0'+dd;} if(mm<10){mm='0'+mm;} today = dd+'.'+mm+'.'+yyyy;
-                document.getElementById("datepicker").value = today;
+                $("#datepicker").val(today);
                 if(hr<10){hr='0'+hr;} if(min<10){min='0'+min;} today = hr+':'+min;
-                document.getElementById("timepicker_inline_div1").value = today;
+                $("#timepicker_inline_div1").val(today);
                 today = new Date();
                 hr = today.getHours() + 1;
-                if(hr==24) {hr=0;} if(hr<10){hr='0'+hr;} today = hr+':'+min;    
-                document.getElementById("timepicker_inline_div2").value = today;
-                
+                if(hr==24) {hr=0;} if(hr<10){hr='0'+hr;} today = hr+':'+min;
+                $("#timepicker_inline_div2").val(today);
+
                 switchMe("#switch00", true);
 
-                document.getElementById("channel").value=0;
+                $("#channel").val(0);
+                $("#prev").val("");
+                $("#recname").val("");
 
-                document.getElementById("prev").value="";            
-                document.getElementById("recname").value="";            
+                if(here("list")) {
+                    $("#channel").val(dialognr);
+                    $("#recname").val(document.getElementById("channel").options[document.getElementById("channel").selectedIndex].innerHTML);
+                }
             }
-            
+
         },
-/*        buttons: {
-            "Schedule a record": function() ,
-            Cancel: function() {
-                $( this ).dialog( "close" );
-            }
-        },*/
         close: function() {
-            allFields.removeClass( "ui-state-error" ); //.val( "" )
+            allFields.removeClass( "ui-state-error" );
         }
     });
 
@@ -531,7 +500,7 @@ $(function() {
             "Record": function() {
                 $( this ).dialog( "close" );
                 $("#dialog_content").html("");
-                document.returnform.submit();                
+                document.returnform.submit();
             },
             Cancel: function() {
                 $( this ).dialog( "close" );
@@ -544,7 +513,7 @@ $(function() {
     });
 
 
-    
+
     $( "#upload-form" ).dialog({
         autoOpen: false,
         height: 190,
@@ -552,8 +521,8 @@ $(function() {
         modal: true,
         buttons: {
             "Upload file": function() {
-                $( this ).dialog( "close" );                    
-                document.uploader.submit();                
+                $( this ).dialog( "close" );
+                document.uploader.submit();
             },
             Cancel: function() {
                 $( this ).dialog( "close" );
@@ -564,7 +533,7 @@ $(function() {
         }
     });
 
-    
+
     $( "#createchannel-form" ).dialog({
         autoOpen: false,
         height: 340,
@@ -574,14 +543,14 @@ $(function() {
             allFields.val( "" ).removeClass( "ui-state-error" );
         },
         open: function( event, ui ) {
-                
+
             var cancelbutton = {
                 text: "Cancel", click: function() {
                     $( this ).dialog( "close" );
-                }                                                
+                }
             };
-            var updatebutton = { 
-                text: (dialognr==-1?"Create channel":"Update"), click: function()  
+            var updatebutton = {
+                text: (dialognr==-1?"Create channel":"Update"), click: function()
                 {
                     var bValid = true;
                     allFields.removeClass( "ui-state-error" );
@@ -593,62 +562,62 @@ $(function() {
                         var epggrab = 0;
                         if ($("#switch01").attr("checked") == "checked") {akt = 1;}
                         if ($("#switch02").attr("checked") == "checked") {epggrab = 1;}
-                        post("/create_channel", { 
-                            prev:document.getElementById("prev").value, 
-                            ccid:document.getElementById("ccid").value, 
-                            cname:document.getElementById("cname").value, 
-                            cpath:document.getElementById("cpath").value,
-                            cext: document.getElementById("cext").value,
+                        post("/create_channel", {
+                            prev: $("#prev").val(),
+                            ccid: $("#ccid").val(),
+                            cname:$("#cname").val(),
+                            cpath:$("#cpath").val(),
+                            cext: $("#cext").val(),
                             aktiv:akt,
-                            epggrab: epggrab                   
-                        }, 1);                                 
+                            epggrab: epggrab
+                        }, 1);
                         $( this ).dialog( "close" );
                     }
                 }
             };
-            var deletebutton = { 
-                text: "Delete", click: function()  
+            var deletebutton = {
+                text: "Delete", click: function()
                 {
-                    $( this ).dialog( "close" );    
+                    $( this ).dialog( "close" );
                     $( "#dialog" ).dialog( "open" );
                 }
             };
-        
+
             if(dialognr!=-1) {
                 $( this ).dialog( "option", "buttons", [deletebutton, updatebutton, cancelbutton] );
-                
+
                 oTable = $('#clist').dataTable();
                 var data = oTable.fnGetData();
                 var len = data.length;
                 if (len>0) {
                     for(var i=0;i<len;i++) {
                         if(data[i][0]==dialognr) {
-                            
+
                             switchMe("#switch01", ($("#switch-" + data[i][0]).attr("checked") == "checked") );
                             switchMe("#switch02", ( $("#iconsEPG-" + dialognr).children().attr("class").indexOf("plus") > 0) );
 
-                            document.getElementById("prev").value=data[i][0];
-                            document.getElementById("ccid").value=data[i][0];
-                            document.getElementById("cname").value=data[i][1].replace(/<(?:.|\n)*?>/gm, '');
-                            document.getElementById("cpath").value=data[i][2];                            
-                            document.getElementById("cext").value=data[i][3];
+                            $("#prev").val(data[i][0]);
+                            $("#ccid").val(data[i][0]);
+                            $("#cname").val(data[i][1].replace(/<(?:.|\n)*?>/gm, ''));
+                            $("#cpath").val(data[i][2]);
+                            $("#cext").val(data[i][3]);
                             break;
                         }
                     }
                 }
             } else {
-                
-                $( this ).dialog( "option", "buttons", [updatebutton, cancelbutton] );   
-                
+
+                $( this ).dialog( "option", "buttons", [updatebutton, cancelbutton] );
+
                 switchMe("#switch01", true );
                 switchMe("#switch02", false );
-                document.getElementById("prev").value="";            
-                document.getElementById("ccid").value="1";            
-                document.getElementById("cname").value="";            
-                document.getElementById("cpath").value="";    
-                document.getElementById("cext").value="";                                
+                $("#prev").val("");
+                $("#ccid").val("1");
+                $("#cname").val("");
+                $("#cpath").val("");
+                $("#cext").val("");
             }
-            
+
         }
     });
 
@@ -656,7 +625,7 @@ $(function() {
         .button()
         .click(function() {
             dialognr = -1;
-            $( "#dialog-form" ).dialog( "open" );            
+            $( "#dialog-form" ).dialog( "open" );
         });
 
     $( "#purge-records" )
@@ -664,18 +633,18 @@ $(function() {
         .click(function() {
             $( "#confirm01" ).dialog( "open" );
         });
-        
+
     $( "#getepg" )
         .button()
         .click(function(event ) {
-            post("/getepg", {}, 0);                  
+            post("/getepg", {}, 0);
             event.preventDefault();
         });
 
     $( "#grabepgstart" )
         .button()
         .click(function(event ) {
-            post("/grabepgstart", {}, 0);                  
+            post("/grabepgstart", {}, 0);
             $(this).html('Please refresh to see progress');
             $(this).css('height', "20px");
             $(this).addClass( "ui-state-disabled" );
@@ -685,7 +654,7 @@ $(function() {
     $( "#grabepgstop" )
         .button()
         .click(function(event ) {
-            post("/grabepgstop", {}, 1);                  
+            post("/grabepgstop", {}, 1);
             event.preventDefault();
         });
 
@@ -693,14 +662,14 @@ $(function() {
         .button()
         .click(function(event ) {
             $( "#dialog" ).dialog( "open" );
-            //post("/removeepg", {}, 1);                  
+            //post("/removeepg", {}, 1);
             event.preventDefault();
         });
 
     $( "#resetlog" )
         .button()
         .click(function(event ) {
-            post("/resetlog", {}, 1);                  
+            post("/resetlog", {}, 1);
             event.preventDefault();
         });
 
@@ -711,7 +680,7 @@ $(function() {
             $( "#createchannel-form" ).dialog( "open" );
             event.preventDefault();
         });
-        
+
     $( "#upload-user" )
         .button()
         .click(function(event ) {
@@ -725,14 +694,14 @@ $(function() {
             document.submit_cfg_form.submit();
             event.preventDefault();
         });
-        
+
     $( "#downlog" )
         .button()
         .click(function(event ) {
             window.location = "./log.txt";
             event.preventDefault();
         });
-       
+
     $( "#downcl" )
         .button()
         .click(function(event ) {
@@ -745,13 +714,13 @@ $(function() {
                 success: function(data, textStatus) {
                     $( "#cldown" ).dialog( "open" );
                 }
-            });                        
+            });
         });
 
 
      $( "#wday" ).button();
     $( "#weekday" ).buttonset();
-  
+
      $('#clist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
@@ -759,45 +728,44 @@ $(function() {
         "sAjaxSource": "/channellist",
         "fnDrawCallback": function( oSettings ) {
             initSwitch();
-            initIcons();            
+            initIcons();
         },
-        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {        
-            var data4 = ""; 
+        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+            var data4 = "";
             if (aData[4] == 1) data4 = "plus"; else data4="minus";
             var chk = "";
             if (aData[5] == 1) chk = 'checked="checked"';
-            $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-'+data4+'"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');            
-//            $('td:eq(5)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');            
-        }        
-    }); 
-    
+            $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-'+data4+'"></span></label><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
+        }
+    });
+
      $('#recordlist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bProcessing": true,
         "sAjaxSource": "/getrecordlist",
         "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 6,7,8,9 ] },
-                          { "iDataSort": 8, "aTargets": [ 2 ] }, 
+                          { "iDataSort": 8, "aTargets": [ 2 ] },
                           { "iDataSort": 9, "aTargets": [ 3 ] } ],
         "fnDrawCallback": function( oSettings ) {
             initSwitch();
             initIcons();
             initProgressbar();
-            
+
         },
-        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {        
+        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
             var chk = "";
             if (aData[5] == 1) chk = 'checked="checked"';
             htmltext  = '<div id="progressbar' + aData[6] + '"></div>';
-            htmltext += '<input type="checkbox" class="switch icons" id="switch-' + aData[7] + '" ' + chk + ' />';  
-            htmltext += '<a href="#" id="icons-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>';                        
-            $('td:eq(5)', nRow).html(htmltext);            
+            htmltext += '<input type="checkbox" class="switch icons" id="switch-' + aData[7] + '" ' + chk + ' />';
+            htmltext += '<a href="#" id="icons-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>';
+            $('td:eq(5)', nRow).html(htmltext);
         },
         "fnInitComplete": function() {
-             this.fnSort([ [2,'desc'] ]);            
-        } 
-        
-    }); 
+             this.fnSort([ [2,'desc'] ]);
+        }
+
+    });
 
      $('#loglist').dataTable({
         "bJQueryUI": true,
@@ -805,8 +773,8 @@ $(function() {
         "bProcessing": true,
         "sAjaxSource": "/logget",
         "fnInitComplete": function() {
-             this.fnSort([ [0,'desc'] ]);            
-        } 
-    }); 
-            
+             this.fnSort([ [0,'desc'] ]);
+        }
+    });
+
 });

@@ -1,4 +1,5 @@
 #tabs {
+    position: absolute;
 	float:left;
     min-width:500px;
 	width:100%;

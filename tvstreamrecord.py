@@ -131,7 +131,7 @@ def chanlist():
 
 @route('/list')
 def list_s():
-    return template('list')
+    return template('list',rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'))
     
 @post('/list')
 def list_p():
@@ -160,6 +160,12 @@ def clgen_p():
         f.close()
     return
 
+@post('/grab_channel')
+def grabchannel():
+    myid = request.forms.myid
+    sqlRun("UPDATE channels SET epgscan=-epgscan+1 WHERE cid = %s" % myid)                
+    return
+    
 @post('/create_channel')
 def createchannel():
     prev = request.forms.prev

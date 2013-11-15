@@ -1,4 +1,6 @@
-2013-11-13 0.5.2a EPG view is now configurable. Please check the 'Config' page for this option
+2013-11-xx 0.5.3 EPG view is now configurable. Please check the 'Config' page for this option
+                 EPG grab can now be switched directly 
+                 Records can be created at the channel page too
 
 2013-10-20 0.5.2 Extended EPG grab support. Please check About page
                  Highlight events being recorded in EPG

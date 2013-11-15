@@ -24,7 +24,7 @@ html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-si
         margin-top: 2em;
     }
 
-    [id^=icons-], [id^=iconsEPG-] {
+    [id^=icons-], [id^=iconsEPG-], [id^=iconsRec-]  {
         position: relative;
         cursor: pointer;
         float: left;
@@ -32,14 +32,21 @@ html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-si
         width: 14px;
         margin-left: 7px;
     }
-    [id^=icons-] span.ui-icon  {
+    [id^=iconsEPG-], [id^=iconsRec-]   {cursor: default; clear: none;}  
+    
+    [id^=icons-] span.ui-icon {
         float: left;
         margin: -2px -2px;
     }
     
+    [id^=iconsRec-] span.ui-icon {
+        float: left;
+        margin: -1px -1px;
+    }
+    
     [id^=iconsEPG-] span.ui-icon  {
         float: left;
-        margin: -2px -1px;
+        margin: -2px -2px;
     }
 
     .fakewindowcontain .ui-widget-overlay {
@@ -68,7 +75,6 @@ label#append {float: left; margin-top: 3px;}
 [id^=cfg_].text { margin-bottom:0px; width:95%; padding: 0.1em; }
 
 .ui-button-text-only .ui-button-text  { padding: 0px 3px; }
-[id^=iconsEPG] {cursor: default; float: left; clear: none;}  
 
 #feedback { font-size: 1.4em; }
 
@@ -81,7 +87,7 @@ label#append {float: left; margin-top: 3px;}
 #datepicker1, #datepicker3, #searchepg { width: 100px; float:left; margin-left: 5px; margin-right: 5px;}
 #float { float:left; margin-top: 3px; }
 
-th.ccontrols { width: 100px; }
+th.ccontrols { width: 120px; }
 th.cid { width: 40px; }
 th.cname { width: 200px; }
 th.cext { width: 50px; }
@@ -98,6 +104,7 @@ th.lout { width: 30px; }
     position: absolute;
     top: 5px;    
     right: 50px;    
+    z-index: 1;
 }
 
 [id^=wwd] { width: 13.3%; }

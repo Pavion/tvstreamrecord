@@ -1,4 +1,5 @@
 %include header 
+%include create
 <div id="users-contain" class="ui-widget">
 <h1>Channels:
 <button id="create-channel">Create new</button>

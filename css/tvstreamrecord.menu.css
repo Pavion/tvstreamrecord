@@ -1,5 +1,4 @@
 #tabs {
-    position: absolute;
 	float:left;
     min-width:500px;
 	width:100%;
@@ -7,6 +6,7 @@
 	font-size:120%;
 	line-height:normal;
 	border-bottom:1px solid #BCD2E6;
+	
 	}
 #tabs ul {
 	margin:0;

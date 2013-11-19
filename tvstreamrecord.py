@@ -38,7 +38,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.5.2b' 
+version = '0.5.2c' 
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -659,11 +659,14 @@ class record(threading.Thread):
         else:        
             block_sz = 8192
             print "Record: '%s' started" % (self.name)
-            u = urllib2.urlopen(self.url)
             try:
+                u = urllib2.urlopen(self.url)
                 f = open(fn, 'wb')
+            except urllib2.URLError:
+                print "Stream could not be parsed (URL=%s), aborting..." % (self.url)  
+                pass
             except:
-                print "Output file %s can't be created. Please check your settings." % (fn+".mkv")  
+                print "Output file %s couldn not be created. Please check your settings." % (fn+".mkv")  
                 pass
             else:
                 while self.bis > datetime.now() and self.stopflag==0:

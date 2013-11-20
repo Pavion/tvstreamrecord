@@ -1,6 +1,7 @@
-2013-11-xx 0.5.3 EPG view is now configurable. Please check the 'Config' page for this option
+2013-11-20 0.5.3 EPG view is now configurable. Please check the 'Config' page for this option
                  EPG grab can now be switched directly 
-                 Records can be created at the channel page too
+                 Records can also be created at the channel page
+                 New view 'EPG list' has been added
 
 2013-10-20 0.5.2 Extended EPG grab support. Please check About page
                  Highlight events being recorded in EPG
@@ -13,7 +14,7 @@
 
 2013-08-19 0.5.0 Channel editing and moving added
                  Channel list can now be exported and saved
-				 Record editing added
+                 Record editing added
                  Disabling/deleting channels also disable/delete all their records 
                  Several bug fixes & dialog optimisation
 

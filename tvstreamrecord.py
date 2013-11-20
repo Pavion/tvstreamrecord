@@ -38,7 +38,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.5.2c' 
+version = '0.5.3' 
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -476,7 +476,7 @@ def epg_s():
     for row in rows:
         cid=row[1]
         rtemp = list()
-        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=%s AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND julianday(datetime(g_stop, '+60 minutes'), 'localtime')>julianday('now', 'localtime') AND g_id='%s' ORDER BY g_start" % (cid, config.cfg_delta_for_epg, config.cfg_delta_for_epg, todaysql, todaysql, row[0]))
+        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=%s AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id='%s' ORDER BY g_start" % (cid, config.cfg_delta_for_epg, config.cfg_delta_for_epg, todaysql, todaysql, row[0]))
         #c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid FROM guide WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND g_id='%s' ORDER BY g_start" % (todaysql, todaysql, row[0]))
         for event in c_rows:
             
@@ -508,6 +508,18 @@ def epg_s():
                 #print event[5]
         ret.append(rtemp)
     return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret, grabstate=grabthread.getState(), zoom=config.cfg_grab_zoom)            
+
+@route('/epglist')
+def epglist_s():    
+    return template('epglist', grabstate=grabthread.getState())
+    
+@route('/epglist_getter')
+def epglist_getter():
+    l = []
+    rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg))
+    for row in rows:
+        l.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], ""]) 
+    return json.dumps({"aaData": l } )    
 
 #------------------------------- Record List -------------------------------
 
@@ -549,7 +561,7 @@ def records_p():
     
 @post('/createepg')
 def createepg():
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s GROUP BY datetime(guide.g_start, '-3 minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret))
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret, config.cfg_delta_for_epg))
     setRecords()        
     redirect("/records")
     return 
@@ -666,7 +678,7 @@ class record(threading.Thread):
                 print "Stream could not be parsed (URL=%s), aborting..." % (self.url)  
                 pass
             except:
-                print "Output file %s couldn not be created. Please check your settings." % (fn+".mkv")  
+                print "Output file %s could not be created. Please check your settings." % (fn+".mkv")  
                 pass
             else:
                 while self.bis > datetime.now() and self.stopflag==0:

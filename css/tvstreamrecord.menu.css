@@ -1,12 +1,15 @@
 #tabs {
-	float:left;
+	/*float:left;*/
+	/*padding-left:10px;*/
+	position:fixed;
     min-width:500px;
-	width:100%;
+	/*width:inherit;*/
+	left: 20px;
+    right: 20px;
 	background:#F4F7FB;
 	font-size:120%;
 	line-height:normal;
-	border-bottom:1px solid #BCD2E6;
-	
+	border-bottom:1px solid #BCD2E6;	
 	}
 #tabs ul {
 	margin:0;

@@ -7,6 +7,7 @@
 
 <ol>
 <li><p><b>What's new</b></p>
+<p>With version 0.5.3 an EPG list view with search function has beed added. It is also possible to change the layout and the scale of EPG chart by providing a positive/negative zoom level at the config page.</p>
 <p>With version 0.5.2 it is possible to grab EPG data directly from your TV stream. Please read the corresponding section to avoid performance issues.</p>
 </li>
 <li><p><b>Introduction</b></p>

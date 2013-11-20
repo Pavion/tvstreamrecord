@@ -75,6 +75,10 @@ def mjd_to_local(strin):
     except:
         start = datetime(1900,1,1,0,0,0) 
     
+    # removing suspicious futuristic epg information 
+    if start > datetime.now()+timedelta(days = 60):
+        start = datetime(1900,1,1,0,0,0) 
+
     return start 
     
 def joinarrays(arr_max, arr_in):

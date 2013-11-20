@@ -4,7 +4,7 @@
 <HTML>	
     <head>
     <meta charset="utf-8">
-	<title>tvstreamrecord 0.5.2c</title>
+	<title>tvstreamrecord 0.5.3</title>
 	<link href="css/smoothness/jquery-ui-1.9.2.custom.css" rel="stylesheet">
 	<script src="js/jquery-1.8.3.js"></script>
 	<script src="js/jquery-ui-1.9.2.custom.js"></script>
@@ -25,7 +25,8 @@
   <ul>
     <li><a href="/records"><span>Records</span></a></li>
     <li><a href="/list"><span>Channels</span></a></li>
-    <li><a href="/epg"><span>EPG</span></a></li>
+    <li><a href="/epg"><span>EPG Chart</span></a></li>
+    <li><a href="/epglist"><span>EPG List</span></a></li>
     <li><a href="/config"><span>Config</span></a></li>
     <li><a href="/log"><span>Log</span></a></li>
     <li><a href="/about"><span>About</span></a></li>

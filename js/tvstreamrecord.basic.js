@@ -17,6 +17,7 @@
 
 var dialognr = -1;
 var weekdays = new Array('Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su');
+//var localtime  = "dd.mm.yy";
 
 function where() {
     return window.location.href.slice(window.location.href.lastIndexOf("/"));
@@ -83,7 +84,7 @@ function initProgressbar() {
 }
 
 function initIcons() {
-    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-]" ).hover(
+    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsERec-]" ).hover(
         function() {
             $( this ).addClass( "ui-state-hover" );
         },
@@ -107,6 +108,28 @@ function initIcons() {
     $( "[id^=iconsRec-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("iconsRec-",""));
         $( "#dialog-form" ).dialog( "open" );
+        event.preventDefault();
+    });
+
+    $( "[id^=iconsERec-]" ).click(function( event ) {
+        dialognr = parseInt($(this).attr('id').replace("iconsERec-",""));
+        oTable = $('#epglist').dataTable();
+        var data = oTable.fnGetData();
+        var len = data.length;
+        if (len>0) {
+            for(var i=0;i<len;i++) {
+                if(data[i][6]==dialognr) {
+                    $("#ret").val(dialognr);
+//                    $("#dialog_content").html ("<b>" + data[i][1] + "<br>"+data[i][3]+" - " + data[i][4] + "</b><br><br>" + data[i][2]);
+                    $("#dialog_content").html (data[i][7]);
+                    $( "#record_from_epg" ).dialog( "open" );
+                    break;
+                }
+            }
+        }
+
+        
+   $( "#dialog-form" ).dialog( "open" );
         event.preventDefault();
     });
 
@@ -739,6 +762,34 @@ $(function() {
         }
     });
 
+    $('#epglist').dataTable({
+        "bJQueryUI": true,
+        "sPaginationType": "full_numbers",
+        "bProcessing": true,
+        "sAjaxSource": "/epglist_getter",
+/*        "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 6,7,8,9 ] },
+                          { "iDataSort": 8, "aTargets": [ 3 ] },
+                          { "iDataSort": 9, "aTargets": [ 4 ] } ],*/
+        "fnDrawCallback": function( oSettings ) {
+            initIcons();
+        },
+        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+        	var dat_v = aData[3].split(" "); 
+        	var dat_b = aData[4].split(" "); 
+	        aData[7]="<b>"+aData[1]+": "+dat_v[1] + " - " + dat_b[1] + "</b><BR><BR>"+aData[2];
+			var myday = $.datepicker.parseDate('yy-mm-dd', dat_v[0]);
+			$('td:eq(3)', nRow).html($.datepicker.formatDate('dd.mm.yy', myday)+" "+dat_v[1]);			
+			myday = $.datepicker.parseDate('yy-mm-dd', dat_b[0]);
+			$('td:eq(4)', nRow).html($.datepicker.formatDate('dd.mm.yy', myday)+" "+dat_b[1]);
+			
+            $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
+        },
+        "fnInitComplete": function() {
+             this.fnSort([ [3,'asc'] ]);
+        }
+    });
+
+    
      $('#recordlist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",

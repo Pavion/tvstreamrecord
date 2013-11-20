@@ -1,6 +1,6 @@
 %include header 
 <div id="users-contain" class="ui-widget">
-<h1>
+<h1>Electronic Program Guide List:
 <button id="getepg">Load XMLTV information</button>
 %if grabstate[0] == False:
 <button id="grabepgstart">Grab EPG from {{grabstate[2]}} streams</button>

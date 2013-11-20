@@ -17,7 +17,6 @@
 
 var dialognr = -1;
 var weekdays = new Array('Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su');
-//var localtime  = "dd.mm.yy";
 
 function where() {
     return window.location.href.slice(window.location.href.lastIndexOf("/"));
@@ -325,7 +324,9 @@ $(function() {
 
     if(!isNaN(zoom)) {
         if (zoom>0) {
-            if(zoom!=1) $("body").css("width", (zoom*100)+"%");
+            if(zoom!=1) {
+            	$("body").css("width", (zoom*100)+"%");
+            }
             $("#mybody").css("height", (maxcnt * 100 + 100) +"px");
             $("[id=selectable]").each(function(i) { $(this).css("clear", "left"); });
         } else {
@@ -333,6 +334,7 @@ $(function() {
                 $(this).css("float", "left");
                 $(this).css("height", (-zoom*800)+"px");
             });
+            $("#tabs").css("width", (250*maxcnt+100)+"px");
             $("body").css("width", (250*maxcnt+100)+"px");
             $("#mybody").css("height", (-zoom*800+80)+"px");
         }
@@ -767,9 +769,6 @@ $(function() {
         "sPaginationType": "full_numbers",
         "bProcessing": true,
         "sAjaxSource": "/epglist_getter",
-/*        "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 6,7,8,9 ] },
-                          { "iDataSort": 8, "aTargets": [ 3 ] },
-                          { "iDataSort": 9, "aTargets": [ 4 ] } ],*/
         "fnDrawCallback": function( oSettings ) {
             initIcons();
         },
@@ -794,6 +793,7 @@ $(function() {
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bProcessing": true,
+        "bAutoWidth": false,
         "sAjaxSource": "/getrecordlist",
         "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 6,7,8,9 ] },
                           { "iDataSort": 8, "aTargets": [ 2 ] },

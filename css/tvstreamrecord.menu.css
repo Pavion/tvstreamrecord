@@ -1,9 +1,6 @@
 #tabs {
-	/*float:left;*/
-	/*padding-left:10px;*/
-	position:fixed;
+	position:absolute;
     min-width:500px;
-	/*width:inherit;*/
 	left: 20px;
     right: 20px;
 	background:#F4F7FB;
@@ -13,7 +10,7 @@
 	}
 #tabs ul {
 	margin:0;
-	padding:10px 10px 0 5%;
+	padding:10px 10px 0 20px;
 	list-style:none;
 	}
 #tabs li {

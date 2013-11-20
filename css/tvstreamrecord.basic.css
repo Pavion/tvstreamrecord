@@ -1,11 +1,10 @@
-html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-size:100%; height:100%; margin:0; padding:0; }
-
     body{
+        margin:0; 
         font: 62.5% "Trebuchet MS", sans-serif;
         padding: 20px;
     }
 
-    #mybody {
+    div#mybody {
         min-width:500px;
         background:#F4F7FB;
         font-size:93%;
@@ -19,7 +18,6 @@ html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-si
         padding: 20px 20px 20px 20px;        
     }
 
-
     .demoHeaders {
         margin-top: 2em;
     }
@@ -32,9 +30,10 @@ html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-si
         width: 14px;
         margin-left: 7px;
     }
+
     [id^=iconsEPG-], [id^=iconsRec-] , [id^=iconsERec-]   {cursor: default; clear: none;}  
     
-    [id^=icons-] span.ui-icon {
+    [id^=icons-] span.ui-icon, [id^=iconsEPG-] span.ui-icon {
         float: left;
         margin: -2px -2px;
     }
@@ -44,11 +43,6 @@ html, body { background-color:#fff; font-weight:bold; font-family:Arial; font-si
         margin: -1px -1px;
     }
     
-    [id^=iconsEPG-] span.ui-icon  {
-        float: left;
-        margin: -2px -2px;
-    }
-
     .fakewindowcontain .ui-widget-overlay {
         position: absolute;
     }
@@ -60,7 +54,7 @@ input.text { margin-bottom:8px; width:95%; padding: .2em; }
 input.file { margin-bottom:118px; width:95%; padding: .2em; }
 fieldset { padding:0; border:0; margin-top:15px; }
 h1 { font-size: 1.2em; margin: .6em 0; }
-div#users-contain { width: 90%; margin: 20px 50px; }
+div#users-contain { margin: 20px 0px; }
 div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
 div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
 .ui-dialog .ui-state-error { padding: .3em; }
@@ -107,9 +101,9 @@ th.estop { width: 150px; }
 th.econtrol { width: 30px; }
 
 #logo {
-    position:fixed;
+    position:absolute;
     top: 5px;    
-    right: 50px;    
+    right: 40px;    
     z-index: 1;
 }
 

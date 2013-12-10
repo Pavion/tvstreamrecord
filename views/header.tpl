@@ -4,7 +4,7 @@
 <HTML>	
     <head>
     <meta charset="utf-8">
-	<title>tvstreamrecord 0.5.3</title>
+	<title>tvstreamrecord 0.5.4</title>
 	<link href="css/smoothness/jquery-ui-1.9.2.custom.css" rel="stylesheet">
 	<script src="js/jquery-1.8.3.js"></script>
 	<script src="js/jquery-ui-1.9.2.custom.js"></script>
@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="css/tvstreamrecord.basic.css" type="text/css" />
 </head><BODY>
 <div id="logo">
-	<a href="http://code.google.com/p/tvstreamrecord/"><img src="images/tvstreamrecordlogo.png"></a> 
+	<a href="http://pavion.github.io/tvstreamrecord/"><img src="images/tvstreamrecordlogo.png"></a> 
 </div>
 <div id="tabs">
   <ul>

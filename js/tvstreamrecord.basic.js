@@ -205,9 +205,7 @@ $(function() {
             {
                 text: "Delete",
                 click: function() {
-//                    var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
-//                    if (postto.slice(0,7)=="/config") {
-                    if (here("/config")) {
+                    if (here("config")) {
                         post("/removeepg", {}, 1);
                     } else {
                         post(where(), { myid:dialognr, what:"-1" }, 1);
@@ -687,7 +685,6 @@ $(function() {
         .button()
         .click(function(event ) {
             $( "#dialog" ).dialog( "open" );
-            //post("/removeepg", {}, 1);
             event.preventDefault();
         });
 

@@ -3,6 +3,7 @@
 
 <HTML>	
     <head>
+    <link rel="shortcut icon" href="images/favicon.ico?v=2" type="image/x-icon" /> 
     <meta charset="utf-8">
 	<title>tvstreamrecord 0.5.5</title>
 	<link href="css/smoothness/jquery-ui-1.9.2.custom.css" rel="stylesheet">

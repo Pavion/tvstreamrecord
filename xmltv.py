@@ -75,9 +75,13 @@ def getProg(p_id):
             desc = ""
             if dict_el.find('title') is not None:
                 title = dict_el.find('title').text
+            if dict_el.find('sub-title') is not None:
+                if title != "": title = title + " - "
+                title = title + dict_el.find('sub-title').text
+            if dict_el.find('episode-num') is not None:
+                desc = dict_el.find('episode-num').text + ". "
             if dict_el.find('desc') is not None:
-                desc = dict_el.find('desc').text
-            #print dt1, dt2, p_id, title
+                desc = desc + dict_el.find('desc').text
             sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
         sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
         
@@ -90,7 +94,6 @@ def getFile(file_in, override=0):
         lastmod = rows[0][2]
         etag = rows[0][3]
     try:
-        #print lastmod, etag
         httplib.HTTPConnection.debuglevel = 1                            
         request = urllib2.Request(file_in)
         request.add_header('User-Agent', 'tvstreamrecord/' + version)

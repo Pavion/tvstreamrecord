@@ -78,8 +78,8 @@ def getProg(p_id):
             if dict_el.find('sub-title') is not None:
                 if title != "": title = title + " - "
                 title = title + dict_el.find('sub-title').text
-            if dict_el.find('episode-num') is not None:
-                desc = dict_el.find('episode-num').text + ". "
+            if dict_el.find('episode-num[@system="onscreen"]') is not None:
+                desc = dict_el.find('episode-num[@system="onscreen"]').text + ". "
             if dict_el.find('desc') is not None:
                 desc = desc + dict_el.find('desc').text
             sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])

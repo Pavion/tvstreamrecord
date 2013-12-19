@@ -42,17 +42,16 @@ def getProgList(ver=''):
             if rows:
 
                 rows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (g_id))
-                lastdate = datetime.now()-timedelta(days=10)
+                lastdate = datetime.now()-timedelta(days=30)
                 if rows:
                     lastdate = datetime.strptime(rows[0][0], "%Y-%m-%d %H:%M:%S")
-                #source = "" 
                 dtmax = datetime.min
                 for tim in dict_el.iter("datafor"):
                     dttext = tim.text
+                    dtepg  = datetime.strptime(dttext, "%Y-%m-%d")
                     dt = datetime.strptime(tim.attrib.get("lastmodified")[0:14],"%Y%m%d%H%M%S")
-                    if dt>lastdate:   
+                    if dt>lastdate and dtepg>=datetime.now()-timedelta(days=1):
                         source = url+g_id+"_"+dttext+".xml.gz"
-                        #print source
                         getProg(source)    
                     if dt>dtmax:
                         dtmax = dt

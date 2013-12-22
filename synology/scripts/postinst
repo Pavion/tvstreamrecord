@@ -3,6 +3,6 @@
 [ ${SYNOPKG_PKGDEST} ] || SYNOPKG_PKGDEST=`ls -l /var/packages/tvstreamrecord/target | cut -d\> -f2 | cut -d\  -f2`
 
 eval $(env | grep "^SYNOPKG_PKGDEST=")
-ret=`ln -s "${SYNOPKG_PKGDEST}/tvstreamrecord" /usr/syno/synoman/webman/3rdparty/tvstreamrecord`
+ret=`ln -s "${SYNOPKG_PKGDEST}/webman" /usr/syno/synoman/webman/3rdparty/tvstreamrecord`
 ret=`chown -R admin.users $SYNOPKG_PKGDEST`
-exit 0 
+exit 0

@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "com.cphub.packages.tvstreamrecord": {
+            "type": "url",
+            "title": "tvstreamrecord",
+            "desc": "Program to record TV streams",
+            "allUsers": true,
+            "icon": "images/tvstreamrecord-{0}.png",
+            "protocol": "http",
+            "url": "/records",
+            "port": "8030"
+        }
+    }
+}

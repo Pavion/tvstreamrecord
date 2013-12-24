@@ -21,7 +21,7 @@
 <p>Make sure that my software has been started by DS.</p>
 </li>
 <li><p><b>Installation on other systems</b></p>
-<p>You can download a .zip file from my <a href="http://code.google.com/p/tvstreamrecord/">project page</a>. Simply install <a href="http://www.python.org/">Python 2.x</a> for your system and you'll be able to start my software with the following command:<br />
+<p>You can download a .zip file from my <a href="http://pavion.github.io/tvstreamrecord/">project page</a>. Simply install <a href="http://www.python.org/">Python 2.x</a> for your system and you'll be able to start my software with the following command:<br />
 <i>python tvstreamrecord.py</i><br />
 You shouldn't need any special permissions.</p></li>
 <li><p><b>Running for the first time</b></p>

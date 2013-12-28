@@ -37,11 +37,9 @@ def getProgList(ver=''):
         for dict_el in tree.iterfind('channel'):
             g_id = dict_el.attrib.get("id")
             name = dict_el.find('display-name').text
-            if type == "nonametv":
-                url = dict_el.find('base-url').text
-            else:
+            if not type == "nonametv":
                 print "Unknown XMLTV generator '%s', please contact me if it fails" % type
-                url = dict_el.find('base-url').text
+            url = dict_el.find('base-url').text
                         
             rows=sqlRun("SELECT cname from channels WHERE cname = '%s' and cenabled=1 GROUP BY cname" % name)
             if rows:

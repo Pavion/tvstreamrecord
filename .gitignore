@@ -47,4 +47,4 @@ coverage.xml
 *.pot
 
 # Sphinx documentation
-docs/_build/
+docs/_build/channels.m3u

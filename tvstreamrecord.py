@@ -252,14 +252,15 @@ def upload_p():
         i = 0
         name = ""
         for line in lines:
-            i = i + 1
-            if i>1:
-                if i % 2 == 0: 
-                    name = line.split(",",1)[1]
-                if i % 2 == 1:
-                    retl.append([name, line, rowid])
-                    rowid = rowid + 1 
-                    name = ""
+            if not line[0:10] == "#EXTVLCOPT":
+                i = i + 1
+                if i>1:
+                    if i % 2 == 0: 
+                        name = line.split(",",1)[1]
+                    if i % 2 == 1:
+                        retl.append([name, line, rowid])
+                        rowid = rowid + 1 
+                        name = ""
         sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?, 0)", retl, 1)             
             
     redirect("/list") 

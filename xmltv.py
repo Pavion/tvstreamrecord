@@ -33,11 +33,16 @@ def getProgList(ver=''):
     stri = getFile(config.cfg_xmltvinitpath, 1)
     if stri:    
         tree = et.fromstring(stri)
+        type = tree.attrib.get("generator-info-name")
         for dict_el in tree.iterfind('channel'):
             g_id = dict_el.attrib.get("id")
             name = dict_el.find('display-name').text
-            url = dict_el.find('base-url').text 
-            
+            if type == "nonametv":
+                url = dict_el.find('base-url').text
+            else:
+                print "Unknown XMLTV generator '%s', please contact me if it fails" % type
+                url = dict_el.find('base-url').text
+                        
             rows=sqlRun("SELECT cname from channels WHERE cname = '%s' and cenabled=1 GROUP BY cname" % name)
             if rows:
 

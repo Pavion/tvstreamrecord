@@ -37,7 +37,7 @@
 <label for="name">Channel name</label>
 <input type="text" maxlength="30" id="cname" class="text ui-widget-content ui-corner-all" name="cname" value=""/> 
 <label for="channel">Channel URL</label>
-<input type="text" maxlength="255" id="cpath" class="text ui-widget-content ui-corner-all" name="cpath" value=""/> 
+<input type="text" maxlength="512" id="cpath" class="text ui-widget-content ui-corner-all" name="cpath" value=""/> 
 <label for="channel">File extension (i.e. .mpg)</label>
 <input type="text" maxlength="8" id="cext" class="text ui-widget-content ui-corner-all" name="cext" value=""/> 
 <div id="chb1">

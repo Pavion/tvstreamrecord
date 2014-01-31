@@ -97,7 +97,7 @@ Please contact me if you have a same issue with a different URL.</p>
 <li>Sideshowbob for his ffmpeg support idea and testing</li>
 <li>plusulli for his Dreambox feedback</li>
 <li>zmueller, DSL-Hexe for EPG grabbing ideas and testing</li>
-<li>Honu, zamp411, z-smoker and other supporters for their feedback and trust</li>
+<li>Honu, zamp411, z-smoker, tjeh and other supporters for their feedback and trust</li>
 </ul>
 </p>
 </li>

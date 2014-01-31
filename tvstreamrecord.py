@@ -271,10 +271,37 @@ def upload_p():
 def config_p():    
     attrl = []
     dicts = config.getDict()
+    portchange = False
+    bindchange = False  
     for d in dicts:
         val = request.forms.get(d)
+        if d == "cfg_server_port" and val != config.cfg_server_port:
+            try:
+                intval = int(val)
+                if intval>=2000 and intval<=32000:
+                    portchange = True
+            except:
+                pass
+            if not portchange:
+                print "Invalid port specified ('%s'). Please check your syntax or range (2000-32000)." % val
+                val = config.cfg_server_port
+        elif d == "cfg_server_bind_address" and val != config.cfg_server_bind_address:
+            try:
+                bind = val.split(".")
+                if len(bind)==4:
+                    bindchange = True  
+                    for i in bind:
+                        intval = int(i)
+                        bindchange = bindchange and (i>=0 or i<=255)                        
+            except:
+                bindchange = False
+                pass
+            if not bindchange and val != 'localhost':
+                print "Invalid bind address (%s). Please check your syntax." % val
+                val = config.cfg_server_bind_address
+
         attrl.append([d, val])
-    config.setConfig(attrl)
+    config.setConfig(attrl, portchange)
     grabthread.run()
     redirect("/config") 
 

@@ -18,6 +18,12 @@
 var dialognr = -1;
 var weekdays = new Array('Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su');
 
+if (typeof String.prototype.startsWith != 'function') {
+  String.prototype.startsWith = function (str){
+    return this.slice(0, str.length) == str;
+  };
+}
+
 function where() {
     return window.location.href.slice(window.location.href.lastIndexOf("/"));
 }

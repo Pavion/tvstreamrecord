@@ -24,6 +24,7 @@ stop() {
 	kill -2 ${PID}	
 	sleep 3
 	kill -9 ${PID}	
+	rm -f /usr/syno/synoman/webman/3rdparty/tvstreamrecord
     exit 0
 }
 
@@ -32,6 +33,7 @@ case $1 in
 		cd ${SYNOPKG_PKGDEST}
         findpython        
         nohup ${TVSTREAMRECORD_PYTHON} tvstreamrecord.py >/dev/null 2>&1 &
+		ln -s "${SYNOPKG_PKGDEST}/webman" /usr/syno/synoman/webman/3rdparty/tvstreamrecord
         exit 0
 	;;
 	stop)	stop

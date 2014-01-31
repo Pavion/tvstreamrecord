@@ -126,6 +126,20 @@ def saveConfig():
     for var in getDict():
         sql += "UPDATE config SET value='%s' WHERE param='%s';" % (globals()[var], var) 
     sqlRun(sql, -1, 1)
+    # Port changes should also be written in the Synology Webman configuration
+    webman = list()
+    lfile = open("webman/config", "rb")
+    for lline in lfile:
+        webman.append(lline)
+    lfile.close()    
+    lfile = open("webman/config", "wb")
+    for lline in webman:
+        pos = lline.find('"port":')
+        if pos>0:
+            lfile.write(lline[:pos+8]+'"' + globals()['cfg_server_port'] +'"\n')
+        else:
+            lfile.write(lline)
+    lfile.close()
     return    
         
 

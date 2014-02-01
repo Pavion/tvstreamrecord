@@ -768,7 +768,7 @@ $(function() {
         "fnInitComplete": function(oSettings, json) {
             this.fnSettings()._iDisplayLength=json.iDisplayLength;
             $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
-			this.fnDraw();
+            this.fnDraw();
         }
     });
 
@@ -794,7 +794,7 @@ $(function() {
         "fnInitComplete": function(oSettings, json) {
             this.fnSettings()._iDisplayLength=json.iDisplayLength;
             $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
-			this.fnSort([ [3,'asc'] ]);
+            this.fnSort([ [3,'asc'] ]);
         }
     });
 
@@ -825,7 +825,7 @@ $(function() {
         "fnInitComplete": function(oSettings, json) {
             this.fnSettings()._iDisplayLength=json.iDisplayLength;
             $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
-        	this.fnSort([ [2,'desc'] ]);
+            this.fnSort([ [2,'desc'] ]);
         }
 
     });
@@ -838,7 +838,7 @@ $(function() {
         "fnInitComplete": function(oSettings, json) {
             this.fnSettings()._iDisplayLength=json.iDisplayLength;
             $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
-        	this.fnSort([ [0,'desc'] ]);
+            this.fnSort([ [0,'desc'] ]);
         }
     });
 

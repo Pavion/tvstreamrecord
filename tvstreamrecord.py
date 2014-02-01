@@ -88,7 +88,7 @@ def getWeekdays(i):
 #--------------------------------- Common --------------------------------
 
 @post('/savetable')
-def list_p():
+def savetable():
     myid = request.forms.get("myid")
     mylen = request.forms.get("mylen")
     sqlRun("INSERT OR REPLACE INTO config VALUES (?, '', ?)",['table_'+myid,mylen])
@@ -323,7 +323,7 @@ def config_p():
 
 @route('/config')
 def config_s():    
-    return template('config', rows=sqlRun("SELECT * FROM config WHERE param<>'cfg_version'"))
+    return template('config', rows=sqlRun("SELECT * FROM config WHERE param<>'cfg_version' AND not param LIKE 'table_%'"))
 
 #------------------------------- EPG Grabbing part -------------------------------
 

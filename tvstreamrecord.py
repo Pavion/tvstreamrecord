@@ -85,6 +85,22 @@ def getWeekdays(i):
     for c in s: l.append(c=='1')
     return l
 
+#--------------------------------- Common --------------------------------
+
+@post('/savetable')
+def list_p():
+    myid = request.forms.get("myid")
+    mylen = request.forms.get("mylen")
+    sqlRun("INSERT OR REPLACE INTO config VALUES (?, '', ?)",['table_'+myid,mylen])
+    return
+
+def getListLength(myid):
+    mylen = 10
+    row = sqlRun("SELECT value FROM config WHERE param='table_%s'" % myid)
+    if row:
+        mylen = row[0][0]
+    return mylen
+
 #------------------------------- Main menu -------------------------------
 
 @route('/')
@@ -117,7 +133,7 @@ def log_get():
         if len(lline)>24:
             l.append([ lline[0:19], lline[20:23], lline[24:] ])
     lfile.close()    
-    return json.dumps({"aaData": l } )
+    return json.dumps({"aaData": l, "iDisplayLength": getListLength('loglist') } )
 
 #------------------------------- Channel List -------------------------------
 
@@ -128,7 +144,7 @@ def chanlist():
     for row in rows:
         m3u = "<a href=\"live/" + str(row[0]) + ".m3u\">" + row[1] + "</a>"
         l.append([row[0], m3u, row[2], row[3], row[4], row[5]])
-    return json.dumps({"aaData": l } )
+    return json.dumps({"aaData": l, "iDisplayLength": getListLength('clist') } )
 
 @route('/list')
 def list_s():
@@ -547,7 +563,7 @@ def epglist_getter():
     rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg))
     for row in rows:
         l.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], ""]) 
-    return json.dumps({"aaData": l } )    
+    return json.dumps({"aaData": l, "iDisplayLength": getListLength('epglist') } )    
 
 #------------------------------- Record List -------------------------------
 
@@ -566,7 +582,7 @@ def getrecordlist():
                     rec += weekdays[index]
         m3u = "<a href=\"live/" + str(row[10]) + ".m3u\">" + row[1] + "</a>"
         l.append([row[0], m3u, row[2], row[3], rec, row[5], row[6], row[7], row[8], row[9]])
-    return json.dumps({"aaData": l } )
+    return json.dumps({"aaData": l, "iDisplayLength": getListLength('recordlist')} )
 
 @route('/records')
 def records_s():    
@@ -783,5 +799,3 @@ grabthread.kill()
     
 print "tvstreamrecord v.%s: bye-bye" % version
 logStop()
-        
-#todo:

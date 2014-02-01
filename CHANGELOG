@@ -1,4 +1,6 @@
-2014-01-31 0.5.7 Gear icon in Chrome fixed
+2014-01-31 0.5.7 Table length will be saved
+				 Plausibility check for server port and bind address added
+				 Gear icon in Chrome fixed
 				 Synology shortcut fixes
                  Channel URL length increased to 255
                  Small playlist fixes

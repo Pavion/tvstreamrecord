@@ -758,12 +758,17 @@ $(function() {
             initSwitch();
             initIcons();
         },
-        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+    	"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
             var data4 = "";
             if (aData[4] == 1) data4 = "plus"; else data4="minus";
             var chk = "";
             if (aData[5] == 1) chk = 'checked="checked"';
             $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-'+data4+'"></span></label><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
+       },
+        "fnInitComplete": function(oSettings, json) {
+            this.fnSettings()._iDisplayLength=json.iDisplayLength;
+            $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
+			this.fnDraw();
         }
     });
 
@@ -786,8 +791,10 @@ $(function() {
 			
             $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
         },
-        "fnInitComplete": function() {
-             this.fnSort([ [3,'asc'] ]);
+        "fnInitComplete": function(oSettings, json) {
+            this.fnSettings()._iDisplayLength=json.iDisplayLength;
+            $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
+			this.fnSort([ [3,'asc'] ]);
         }
     });
 
@@ -815,8 +822,10 @@ $(function() {
             htmltext += '<a href="#" id="icons-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>';
             $('td:eq(5)', nRow).html(htmltext);
         },
-        "fnInitComplete": function() {
-             this.fnSort([ [2,'desc'] ]);
+        "fnInitComplete": function(oSettings, json) {
+            this.fnSettings()._iDisplayLength=json.iDisplayLength;
+            $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
+        	this.fnSort([ [2,'desc'] ]);
         }
 
     });
@@ -826,9 +835,17 @@ $(function() {
         "sPaginationType": "full_numbers",
         "bProcessing": true,
         "sAjaxSource": "/logget",
-        "fnInitComplete": function() {
-             this.fnSort([ [0,'desc'] ]);
+        "fnInitComplete": function(oSettings, json) {
+            this.fnSettings()._iDisplayLength=json.iDisplayLength;
+            $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
+        	this.fnSort([ [0,'desc'] ]);
         }
     });
+
+	$('#epglist_length,#recordlist_length,#clist_length,#loglist_length').change( function() {
+	    var thisid = this.id.replace("_length","");
+	    var lengthVal = $('#' + thisid + '').dataTable().fnSettings()._iDisplayLength;
+        post('/savetable', { myid:thisid, mylen:lengthVal }, 0);
+	} );
 
 });

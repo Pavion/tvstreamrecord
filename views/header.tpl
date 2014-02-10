@@ -5,7 +5,7 @@
     <head>
     <link rel="shortcut icon" href="images/favicon.ico?v=2" type="image/x-icon" /> 
     <meta charset="utf-8">
-	<title>tvstreamrecord 0.5.7</title>
+	<title>tvstreamrecord 0.5.7a</title>
 	<link href="css/smoothness/jquery-ui-1.9.2.custom.css" rel="stylesheet">
 	<script src="js/jquery-1.8.3.js"></script>
 	<script src="js/jquery-ui-1.9.2.custom.js"></script>

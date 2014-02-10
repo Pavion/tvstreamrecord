@@ -38,7 +38,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.5.7' 
+version = '0.5.7a' 
 
 @route('/live/<filename>')
 def server_static9(filename):

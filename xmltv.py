@@ -31,42 +31,52 @@ def getProgList(ver=''):
     version = ver    
     print "tvstreamrecord v.%s / XMLTV import started" % version
     stri = getFile(config.cfg_xmltvinitpath, 1)
+    channellist = []
     if stri:    
         tree = et.fromstring(stri)
         type = tree.attrib.get("generator-info-name")
         for dict_el in tree.iterfind('channel'):
             g_id = dict_el.attrib.get("id")
             name = dict_el.find('display-name').text
-            if not type == "nonametv":
+            if type == "nonametv":
+                url = dict_el.find('base-url').text
+            elif type[:4] == "TVxb":
+                pass
+            else: 
                 print "Unknown XMLTV generator '%s', please contact me if it fails" % type
-            url = dict_el.find('base-url').text
+                url = dict_el.find('base-url').text
                         
             rows=sqlRun("SELECT cname from channels WHERE cname = '%s' and cenabled=1 GROUP BY cname" % name)
             if rows:
+                timerows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (g_id))
+                dtmax = datetime.now()
+                if type[:4] == "TVxb":   # same file
+                    channellist.append(g_id)
+                else:               # separate files
+                    lastdate = datetime.now()-timedelta(days=30)
+                    if timerows:
+                        lastdate = datetime.strptime(timerows[0][0], "%Y-%m-%d %H:%M:%S")
+                    dtmax = datetime.min
+                    for tim in dict_el.iter("datafor"):
+                        dttext = tim.text
+                        dtepg  = datetime.strptime(dttext, "%Y-%m-%d")
+                        dt = datetime.strptime(tim.attrib.get("lastmodified")[0:14],"%Y%m%d%H%M%S")
+                        if dt>lastdate and dtepg>=datetime.now()-timedelta(days=1):
+                            source = url+g_id+"_"+dttext+".xml.gz"
+                            stri = getFile(source)
+                            getProg(stri)    
+                        if dt>dtmax:
+                            dtmax = dt
 
-                rows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (g_id))
-                lastdate = datetime.now()-timedelta(days=30)
-                if rows:
-                    lastdate = datetime.strptime(rows[0][0], "%Y-%m-%d %H:%M:%S")
-                dtmax = datetime.min
-                for tim in dict_el.iter("datafor"):
-                    dttext = tim.text
-                    dtepg  = datetime.strptime(dttext, "%Y-%m-%d")
-                    dt = datetime.strptime(tim.attrib.get("lastmodified")[0:14],"%Y%m%d%H%M%S")
-                    if dt>lastdate and dtepg>=datetime.now()-timedelta(days=1):
-                        source = url+g_id+"_"+dttext+".xml.gz"
-                        getProg(source)    
-                    if dt>dtmax:
-                        dtmax = dt
-
-                if not rows:
+                if not timerows:
                     sqlRun("INSERT OR IGNORE INTO guide_chan VALUES (?, ?, ?)", (g_id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
                 else:
                     sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))                       
+        if type[:4] == "TVxb" and len(channellist)>0:   # same file
+            getProg(stri, channellist)        
     print "XMLTV import completed"
        
-def getProg(p_id):    
-    stri = getFile(p_id)
+def getProg(stri, channellist=[]):    
     sqllist = []
     if stri: #tree = et.parse("hd.zdf.de_2013-02-14.xml")
         tree = et.fromstring(stri)
@@ -74,18 +84,19 @@ def getProg(p_id):
             dt1 = datetime.strptime(dict_el.attrib.get("start")[0:14],"%Y%m%d%H%M%S")        
             dt2 = datetime.strptime(dict_el.attrib.get("stop")[0:14],"%Y%m%d%H%M%S")        
             p_id = dict_el.attrib.get("channel")
-            title = ""
-            desc = ""
-            if dict_el.find('title') is not None:
-                title = dict_el.find('title').text
-            if dict_el.find('sub-title') is not None:
-                if title != "": title = title + " - "
-                title = title + dict_el.find('sub-title').text
-            if dict_el.find('episode-num[@system="onscreen"]') is not None:
-                desc = dict_el.find('episode-num[@system="onscreen"]').text + ". "
-            if dict_el.find('desc') is not None:
-                desc = desc + dict_el.find('desc').text
-            sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
+            if len(channellist)==0 or p_id in channellist:
+                title = ""
+                desc = ""
+                if dict_el.find('title') is not None:
+                    title = dict_el.find('title').text
+                if dict_el.find('sub-title') is not None:
+                    if title != "": title = title + " - "
+                    title = title + dict_el.find('sub-title').text
+                if dict_el.find('episode-num[@system="onscreen"]') is not None:
+                    desc = dict_el.find('episode-num[@system="onscreen"]').text + ". "
+                if dict_el.find('desc') is not None:
+                    desc = desc + dict_el.find('desc').text
+                sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
         sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
         
 def getFile(file_in, override=0):
@@ -117,4 +128,3 @@ def getFile(file_in, override=0):
         print "XMLTV: no new data, try again later"
         pass
     return out
-    

@@ -42,8 +42,7 @@ case $1 in
 		exit 0
 	;;
 	log)
-		echo "tvstreamrecord is installed properly. To access it, click icon under 'admin' menu">/tmp/cc.log
-		echo "/tmp/cc.log";
+		echo "${SYNOPKG_PKGDEST}/log.txt";
 		exit 0
 	;;
 esac

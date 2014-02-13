@@ -73,6 +73,7 @@ function checkRegexp(o, regexp, n ) {
         updateTips( n );
         return false;
     } else {
+        $("#"+o).removeClass( "ui-state-error" );
         return true;
     }
 }
@@ -191,18 +192,12 @@ $(function() {
 
     var pickerform = "dd.mm.yy";
 
-    $("#timepicker_inline_div1").timepicker({
-        constrainInput: true,
-        showPeriodLabels: false
-    });
-    $("#timepicker_inline_div2").timepicker({
+    $("#timepicker_inline_div1,#timepicker_inline_div2,#cfg_grab_time").timepicker({
         constrainInput: true,
         showPeriodLabels: false
     });
 
-    $( "#switch00" ).slickswitch();
-    $( "#switch01" ).slickswitch();
-    $( "#switch02" ).slickswitch();
+    $( "#switch00,#switch01,#switch02" ).slickswitch();
 
     $( "#dialog" ).dialog({
         autoOpen: false,
@@ -716,13 +711,13 @@ $(function() {
             event.preventDefault();
         });
 
-    $( "#submit_cfg" )
+/*    $( "#submit_cfg" )
         .button()
         .click(function(event ) {
             document.submit_cfg_form.submit();
             event.preventDefault();
         });
-
+*/
     $( "#downlog" )
         .button()
         .click(function(event ) {
@@ -847,5 +842,54 @@ $(function() {
 	    var lengthVal = $('#' + thisid + '').dataTable().fnSettings()._iDisplayLength;
         post('/savetable', { myid:thisid, mylen:lengthVal }, 0);
 	} );
+
+    $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
+	$( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
+    
+    $("#cfg_purgedelta,#cfg_delta_for_epg,#cfg_grab_max_duration").spinner();
+    $("#cfg_grab_zoom").spinner( { step: 0.1 } );
+    
+    if (here("config")) {
+        $.get( "/getconfig", function( data )  {
+            var p = new Function('return ' + data + ';')();
+            var data = p.configdata;
+            for (var i = 0; i < data.length; i++) {
+                $("#" + data[i][0]).val(data[i][2]);
+            }
+        });
+        
+        $( "#submit_cfg" ).button().click(function(event ) {
+            var my_config_data = new Array(); 
+            var myalert = false; 
+            $("[id^=cfg_]").each(function() {
+                if ($(this).attr('id')=="cfg_server_port") {
+                    var port = parseInt($(this).val());
+                    if (!checkRegexp("cfg_server_port", /^[0-9]{1,5}$/, "") || port<80 || isNaN(port) || port > 65535 ) {
+                        alert("Invalid port, please check your settings");
+                        myalert = true; 
+                    }                    
+                } else if ($(this).attr('id')=="cfg_server_bind_address") {
+                    if ( $(this).val() != "localhost") if ( !checkRegexp( "cfg_server_bind_address", /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/, "" ) ) {
+                        alert("Invalid bind address, please check your settings");
+                        myalert = true; 
+                    }                    
+                } else if ($(this).attr('id')=="cfg_grab_time") {
+                    if ( $(this).val().trim() != "0" ) if ( !checkRegexp( "cfg_grab_time", /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "" ) ) {
+                        alert("Invalid grab time, please check your settings");
+                        myalert = true; 
+                    }                    
+                }
+                
+                my_config_data.push(new Array($(this).attr('id'), $(this).val()));
+            });
+            if (!myalert) {
+                var my_config_data_str = JSON.stringify(my_config_data);
+                post("/config", {configdata:my_config_data_str}, 0);
+            }            
+        });
+
+        
+    }    
+    
 
 });

@@ -113,34 +113,39 @@ def loadConfig():
     setConfig(rows)
     return
         
-def setConfig(attrlist = [], writefile = False):
+def setConfig(attrlist = []):
     for attr in attrlist:
         if attr[0] in globals():
+            if attr[0]=="cfg_server_port":
+                if int(globals()[attr[0]]) != int(attr[1]):
+                    writeWebman(int(attr[1]))
             globals()[attr[0]] = attr[1]                
-    saveConfig(writefile)
+    saveConfig()
             
             
-def saveConfig(writefile):
+def saveConfig():
     from sql import sqlRun
     sql = ''   
     for var in getDict():
         sql += "UPDATE config SET value='%s' WHERE param='%s';" % (globals()[var], var) 
     sqlRun(sql, -1, 1)
-    # Port changes should also be written in the Synology Webman configuration
-    if writefile:
-        webman = list()
-        lfile = open("webman/config", "rb")
-        for lline in lfile:
-            webman.append(lline)
-        lfile.close()    
-        lfile = open("webman/config", "wb")
-        for lline in webman:
-            pos = lline.find('"port":')
-            if pos>0:
-                lfile.write(lline[:pos+8]+'"' + globals()['cfg_server_port'] +'"\n')
-            else:
-                lfile.write(lline)
-        lfile.close()
+
+# Port changes should also be written in the Synology Webman configuration
+def writeWebman(port): 
+    webman = list()
+    lfile = open("webman/config", "rb")
+    for lline in lfile:
+        webman.append(lline)
+    lfile.close()    
+    lfile = open("webman/config", "wb")
+    for lline in webman:
+        pos = lline.find('"port":')
+        if pos>0:
+            lfile.write(lline[:pos+8]+'"' + str(port) + '"\n')
+        else:
+            lfile.write(lline)
+    lfile.close()
+    print "Port changes saved, new port: %s, please restart the software" % str(port)
     return    
         
 

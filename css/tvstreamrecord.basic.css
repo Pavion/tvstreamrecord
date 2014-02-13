@@ -66,7 +66,7 @@ label#append {float: left; margin-top: 3px;}
 #chb1 { width:46%; float: left;}
 #chb2 { width:46%; float: right;}
 
-[id^=cfg_].text { margin-bottom:0px; width:95%; padding: 0.1em; }
+[id^=cfg_].text { margin-bottom:0px; width:95%; padding-left: 0.4em; }
 
 .ui-button-text-only .ui-button-text  { padding: 0px 3px; }
 

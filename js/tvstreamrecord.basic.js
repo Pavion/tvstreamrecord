@@ -197,7 +197,9 @@ $(function() {
         showPeriodLabels: false
     });
 
-    $( "#switch00,#switch01,#switch02" ).slickswitch();
+    $( "#switch00").slickswitch();
+    $( "#switch01").slickswitch();
+    $( "#switch02").slickswitch();
 
     $( "#dialog" ).dialog({
         autoOpen: false,
@@ -775,6 +777,8 @@ $(function() {
         "fnDrawCallback": function( oSettings ) {
             initIcons();
         },
+        "bServerSide": true,
+        //"bStateSave": true,
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
         	var dat_v = aData[3].split(" "); 
         	var dat_b = aData[4].split(" "); 
@@ -787,9 +791,10 @@ $(function() {
             $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
         },
         "fnInitComplete": function(oSettings, json) {
-            this.fnSettings()._iDisplayLength=json.iDisplayLength;
-            $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
-            this.fnSort([ [3,'asc'] ]);
+        	//console.log(oSettings);
+            //this.fnSettings()._iDisplayLength=json.iDisplayLength;
+            //$('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
+            //this.fnSort([ [3,'asc'] ]);
         }
     });
 
@@ -850,11 +855,18 @@ $(function() {
     $("#cfg_grab_zoom").spinner( { step: 0.1 } );
     
     if (here("config")) {
+    	$("#cfg_switch_xmltv_auto").slickswitch();
+    	$("#cfg_switch_grab_auto").slickswitch();
+   	
         $.get( "/getconfig", function( data )  {
             var p = new Function('return ' + data + ';')();
             var data = p.configdata;
             for (var i = 0; i < data.length; i++) {
-                $("#" + data[i][0]).val(data[i][2]);
+            	if (data[i][0].startsWith('cfg_switch')) {
+            		switchMe( "#" + data[i][0], data[i][2]=='1');
+            	} else {            			
+            		$("#" + data[i][0]).val(data[i][2]);
+            	}
             }
         });
         
@@ -862,27 +874,33 @@ $(function() {
             var my_config_data = new Array(); 
             var myalert = false; 
             $("[id^=cfg_]").each(function() {
+	            var value = $(this).val(); 
                 if ($(this).attr('id')=="cfg_server_port") {
-                    var port = parseInt($(this).val());
+                    var port = parseInt(value);
                     if (!checkRegexp("cfg_server_port", /^[0-9]{1,5}$/, "") || port<80 || isNaN(port) || port > 65535 ) {
                         alert("Invalid port, please check your settings");
                         myalert = true; 
                     }                    
                 } else if ($(this).attr('id')=="cfg_server_bind_address") {
-                    if ( $(this).val() != "localhost") if ( !checkRegexp( "cfg_server_bind_address", /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/, "" ) ) {
+                    if ( value != "localhost") if ( !checkRegexp( "cfg_server_bind_address", /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/, "" ) ) {
                         alert("Invalid bind address, please check your settings");
                         myalert = true; 
                     }                    
                 } else if ($(this).attr('id')=="cfg_grab_time") {
-                    if ( $(this).val().trim() != "0" ) if ( !checkRegexp( "cfg_grab_time", /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "" ) ) {
+                    if ( value.trim() != "0" ) if ( !checkRegexp( "cfg_grab_time", /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "" ) ) {
                         alert("Invalid grab time, please check your settings");
                         myalert = true; 
                     }                    
+                } else if ($(this).attr('id').startsWith('cfg_switch') && $(this).attr('type')!="checkbox") {
+                	value = "null";                	                	
+                } else if ($(this).attr('id').startsWith('cfg_switch')) {
+                	value = ($(this).attr('checked')=="checked") ? "1" : "0";  
                 }
                 
-                my_config_data.push(new Array($(this).attr('id'), $(this).val()));
+                
+                if(value != "null") my_config_data.push(new Array($(this).attr('id'), value));
             });
-            if (!myalert) {
+            if (!myalert) {            	
                 var my_config_data_str = JSON.stringify(my_config_data);
                 post("/config", {configdata:my_config_data_str}, 0);
             }            

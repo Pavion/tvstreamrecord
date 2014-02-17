@@ -92,6 +92,18 @@ configuration = [
 'cfg_grab_zoom',
 "Zoom level for EPG view. Positive values for horizontal, negative for vertical view (default '1' for old style)",
 '1'
+],
+
+[
+'cfg_switch_xmltv_auto',
+"Automatic XMLTV-Import (default off)",
+'0'
+],
+
+[
+'cfg_switch_grab_auto',
+"Automatic stream scan / grab (default off')",
+'0'
 ]
 
 ]

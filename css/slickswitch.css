@@ -51,3 +51,8 @@
     margin-top: 2px;
 }
 
+
+[id^=cfg_switch] {
+    margin-left: 0px;
+    
+}

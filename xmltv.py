@@ -90,8 +90,10 @@ def getProg(stri, channellist=[]):
                 if dict_el.find('title') is not None:
                     title = dict_el.find('title').text
                 if dict_el.find('sub-title') is not None:
-                    if title != "": title = title + " - "
-                    title = title + dict_el.find('sub-title').text
+                    sub_title = dict_el.find('sub-title').text
+                    if not "http://" in sub_title: # fix for corrupted XML data
+                        if title != "": title = title + " - "
+                        title = title + sub_title
                 if dict_el.find('episode-num[@system="onscreen"]') is not None:
                     desc = dict_el.find('episode-num[@system="onscreen"]').text + ". "
                 if dict_el.find('desc') is not None:

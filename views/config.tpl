@@ -52,7 +52,7 @@
 <tr><td>Automatic XMLTV-Import</td><td><input type="checkbox" class="switch icons" id="cfg_switch_xmltv_auto" /></td></tr>
 <tr><td>Initial path for an XMLTV-Import</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_xmltvinitpath" value="" autocomplete="off" /></td></tr>
 <tr><td>Automatic stream scan / grab</td><td><input type="checkbox" class="switch icons" id="cfg_switch_grab_auto" /></td></tr>
-<tr><td>Time to perform daily EPG grab on all marked channels (hh:mm format, 24h based, default '0' for manual only)</td><td><input type="text" maxlength="5" id="cfg_grab_time" class="text ui-widget-content ui-corner-all" /></td></tr>
+<tr><td>Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)</td><td><input type="text" maxlength="5" id="cfg_grab_time" class="text ui-widget-content ui-corner-all" /></td></tr>
 <tr><td>Maximal EPG scan duration per channel, [seconds] (default '60')</td><td><input id="cfg_grab_max_duration" /></td></tr>
 <tr><td>Zoom level for EPG view. Positive values for horizontal, negative for vertical view (default '1' for old style)</td><td><input id="cfg_grab_zoom" /></td></tr>
 <tr><td>Delete/reset all EPG data</td><td><button id="removeepg">Delete EPG data</button></td></tr>

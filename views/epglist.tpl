@@ -3,9 +3,9 @@
 <h1>Electronic Program Guide List:
 <button id="getepg">Load XMLTV information</button>
 %if grabstate[0] == False:
-<button id="grabepgstart">Grab EPG from {{grabstate[2]}} streams</button>
+<button id="grabepgstart">Grab EPG from {{grabstate[2]}} sources</button>
 %else:
-<button id="grabepgstop">Stop grabbing EPG (State: {{grabstate[1]}}/{{grabstate[2]}})</button>
+<button id="grabepgstop">Stop loading EPG (State: {{grabstate[1]}}/{{grabstate[2]}})</button>
 %end
 </h1>
 <table id="epglist">

@@ -657,20 +657,20 @@ $(function() {
     $( "#purge-records" )
         .button()
         .click(function() {
-            $( "#confirm01" ).dialog( "open" );
+        	$( "#confirm01" ).dialog( "open" );
         });
 
     $( "#getepg" )
         .button()
         .click(function(event ) {
-            post("/getepg", {}, 0);
+            post("/grabepg", {"mode": 2}, 0);
             event.preventDefault();
         });
 
     $( "#grabepgstart" )
         .button()
         .click(function(event ) {
-            post("/grabepgstart", {}, 0);
+            post("/grabepg", {"mode": 0}, 0);
             $(this).html('Please refresh to see progress');
             $(this).css('height', "20px");
             $(this).addClass( "ui-state-disabled" );
@@ -680,7 +680,7 @@ $(function() {
     $( "#grabepgstop" )
         .button()
         .click(function(event ) {
-            post("/grabepgstop", {}, 1);
+            post("/grabepg", {"mode": 1}, 1);
             event.preventDefault();
         });
 
@@ -713,13 +713,6 @@ $(function() {
             event.preventDefault();
         });
 
-/*    $( "#submit_cfg" )
-        .button()
-        .click(function(event ) {
-            document.submit_cfg_form.submit();
-            event.preventDefault();
-        });
-*/
     $( "#downlog" )
         .button()
         .click(function(event ) {
@@ -778,7 +771,7 @@ $(function() {
             initIcons();
         },
         "bServerSide": true,
-        //"bStateSave": true,
+        "bStateSave": true,
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
         	var dat_v = aData[3].split(" "); 
         	var dat_b = aData[4].split(" "); 
@@ -789,13 +782,13 @@ $(function() {
 			$('td:eq(4)', nRow).html($.datepicker.formatDate('dd.mm.yy', myday)+" "+dat_b[1]);
 			
             $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
-        },
+        }/*,
         "fnInitComplete": function(oSettings, json) {
         	//console.log(oSettings);
             //this.fnSettings()._iDisplayLength=json.iDisplayLength;
             //$('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
             //this.fnSort([ [3,'asc'] ]);
-        }
+        }*/
     });
 
     
@@ -848,13 +841,15 @@ $(function() {
         post('/savetable', { myid:thisid, mylen:lengthVal }, 0);
 	} );
 
-    $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
-	$( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
     
-    $("#cfg_purgedelta,#cfg_delta_for_epg,#cfg_grab_max_duration").spinner();
-    $("#cfg_grab_zoom").spinner( { step: 0.1 } );
     
     if (here("config")) {
+	    $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
+		$( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
+
+    	$("#cfg_purgedelta,#cfg_delta_for_epg,#cfg_grab_max_duration").spinner();
+	    $("#cfg_grab_zoom").spinner( { step: 0.1 } );
+	    
     	$("#cfg_switch_xmltv_auto").slickswitch();
     	$("#cfg_switch_grab_auto").slickswitch();
    	

@@ -6,14 +6,11 @@
 <p><b>Quick guide</b></p>
 
 <ol>
-<li><p><b>What's new</b></p>
-<p>With version 0.5.3 an EPG list view with search function has beed added. It is also possible to change the layout and the scale of EPG chart by providing a positive/negative zoom level at the config page.</p>
-<p>With version 0.5.2 it is possible to grab EPG data directly from your TV stream. Please read the corresponding section to avoid performance issues.</p>
-</li>
 <li><p><b>Introduction</b></p>
 <p>This software was designed to record http streams (TV and such). My goal was to be able to record streams from Elgato EyeTV Netstream with my NAS server so it's the primary objective of this software. Please note, that this software can't be used to record any videos from USB-based devices. A simply stream would be http://streamadress/stream000000 and will be recorded or grabbed as is. </p>
 <p>As reported, streams from Dreambox (800 HD) can also be used. Its stream URL should be like this: <br /><i>http://192.168.0.10:8001/1:0:1:6DCA:44D:1:C00000:0:0:0:</i></p>
 <p>Please note, that the recording of some streams may be forbidden by the law of your country or your local content provider. Author takes no responsibility for any records taken.</p>
+<p>If you are using XMLTV source for your EPG guide, please make sure, that your source provider allows accessing his data with third party applications. </p>
 </li>
 <li><p><b>Installation on Synology DS systems</b></p>
 <p>Installation in Synology DS systems via community hub <a href="http://www.cphub.net">http://www.cphub.net</a>. Please insert it as package source in your DS Package Center and you will see my software under "other sources"</p>
@@ -25,21 +22,30 @@
 <i>python tvstreamrecord.py</i><br />
 You shouldn't need any special permissions.</p></li>
 <li><p><b>Running for the first time</b></p>
-<p>To access the software you should open your favorite browser and navigate to your target IP with the port 8030, e.g. <a href="http://localhost:8030">http://localhost:8030.</a> Now you should see the web based page of my software. First you should proceed to the config page and review following settings:</p>
+<p>To access the software you should open your favorite browser and navigate to your target IP with the port 8030, e.g. <a href="http://localhost:8030">http://localhost:8030.</a> Now you should see the web based interface of my software. First you should proceed to the config page and review following settings:</p>
 <li><p><b>Settings</b></p>
-<p><i>Initial path for an XMLTV-Import</i> can be used to import EGP (electronic program guide) from free XMLTV-compatible pages. The default value is the only one tested at this time.<br />
-<i>Purge database records</i> will be used to automatically delete old EPG and records information and shouldn't normally be changed<br />
-<i>Lenghten an EPG record</i> will be used to prolong the record and avoid any small time shifts in TV charts. Please note, that your system time will be used for recording and should be exact.<br />
+<p>
+<b>General tab</b><br />
 <i>Path for your recordings</i> is a vital setting and should be set. On Synology DS you can use any shared folder, which can be accessed with the root user (e.g. /volume1/common/). On Windows systems you can use any path (e.g. d:\records\). Be sure to close your path string with an path char (/ or \), as the path string will be added to the filename. Otherwise you can use this to add prefixes to your recordings. As example, providing the path <i>/volume1/films/rec</i> will result in files with names: rec20130101000000<br />
-<i>Server bind address</i> is exactly what it says. Default 0.0.0.0 will make your server available from any local address. Any other choices (i.e. 127.0.0.1) may be used to limit the access. This setting should not normally be changed. Changing it requires restart.<br />
-<i>Server port</i> is the port the server runs on. You can change it, if you need it. Changing it requires restart.<br />
-<i>File extension for the recorded stream</i> will be added to the filename. Mostly it would be MPEG transport stream (.ts). Changing this parameter doesn't change anything beside filename.<br />
-<i>Full path to ffmpeg</i> is needed for experimental <i>ffmpeg</i> support. <i>ffmpeg</i> is not included within this software. On Synology DS is <i>ffmpeg</i> preinstalled and the default value should not be changed.<br />
-<i>Stream types</i> would be forwarded to ffmpeg. If your stream can be recorded with, you can add its prefix here.<br />
-<i>Additional output arguments for ffmpeg</i> can be used to change your output. Please check next part for details.<br />
-<i>Time to perform daily EPG grab</i> can be used to automatically refresh your EPG guide using your streams. Please read the corresponding section for details.<br />
+<i>File extension for the recorded stream</i> will be added as suffix to the filename. Mostly it would be MPEG transport stream (.ts). Changing this parameter doesn't affect anything beside filename.<br />
+<b>EPG tab</b><br />
+<i>Lenghten an EPG record</i> will be used to prolong the record and avoid any small time shifts in TV charts. Please note, that your system time will be used for recording and should be exact.<br />
+<i>Automatic XMLTV import</i> will be performed once per day at specified time if enabled. <br />
+<i>Initial path for an XMLTV-Import</i> can be used to import EGP (electronic program guide) from free XMLTV-compatible pages. <br />
+<i>Automatic stream scan/grab</i> will be performed once per day at specified time if enabled. <br />
 <i>Maximal EPG scan duration <b>per channel</b> in seconds</i>. Some channels resend all their EPG information each minute, some channels have much longer cycles. Increasing duration can result in receiving more guide information.<br /> 
-<i>Zoom level for EPG view</i>. You can change your default EPG view here. Enter negative values for vertical and positive values for default horizontal view (i.e. 2=200% horizontal, -3=300% vertical). Default is '1' for classic horizontal one-page view. 
+<i>Time to perform daily EPG/XMLTV grab</i> can be used to automatically refresh your EPG guide using your streams and/or your XMLTV provider. Please read the corresponding sections for more details.<br />
+<i>Zoom level for EPG view</i>. You can change your default EPG view here. Enter negative values for vertical and positive values for default horizontal view (i.e. 2=200% horizontal, -3=300% vertical). Default is '1' for classic horizontal one-page view.<br /> 
+<i>Delete/reset all EPG data</i> should be used to clear your database in case of EPG issues <br />
+<b>FFMPEG support tab</b><br />
+<i>Stream types</i> would be forwarded to ffmpeg. If your stream can be recorded with, you can add its prefix here.<br />
+<i>Full path to ffmpeg</i> is needed for experimental <i>ffmpeg</i> support. <i>ffmpeg</i> is not included within this software. On Synology DS <i>ffmpeg</i> is preinstalled with Video Station and the default value should not be changed.<br />
+<i>Additional output arguments for ffmpeg</i> can be used to change your output. Please check the next part for details.<br />
+<b>Advanced tab</b><br />
+<i>Purge database records</i> will be used to automatically delete old EPG and records information and shouldn't normally be changed.<br />
+<i>Server bind address</i> does exactly what it says. Default 0.0.0.0 will make your server available from any local address. Any other choices (i.e. 127.0.0.1) may be used to limit the access. This setting should not normally be changed. Changing it requires restart.<br />
+<i>Server port</i> is the port the server runs on. You can change it, if you need it. Changing it requires restart.<br />
+<i>Reset log</i> should be used to clear your log file if it's becoming too big or on output issues.<br />
 </p></li>
 <li><p><b>FFMPEG support</b></p>
 <p>This software can forward your streams to external software <a href='http://www.ffmpeg.org/'>ffmpeg</a> thus providing support for non-HTTP streams. If you can record your stream with ffmpeg, you can also do it through my software. On Synology systems ffmpeg is preinstalled, for other systems please check <a href='http://www.ffmpeg.org/'>ffmpeg</a> page. Here is a small tutorial for checking and adding your stream support:<br />

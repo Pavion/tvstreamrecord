@@ -296,7 +296,7 @@ def config_s():
 
 @route('/getconfig')
 def getconfig():
-    rows=sqlRun("SELECT * FROM config WHERE param<>'cfg_version' AND not param LIKE 'table_%'")
+    rows=sqlRun("SELECT param, '', value FROM config WHERE param<>'cfg_version' AND not param LIKE 'table_%'")
     return json.dumps({"configdata": rows } )    
     
 #------------------------------- EPG Grabbing part -------------------------------
@@ -318,10 +318,9 @@ class epggrabthread(threading.Thread):
         rows = sqlRun("SELECT count(cname) FROM channels WHERE epgscan = 1 AND cenabled = 1;")
         if rows:
             self.epggrabberstate[1] = rows[0][0]
+        if config.cfg_switch_xmltv_auto=="1": self.epggrabberstate[1] += 1     
     
     def __init__(self):
-        #rows = sqlRun("SELECT count(cname) FROM channels WHERE epgscan = 1 AND cenabled = 1;")
-        #if rows:
         self.setChannelCount()
         threading.Thread.__init__(self)
     
@@ -331,26 +330,40 @@ class epggrabthread(threading.Thread):
     
     def run(self):
         self.kill()
-        if not config.cfg_grab_time == '0':
-            if len(config.cfg_grab_time)>=3 and len(config.cfg_grab_time)<=5:
-                try:
-                    mytime = datetime.strptime(config.cfg_grab_time, "%H:%M").time()
-                    mydatetime = datetime.combine(datetime.now().date(), mytime)
-                    if mydatetime < datetime.now():
-                        mydatetime = mydatetime + timedelta(days=1)
-                    td = mydatetime-datetime.now()
-                    deltas = td.total_seconds()
-                    self.timer = threading.Timer(deltas, self.doIt)
-                    self.timer.start()
-                    if deltas>0:
-                        print "Thread timer for EPG grab waiting till %s (%d seconds)" % (config.cfg_grab_time, deltas)                        
-                except:
-                    print "Something went wrong with EPG grab thread. Please check your config settings regarding your start time"
-                    pass
-
+        if not config.cfg_grab_time == '0' and len(config.cfg_grab_time)>=3:
+            try:
+                mytime = datetime.strptime(config.cfg_grab_time, "%H:%M").time()
+                mydatetime = datetime.combine(datetime.now().date(), mytime)
+                if mydatetime < datetime.now():
+                    mydatetime = mydatetime + timedelta(days=1)
+                td = mydatetime-datetime.now()
+                deltas = td.total_seconds()
+                self.timer = threading.Timer(deltas, self.doIt)
+                self.timer.start()
+                if deltas>0:
+                    print "EPG Thread timer waiting till %s (%d seconds)" % (config.cfg_grab_time, deltas)                        
+            except:
+                print "Something went wrong with EPG thread. Please check your config settings regarding your start time"
+    
     def doIt(self):
         self.kill()
         self.running = True        
+        if config.cfg_switch_grab_auto=="1" and not self.stopflag:  self.grabStream()
+        if config.cfg_switch_xmltv_auto=="1" and not self.stopflag: self.grabXML()
+        self.epggrabberstate[0]=0
+        self.running = False
+        sleep(61)        
+        self.stopflag = False
+        self.run()
+        
+    def grabXML(self):
+        try:
+            xmltv.getProgList(version)
+        except:
+            print "XMLTV import could not be completed, please try again later (%s)" % sys.exc_info()[0]
+        self.epggrabberstate[0] += 1    
+ 
+    def grabStream(self):
         rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
         self.epggrabberstate[1] = len(rows)        
         for row in rows:
@@ -358,8 +371,6 @@ class epggrabthread(threading.Thread):
                 break
             self.epggrabberstate[0] = self.epggrabberstate[0] + 1
             fulllist = grabber.startgrab(row)
-    #        fulllist = grabber.main()
-    #        fulllist = list()
             sqllist = list()
             sqlchlist = list()
             prevname = ""
@@ -394,54 +405,21 @@ class epggrabthread(threading.Thread):
                 sqlRun("INSERT OR REPLACE INTO guide_chan VALUES (?, ?, ?)", sqlchlist, 1 )
                 sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
         
-        self.epggrabberstate[0]=0
-        self.running = False
-        sleep(61)
-        
-        self.stopflag = False
-        self.run()
     
     def stop(self):
         self.stopflag = True
         
-@post('/grabepgstart')
+@post('/grabepg')
 def grabepgstart():
+    mode = int(request.forms.mode)
     if not grabthread.isRunning():
-        grabthread.doIt()
+        if mode == 0:
+            grabthread.grabStream()
+        elif mode == 1:
+            grabthread.stop()
+        elif mode == 2:
+            grabthread.grabXML()
     return 
-
-@post('/grabepgstop')
-def grabepgstop():
-    if grabthread.isRunning():
-        grabthread.stop()
-    return 
-
-#------------------------------- EPG XMLTV import -------------------------------
-    
-epgrunning = False    
-@post('/getepg')
-def getepg():
-    global epgrunning
-    if not epgrunning:     
-        epgrunning = True  
-        mythread = epgthread()
-        mythread.start()
-    else:
-        print "EPG import already running, please be patient"
-    return 
-
-class epgthread(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-
-    def run(self):
-        try:
-            xmltv.getProgList(version)
-        except:
-            print "XMLTV import could not be completed, please try again later (%s)" % sys.exc_info()[0]
-        finally:    
-            global epgrunning
-            epgrunning = False
 
 #------------------------------- EPG painting part -------------------------------
         
@@ -451,7 +429,6 @@ def removeepg():
     sqlRun("DELETE FROM guide_chan")
     print "All EPG data was deleted"
     return 
-
 
 @post('/epg')
 def epg_p():    
@@ -789,7 +766,7 @@ print "Initializing config..."
 config.loadConfig()
 print "Initializing records..."
 setRecords()
-print "Initializing EPG grab thread..."
+print "Initializing EPG import thread..."
 grabthread = epggrabthread()
 grabthread.run()
     

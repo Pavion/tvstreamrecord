@@ -30,7 +30,7 @@ import xmltv
 import json
 import urllib2
 import threading 
-import os
+import os, sys
 from mylogging import logInit, logRenew, logStop
 
 records = []    

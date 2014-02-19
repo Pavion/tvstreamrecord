@@ -78,7 +78,9 @@ def getProgList(ver=''):
        
 def getProg(stri, channellist=[]):    
     sqllist = []
-    if stri: #tree = et.parse("hd.zdf.de_2013-02-14.xml")
+    #f = open("test.xml", "r")
+    #stri = f.read()
+    if stri: 
         tree = et.fromstring(stri)
         for dict_el in tree.iterfind('programme'):
             dt1 = datetime.strptime(dict_el.attrib.get("start")[0:14],"%Y%m%d%H%M%S")        
@@ -126,6 +128,16 @@ def getFile(file_in, override=0):
         d = zlib.decompressobj(16+zlib.MAX_WBITS)
         out = d.decompress(feeddata)
         print "XMLTV: reading URL %s" % file_in
+        
+        if not "</tv>" in out[-1000:]:
+            print "Possibly corrupted XML file, attempting to repair..."
+            pos = out.rfind("</programme>") 
+            if pos != -1:
+                out = out[:pos+12]  + "</tv>"
+            else: 
+                pos = out.rfind("</channel>")
+                if pos != -1:
+                    out = out[:pos+10]  + "</tv>" 
     except:
         print "XMLTV: no new data, try again later"
         pass

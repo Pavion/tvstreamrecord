@@ -18,6 +18,7 @@
 import sqlite3
 
 def sqlRun(sql, t=-1, many=0):    
+    print "test"
     fa = []
     try:
         conn = sqlite3.connect('settings.db')

@@ -55,6 +55,7 @@
 <tr><td>Maximal EPG scan duration per channel, [seconds] (default '60')</td><td><input id="cfg_grab_max_duration" /></td></tr>
 <tr><td>Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)</td><td><input type="text" maxlength="5" id="cfg_grab_time" class="text ui-widget-content ui-corner-all" /></td></tr>
 <tr><td>Zoom level for EPG view. Positive values for horizontal, negative for vertical view (default '1' for old style)</td><td><input id="cfg_grab_zoom" /></td></tr>
+<tr><td>EPG list mode. Disable for client-side processing (more network load), enable for server-side processing (more server load)</td><td><input type="checkbox" class="switch icons" id="cfg_switch_epglist_mode" /></td></tr>
 <tr><td>Delete/reset all EPG data</td><td><button id="removeepg">Delete EPG data</button></td></tr>
 </tbody>
 </table>

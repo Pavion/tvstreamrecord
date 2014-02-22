@@ -510,44 +510,48 @@ def epg_s():
 
 @route('/epglist')
 def epglist_s():    
-    return template('epglist', grabstate=grabthread.getState())
+    return template('epglist', grabstate=grabthread.getState(), listmode=config.cfg_switch_epglist_mode)
     
 @route('/epglist_getter')
 def epglist_getter():
     sEcho =  request.query.sEcho
-    columns = ['guide_chan.g_name', 'guide.g_title', 'guide.g_desc', 'guide.g_start', 'guide.g_stop']
-    sLimit = "LIMIT %s OFFSET %s" % (request.query.iDisplayLength, request.query.iDisplayStart)
-    iSortingCols = int(request.query.iSortingCols)
-    sOrder = ""
-    if iSortingCols:
-        sOrder = "ORDER BY"
-        col = int(request.query['iSortCol_0'])
-        sOrder += " %s " % columns[col]  
-        sOrder += "ASC" if request.query['sSortDir_0']=="asc" else "DESC"
-        if sOrder == "ORDER BY":
-            sOrder = ""
-    iSearch = request.query.sSearch
-    sWhere = ""
-    if iSearch and iSearch!="":
-        sWhere = "AND (guide_chan.g_name LIKE '%" + iSearch + "%' OR guide.g_title LIKE '%" + iSearch + "%' OR guide.g_desc LIKE '%" + iSearch + "%')" 
-        
-    query = "SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s %s %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere, sOrder, sLimit)
-    countquery = "SELECT COUNT(guide.g_start) FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere)
+    retlist = []
     totalrows = 0
-    count = sqlRun(countquery)
-    if count:
-        totalrows = count[0][0]
-    
-    l = []
-    rows=sqlRun(query)
+    if sEcho: # Server-side processing
+        columns = ['guide_chan.g_name', 'guide.g_title', 'guide.g_desc', 'guide.g_start', 'guide.g_stop']
+        sLimit = "LIMIT %s OFFSET %s" % (request.query.iDisplayLength, request.query.iDisplayStart)
+        iSortingCols = int(request.query.iSortingCols)
+        sOrder = ""
+        if iSortingCols:
+            sOrder = "ORDER BY"
+            col = int(request.query['iSortCol_0'])
+            sOrder += " %s " % columns[col]  
+            sOrder += "ASC" if request.query['sSortDir_0']=="asc" else "DESC"
+            if sOrder == "ORDER BY":
+                sOrder = ""
+        iSearch = request.query.sSearch
+        sWhere = ""
+        if iSearch and iSearch!="":
+            sWhere = "AND (guide_chan.g_name LIKE '%" + iSearch + "%' OR guide.g_title LIKE '%" + iSearch + "%' OR guide.g_desc LIKE '%" + iSearch + "%')" 
+            
+        query = "SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s %s %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere, sOrder, sLimit)
+        countquery = "SELECT COUNT(guide.g_start) FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere)
+        count = sqlRun(countquery)
+        if count:
+            totalrows = count[0][0]
+        
+        rows=sqlRun(query)
+    else: # Client-side processing
+        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg))    
+
     for row in rows:
-        l.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], ""])
+        retlist.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], ""])
     return json.dumps(
-                      {"aaData": l, 
+                      {"aaData": retlist, 
                        "sEcho": sEcho,
                        "iTotalRecords": totalrows,
                        "iTotalDisplayRecords": totalrows 
-                       } )    
+                       } )
 
 #------------------------------- Record List -------------------------------
 

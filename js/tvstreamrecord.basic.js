@@ -762,34 +762,38 @@ $(function() {
         }
     });
 
-    $('#epglist').dataTable({
-        "bJQueryUI": true,
-        "sPaginationType": "full_numbers",
-        "bProcessing": true,
-        "sAjaxSource": "/epglist_getter",
-        "fnDrawCallback": function( oSettings ) {
-            initIcons();
-        },
-        "bServerSide": true,
-        "bStateSave": true,
-        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-        	var dat_v = aData[3].split(" "); 
-        	var dat_b = aData[4].split(" "); 
-	        aData[7]="<b>"+aData[1]+": "+dat_v[1] + " - " + dat_b[1] + "</b><BR><BR>"+aData[2];
-			var myday = $.datepicker.parseDate('yy-mm-dd', dat_v[0]);
-			$('td:eq(3)', nRow).html($.datepicker.formatDate('dd.mm.yy', myday)+" "+dat_v[1]);			
-			myday = $.datepicker.parseDate('yy-mm-dd', dat_b[0]);
-			$('td:eq(4)', nRow).html($.datepicker.formatDate('dd.mm.yy', myday)+" "+dat_b[1]);
-			
-            $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
-        }/*,
-        "fnInitComplete": function(oSettings, json) {
-        	//console.log(oSettings);
-            //this.fnSettings()._iDisplayLength=json.iDisplayLength;
-            //$('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
-            //this.fnSort([ [3,'asc'] ]);
-        }*/
-    });
+    if (here("epglist")) {
+    	var serverSide = ($("#listmode").attr("value") == "1");  
+
+	    $('#epglist').dataTable({
+	        "bJQueryUI": true,
+	        "sPaginationType": "full_numbers",
+	        "bProcessing": true,
+	        "sAjaxSource": "/epglist_getter",
+	        "fnDrawCallback": function( oSettings ) {
+	            initIcons();
+	        },
+	        "bServerSide": serverSide,
+	        "bStateSave": true,
+	        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+	        	var dat_v = aData[3].split(" "); 
+	        	var dat_b = aData[4].split(" "); 
+		        aData[7]="<b>"+aData[1]+": "+dat_v[1] + " - " + dat_b[1] + "</b><BR><BR>"+aData[2];
+				var myday = $.datepicker.parseDate('yy-mm-dd', dat_v[0]);
+				$('td:eq(3)', nRow).html($.datepicker.formatDate('dd.mm.yy', myday)+" "+dat_v[1]);			
+				myday = $.datepicker.parseDate('yy-mm-dd', dat_b[0]);
+				$('td:eq(4)', nRow).html($.datepicker.formatDate('dd.mm.yy', myday)+" "+dat_b[1]);
+				
+	            $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
+	        }/*,
+	        "fnInitComplete": function(oSettings, json) {
+	        	//console.log(oSettings);
+	            //this.fnSettings()._iDisplayLength=json.iDisplayLength;
+	            //$('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
+	            //this.fnSort([ [3,'asc'] ]);
+	        }*/
+	    });
+	}
 
     
      $('#recordlist').dataTable({
@@ -850,6 +854,7 @@ $(function() {
     	$("#cfg_purgedelta,#cfg_delta_for_epg,#cfg_grab_max_duration").spinner();
 	    $("#cfg_grab_zoom").spinner( { step: 0.1 } );
 	    
+    	$("#cfg_switch_epglist_mode").slickswitch();
     	$("#cfg_switch_xmltv_auto").slickswitch();
     	$("#cfg_switch_grab_auto").slickswitch();
    	

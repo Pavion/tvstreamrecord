@@ -7,6 +7,7 @@
 %else:
 <button id="grabepgstop">Stop loading EPG (State: {{grabstate[1]}}/{{grabstate[2]}})</button>
 %end
+<div id="listmode" value="{{listmode}}"></div>
 </h1>
 <table id="epglist">
 <thead>

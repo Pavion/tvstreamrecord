@@ -104,6 +104,12 @@ configuration = [
 'cfg_switch_grab_auto',
 "Automatic stream scan / grab (default off')",
 '0'
+],
+
+[
+'cfg_switch_epglist_mode',
+"EPG list mode",
+'0'
 ]
 
 ]

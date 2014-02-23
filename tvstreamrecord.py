@@ -250,34 +250,36 @@ def upload_p():
     print "M3U upload parsing started"
     retl = []
     upfile = request.files.upfile
-    header = upfile.file.read(7)
-    if header.startswith("#EXTM3U"):
-        how = getBool(request.forms.get("switch00"))
-        upfilecontent = upfile.file.read()        
-        rowid = 1
-        if how==0:
-            sqlRun('DELETE FROM channels')
-            sqlRun('DELETE FROM records')
-            setRecords()
-        else:
-            rows2 = sqlRun("select max(cid) from channels")
-            if rows2 and not rows2[0][0] is None:
-                rowid = rows2[0][0]+1
-            
-        lines = upfilecontent.splitlines()
-        i = 0
-        name = ""
-        for line in lines:
-            if not line[0:10] == "#EXTVLCOPT":
-                i = i + 1
-                if i>1:
-                    if i % 2 == 0: 
+    if not upfile:
+        print "No file specified, please try again"
+    else:    
+        header = upfile.file.read(7)
+        if header.startswith("#EXTM3U"):
+            how = getBool(request.forms.get("switch03"))
+            upfilecontent = upfile.file.read()        
+            rowid = 1
+            if how==0:
+                sqlRun('DELETE FROM channels')
+                sqlRun('DELETE FROM records')
+                setRecords()
+            else:
+                rows2 = sqlRun("select max(cid) from channels")
+                if rows2 and not rows2[0][0] is None:
+                    rowid = rows2[0][0]+1
+                
+            lines = upfilecontent.splitlines()
+            i = 0
+            name = ""
+            for line in lines:
+                if not line[0:10] == "#EXTVLCOPT" and line!="":
+                    i = i + 1
+                    if i % 2 == 1: 
                         name = line.split(",",1)[1]
-                    if i % 2 == 1:
+                    if i % 2 == 0:
                         retl.append([name, line, rowid])
                         rowid = rowid + 1 
                         name = ""
-        sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?, 0)", retl, 1)             
+            sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?, 0)", retl, 1)             
             
     redirect("/list") 
 

@@ -109,3 +109,5 @@ th.econtrol { width: 30px; }
 
 [id^=wwd] { width: 13.3%; }
 [id^=wwd].ui-state-active { background: #accccc; }
+
+#epglist_processing {background: #accccc;}

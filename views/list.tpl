@@ -57,7 +57,7 @@
 <label for="filenamelabel">.m3u file name</label>
 <input type="file" id="upfile" width="80%" class="text ui-widget-content ui-corner-all" name="upfile" value=""/> 
 <label for="append" id="append">Append to existing channels:</label>
-<input type="checkbox" class="switch icons" id="switch00" name="switch00" />  
+<input type="checkbox" class="switch icons" name="switch03" id="switch03" />  
 </fieldset>
 </form>
 </div>

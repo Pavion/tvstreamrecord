@@ -36,6 +36,7 @@ You shouldn't need any special permissions.</p></li>
 <i>Maximal EPG scan duration <b>per channel</b> in seconds</i>. Some channels resend all their EPG information each minute, some channels have much longer cycles. Increasing duration can result in receiving more guide information.<br /> 
 <i>Time to perform daily EPG/XMLTV grab</i> can be used to automatically refresh your EPG guide using your streams and/or your XMLTV provider. Please read the corresponding sections for more details.<br />
 <i>Zoom level for EPG view</i>. You can change your default EPG view here. Enter negative values for vertical and positive values for default horizontal view (i.e. 2=200% horizontal, -3=300% vertical). Default is '1' for classic horizontal one-page view.<br /> 
+<i>EPG list mode</i>. Disabled for classic client side processing with greater network load, enabled for server side processing with greater server load but lesser traffic.<br /> 
 <i>Delete/reset all EPG data</i> should be used to clear your database in case of EPG issues <br />
 <b>FFMPEG support tab</b><br />
 <i>Stream types</i> would be forwarded to ffmpeg. If your stream can be recorded with, you can add its prefix here.<br />

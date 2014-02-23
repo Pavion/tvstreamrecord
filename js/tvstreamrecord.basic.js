@@ -200,6 +200,7 @@ $(function() {
     $( "#switch00").slickswitch();
     $( "#switch01").slickswitch();
     $( "#switch02").slickswitch();
+    $( "#switch03").slickswitch();
 
     $( "#dialog" ).dialog({
         autoOpen: false,

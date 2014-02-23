@@ -4,8 +4,16 @@
 <p><b>Tvstreamrecord v.{{ver}}</b></p>
 
 <p><b>Quick guide</b></p>
-
 <ol>
+<li><p><b>What's new in {{ver}}?</b></p>
+<ul>
+<li>TVxb support (XMLTV format)</li>
+<li>Automatic XMLTV import option implemented</li>
+<li>Structured config page with built-in plausibility control</li>
+<li>Disable channels from EPG chart</li>
+<li>Switch between client and server sided EPG list for besser compatibility</li>
+</ul>
+</li>
 <li><p><b>Introduction</b></p>
 <p>This software was designed to record http streams (TV and such). My goal was to be able to record streams from Elgato EyeTV Netstream with my NAS server so it's the primary objective of this software. Please note, that this software can't be used to record any videos from USB-based devices. A simply stream would be http://streamadress/stream000000 and will be recorded or grabbed as is. </p>
 <p>As reported, streams from Dreambox (800 HD) can also be used. Its stream URL should be like this: <br /><i>http://192.168.0.10:8001/1:0:1:6DCA:44D:1:C00000:0:0:0:</i></p>

@@ -1,5 +1,8 @@
-2014-02-xx 0.5.8 TVxb support
+2014-02-23 0.5.8 TVxb support
 				 Structured config page with built-in plausibility control
+				 Disable channels from EPG chart
+				 Switch between client and server sided EPG list for besser compatibility
+				 Automatic XMLTV import implemented
 
 2014-02-01 0.5.7 Table length will be saved
                  Plausibility check for server port and bind address added

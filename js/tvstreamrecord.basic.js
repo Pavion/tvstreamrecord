@@ -90,7 +90,7 @@ function initProgressbar() {
 }
 
 function initIcons() {
-    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsERec-]" ).hover(
+    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsERec-], [id^=iconsDisable-]" ).hover(
         function() {
             $( this ).addClass( "ui-state-hover" );
         },
@@ -98,6 +98,12 @@ function initIcons() {
             $( this ).removeClass( "ui-state-hover" );
         }
     );
+
+    $( "[id^=iconsDisable-]" ).click(function( event ) {
+        dialognr = parseInt($(this).attr('id').replace("iconsDisable-",""));
+        $( "#dialog_channel_disable" ).dialog( "open" );
+        event.preventDefault();
+    });
 
     $( "[id^=iconsEPG-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("iconsEPG-",""));
@@ -141,8 +147,6 @@ function initIcons() {
 
     $( "[id^=icons-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("icons-",""));
-//        var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
-//        if (postto.slice(0,8) == "/records") {
         if (here("records")) {
             $( "#dialog-form" ).dialog( "open" );
         } else {
@@ -156,7 +160,6 @@ function initIcons() {
 function initSwitch() {
     $('[id^=switch-]').each(function() {
         var switchnr = parseInt($(this).attr('id').replace("switch-",""));
-//        var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
         $(this).slickswitch({
             toggledOn: function() {
                 post(where(), { myid:switchnr, what:"1" }, 0);
@@ -201,6 +204,27 @@ $(function() {
     $( "#switch01").slickswitch();
     $( "#switch02").slickswitch();
     $( "#switch03").slickswitch();
+
+    $( "#dialog_channel_disable" ).dialog({
+        autoOpen: false,
+        width: 300,
+        buttons: [
+            {
+                text: "Disable",
+                click: function() {
+	                post("list", { myid:dialognr, what:"0" }, 1);
+                    $( this ).dialog( "close" );
+                }
+            },
+            {
+                text: "Cancel",
+                click: function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+        ]
+    });
+
 
     $( "#dialog" ).dialog({
         autoOpen: false,
@@ -762,6 +786,10 @@ $(function() {
             this.fnDraw();
         }
     });
+    
+    if (here("epg")) {
+    	initIcons();
+    }
 
     if (here("epglist")) {
     	var serverSide = ($("#listmode").attr("value") == "1");  

@@ -33,14 +33,15 @@
 
     [id^=iconsEPG-], [id^=iconsRec-] , [id^=iconsERec-]   {cursor: default; clear: none;}  
     
-    [id^=icons-] span.ui-icon, [id^=iconsEPG-] span.ui-icon {
+    [id^=icons-] span.ui-icon  {
         float: left;
         margin: -2px -2px;
     }
     
-    [id^=iconsRec-] span.ui-icon, [id^=iconsERec-]  span.ui-icon {
+    [id^=iconsRec-] span.ui-icon, [id^=iconsERec-]  span.ui-icon, [id^=iconsEPG-] span.ui-icon, [id^=iconsDisable-] span.ui-icon {
         float: left;
-        margin: -1px -1px;
+        margin-top: -1px;
+        margin-left: -1px;
     }
     
     .fakewindowcontain .ui-widget-overlay {
@@ -111,3 +112,9 @@ th.econtrol { width: 30px; }
 [id^=wwd].ui-state-active { background: #accccc; }
 
 #epglist_processing {background: #accccc;}
+
+[id^=iconsDisable] { 
+    float:left; 
+    margin-top: 0px;
+    margin-right: 8px; 
+}

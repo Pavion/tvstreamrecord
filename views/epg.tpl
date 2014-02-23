@@ -20,10 +20,13 @@
 %for rows in rowss:
 %if len(rows)>0:
 %if rows[0][0] == -1:
-<div id="epg_cname" cnt="{{cnt}}"></div>
+<div id="epg_cname" cnt="{{cnt}}">
 %else:
-<div id="epg_cname" cnt="{{cnt}}"><h1><b><a href="live/{{rows[0][0]}}.m3u">{{rows[0][7]}}</a></b></h1></div>
+<div id="epg_cname" cnt="{{cnt}}"><h1><b><a href="live/{{rows[0][0]}}.m3u">{{rows[0][7]}}</a></b>
+<label title="Disable channel" id="iconsDisable-{{rows[0][0]}}" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-close"></span></label>
+</h1>
 %end
+</div>
 <div id="selectable">
 %for row in rows:
 <div class="ui-state-default" id="event" cnt="{{cnt}}" x="{{row[1]}}" width="{{row[2]}}" cid="{{row[0]}}" rid="{{row[6]}}" fulltext="{{row[5]}}" recording="{{row[8]}}" title="{{row[4]}}">{{row[3]}}</div>
@@ -38,6 +41,8 @@
 <form method='POST' enctype='multipart/form-data' action='/createepg' name='returnform'>
 <input type="text" style="display: none;" name="ret" id="ret" value="X"/>
 </form>
-
+<div id="dialog_channel_disable" title="Channel disable">
+	<p>Do you want to disable this channel? You can enable it again at the channel list page.</p>
+</div>
 %include footer
 

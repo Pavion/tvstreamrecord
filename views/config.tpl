@@ -3,7 +3,9 @@
 <div id="users-contain" class="ui-widget">
 <h1>Configuration:
 <button id="submit_cfg">Submit changes</button>
+<div id="label_config_saved"></div>
 </h1>
+
 <!--<form method='POST' enctype='multipart/form-data' action='/config' name='submit_cfg_form'>-->
 <!--<table id="clist">  -->
 

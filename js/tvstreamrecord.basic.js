@@ -932,6 +932,7 @@ $(function() {
             if (!myalert) {            	
                 var my_config_data_str = JSON.stringify(my_config_data);
                 post("/config", {configdata:my_config_data_str}, 0);
+                $("#label_config_saved").text("Configuration saved!");
             }            
         });
 

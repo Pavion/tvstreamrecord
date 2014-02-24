@@ -118,3 +118,6 @@ th.econtrol { width: 30px; }
     margin-top: 0px;
     margin-right: 8px; 
 }
+
+#label_config_saved { float: right;  margin-top: 5px; }
+

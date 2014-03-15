@@ -687,21 +687,27 @@ class record(threading.Thread):
         ffargs = config.cfg_ffmpeg_params
         ffargs = ffargs.split()
         if streamtype in fftypes: 
-            if (os.name == "posix"):
-                devnull = open('/dev/null', 'w')
-            elif (os.name == 'nt'):
-                devnull = open('nul', 'w')                               
             delta = self.bis - datetime.now()
             deltasec = '%d' % delta.total_seconds()
-            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-t', deltasec] + ffargs + [fn] 
+            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'error', '-t', deltasec] + ffargs + [fn] 
             print "FFMPEG (%s) record '%s' called with:" % (streamtype, self.name)
             print attr
-            try:
-                self.process = subprocess.Popen(attr, stdout=devnull, stderr=devnull)
-                self.process.wait()
+#            try:
+            self.process = subprocess.Popen(attr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            out, err = self.process.communicate()
+            self.process.wait()
+            #errpos = 0
+            if err:
+                print "FFMPEG record '%s' ended with an error:\n%s" % (self.name, err)
+            else:
                 print "FFMPEG record '%s' ended" % self.name
-            except:
-                print "FFMPEG could not be started"
+#                    errpos = err.lower().rfind("error")
+#                    if errpos > 0:
+#                        i = err.rfind("\n", 0, errpos)+1
+#                print err#[i:]
+#            print "FFMPEG record '%s' ended%" % (self.name, (" with an error:%s\n" % err) if err else "")
+#            except:
+#                print "FFMPEG could not be started"
         else:        
             block_sz = 8192
             print "Record: '%s' started" % (self.name)

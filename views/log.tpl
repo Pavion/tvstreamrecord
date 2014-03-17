@@ -1,4 +1,4 @@
-%include header 
+%include header style=curstyle, version=version
 
 <div id="users-contain" class="ui-widget">
 <h1>Log:

@@ -1,63 +1,96 @@
-    body{
-        margin:0; 
-        font: 62.5% "Trebuchet MS", sans-serif;
-        padding: 20px;
-    }
+body {
+    margin:0px; 
+    font: 82.5% "Trebuchet MS", sans-serif;
+}
 
-    div#mybody {
-        min-width:500px;
-        background:#F4F7FB;
-        font-size:93%;
-        line-height:normal;
-        border-bottom:1px solid #BCD2E6;
-        padding: 20px;
-    }
+#menus {
+    min-width:750px;
+    left: 20px;
+    right: 20px;
+    font-size:130%;
+}
 
-    div#about {
-        font-size:150%;
-        padding: 20px 20px 20px 20px;        
-    }
-
-    .demoHeaders {
-        margin-top: 2em;
-    }
-
-    [id^=icons-], [id^=iconsEPG-], [id^=iconsRec-] , [id^=iconsERec-]  {
-        position: relative;
-        cursor: pointer;
-        float: left;
-        height: 14px;
-        width: 14px;
-        margin-left: 7px;
-    }
-
-    [id^=iconsEPG-], [id^=iconsRec-] , [id^=iconsERec-]   {cursor: default; clear: none;}  
+#tabs {
+    float:left;
+}
     
-    [id^=icons-] span.ui-icon  {
-        float: left;
-        margin: -2px -2px;
-    }
+#tabs ul {
+    margin:0px;
+    list-style:none;
+}
+
+#tabs li, #tabs a  {
+    display:inline;
+    cursor:pointer; 
+}
+
+#logo {
+    z-index: 1;
+    float:right;
+    clear:both;
+}
+
+div#mybody {
+    min-width:500px;
+    font-size:93%;
+    line-height:normal;
+    border-bottom:1px solid #BCD2E6;
+    padding: 20px 20px 0px 20px; 
+}
+
+div#about {
+    font-size:140%;
+    padding-top: 30px;        
+}
+
+
+[id^=icons-], [id^=iconsEPG-], [id^=iconsRec-] , [id^=iconsERec-]  {
+    position: relative;
+    cursor: pointer;
+    float: left;
+    height: 14px;
+    width: 14px;
+    margin-left: 7px;
+}
+
+[id^=iconsEPG-], [id^=iconsRec-] , [id^=iconsERec-]   {
+    cursor: default; 
+    clear: none;
+}  
     
-    [id^=iconsRec-] span.ui-icon, [id^=iconsERec-]  span.ui-icon, [id^=iconsEPG-] span.ui-icon, [id^=iconsDisable-] span.ui-icon {
-        float: left;
-        margin-top: -1px;
-        margin-left: -1px;
-    }
+[id^=icons-] span.ui-icon  {
+    float: left;
+    margin: -2px -2px;
+}
     
-    .fakewindowcontain .ui-widget-overlay {
-        position: absolute;
-    }
+[id^=iconsRec-] span.ui-icon, [id^=iconsERec-]  span.ui-icon, [id^=iconsEPG-] span.ui-icon, [id^=iconsDisable-] span.ui-icon {
+    float: left;
+    margin-top: -1px;
+    margin-left: -1px;
+}
+
+.fakewindowcontain .ui-widget-overlay {
+    position: absolute;
+}
     
 label,option { display:block;}
-input#ret, select#channel { display:block;}
 label {clear:both; }
+
+input#ret, select#channel { display:block;}
 input.text { margin-bottom:8px; width:95%; padding: .2em; }
 input.file { margin-bottom:118px; width:95%; padding: .2em; }
 fieldset { padding:0; border:0; margin-top:15px; }
-h1 { font-size: 1.2em; margin: .6em 0; }
+h1 {
+    font-size: 1.2em; 
+    margin-top: 44px; 
+    float: none;
+    left: 0px;
+}
 div#users-contain { margin: 20px 0px; }
 div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
-div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
+div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left;  }
+[id^=configtabs-] table th { width: 50%; }
+
 .ui-dialog .ui-state-error { padding: .3em; }
 .validateTips { border: 1px solid transparent; padding: 0.3em; }
 #timepicker_inline_div1 { width:45%; float:left; }
@@ -97,21 +130,12 @@ th.lout { width: 30px; }
 
 th.echan { width: 150px; }
 th.etit{ width: 200px; }
-th.estart { width: 150px; }
-th.estop { width: 150px; }
+th.estart { width: 200px; }
+th.estop { width: 200px; }
 th.econtrol { width: 30px; }
-
-#logo {
-    position:absolute;
-    top: 5px;    
-    right: 40px;    
-    z-index: 1;
-}
 
 [id^=wwd] { width: 13.3%; }
 [id^=wwd].ui-state-active { background: #accccc; }
-
-#epglist_processing {background: #accccc;}
 
 [id^=iconsDisable] { 
     float:left; 
@@ -121,3 +145,18 @@ th.econtrol { width: 30px; }
 
 #label_config_saved { float: right;  margin-top: 5px; }
 
+/* blue table style */
+/*
+table.dataTable tr.odd { background-color: #E2E4FF; }
+table.dataTable tr.even { background-color: white; }
+table.dataTable tr.odd td.sorting_1 { background-color: #D3D6FF; }
+table.dataTable tr.even td.sorting_1 { background-color: #EAEBFF; }
+*/
+
+/* green table style */
+
+table.dataTable tr.odd { background-color: #ddffdd; }
+table.dataTable tr.even { background-color: #eeffee; }
+table.dataTable tr.odd td.sorting_1 { background-color: #C4FFC4; }
+table.dataTable tr.even td.sorting_1 { background-color: #D5FFD5; }
+table.dataTable { color:black; }

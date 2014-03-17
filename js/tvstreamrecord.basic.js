@@ -189,9 +189,23 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+function paintTable() {
+    /*$("tr:even").css("background-color", $("table.dataTable thead th").css("background-color") );
+    $("tr:odd").css("background-color", $(".ui-tabs").css("background-color") );*/
+}
+
 
 $(function() {
     $(document).tooltip();
+    
+    var menu = new Array("/records","/list","/epg","/epglist","/config","/log","/about");
+    if (where()=="/") $("#menu-6").addClass('ui-tabs-active ui-state-active');
+    for (var m = 0; m < menu.length; m ++) {
+    	if (where()==menu[m]) {	    	
+    		$("#menu-" + m.toString()).addClass('ui-tabs-active ui-state-active');
+    		break; 
+    	} 
+    }
 
     var pickerform = "dd.mm.yy";
 
@@ -270,7 +284,6 @@ $(function() {
             {
                 text: "OK",
                 click: function() {
-//                    var postto = window.location.href.slice(window.location.href.lastIndexOf("/"));
                     post(where(), { myid:'-1', what:"-2" }, 1);
                     $( this ).dialog( "close" );
                 }
@@ -307,7 +320,7 @@ $(function() {
         values: [ 17, 67 ]
     });
 
-    var selcount = 0;
+    //var selcount = 0;
 
     var zoom = +$("#zoom").attr('zoom');
     if (zoom==0) zoom=1;
@@ -402,7 +415,7 @@ $(function() {
     });
 
 
-    var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" ).add("#cname").add("#ccid").add("#cpath");
+var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" ).add("#cname").add("#ccid").add("#cpath");
 
     $( "#dialog-form" ).dialog({
         autoOpen: false,
@@ -489,9 +502,8 @@ $(function() {
                             var kids = $("#channel").children();
                             for (var j=0;j<kids.length;j++) {
                             	if (kids[j].innerHTML==data[i][1].replace(/<(?:.|\n)*?>/gm, '')) {
-
-									$("#channel").val(kids[j].value);
-                            		break;
+                                    $("#channel").val(kids[j].value);
+                                    break;
                             	}	
                             }
 
@@ -769,9 +781,12 @@ $(function() {
         "sPaginationType": "full_numbers",
         "bProcessing": true,
         "sAjaxSource": "/channellist",
+        "bStateSave": true,
+        "iCookieDuration": 365*60*60*24,
         "fnDrawCallback": function( oSettings ) {
             initSwitch();
             initIcons();
+            paintTable();
         },
     	"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
             var data4 = "";
@@ -779,12 +794,12 @@ $(function() {
             var chk = "";
             if (aData[5] == 1) chk = 'checked="checked"';
             $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-'+data4+'"></span></label><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
-       },
+        }/*,
         "fnInitComplete": function(oSettings, json) {
             this.fnSettings()._iDisplayLength=json.iDisplayLength;
             $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
             this.fnDraw();
-        }
+        }*/
     });
     
     if (here("epg")) {
@@ -801,9 +816,11 @@ $(function() {
 	        "sAjaxSource": "/epglist_getter",
 	        "fnDrawCallback": function( oSettings ) {
 	            initIcons();
+	            paintTable();
 	        },
 	        "bServerSide": serverSide,
 	        "bStateSave": true,
+                "iCookieDuration": 365*60*60*24,
 	        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
 	        	var dat_v = aData[3].split(" "); 
 	        	var dat_b = aData[4].split(" "); 
@@ -814,7 +831,8 @@ $(function() {
 				$('td:eq(4)', nRow).html($.datepicker.formatDate('dd.mm.yy', myday)+" "+dat_b[1]);
 				
 	            $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
-	        }/*,
+	        }//,
+			/*,
 	        "fnInitComplete": function(oSettings, json) {
 	        	//console.log(oSettings);
 	            //this.fnSettings()._iDisplayLength=json.iDisplayLength;
@@ -831,6 +849,8 @@ $(function() {
         "bProcessing": true,
         "bAutoWidth": false,
         "sAjaxSource": "/getrecordlist",
+        "bStateSave": true,
+        "iCookieDuration": 365*60*60*24,
         "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 6,7,8,9 ] },
                           { "iDataSort": 8, "aTargets": [ 2 ] },
                           { "iDataSort": 9, "aTargets": [ 3 ] } ],
@@ -838,7 +858,7 @@ $(function() {
             initSwitch();
             initIcons();
             initProgressbar();
-
+            paintTable();
         },
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
             var chk = "";
@@ -847,12 +867,12 @@ $(function() {
             htmltext += '<input type="checkbox" class="switch icons" id="switch-' + aData[7] + '" ' + chk + ' />';
             htmltext += '<a href="#" id="icons-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>';
             $('td:eq(5)', nRow).html(htmltext);
-        },
+        }/*,
         "fnInitComplete": function(oSettings, json) {
             this.fnSettings()._iDisplayLength=json.iDisplayLength;
             $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
             this.fnSort([ [2,'desc'] ]);
-        }
+        }*/
 
     });
 
@@ -861,40 +881,45 @@ $(function() {
         "sPaginationType": "full_numbers",
         "bProcessing": true,
         "sAjaxSource": "/logget",
-        "fnInitComplete": function(oSettings, json) {
+        "bStateSave": true,
+        "iCookieDuration": 365*60*60*24,
+        /*"fnInitComplete": function(oSettings, json) {
             this.fnSettings()._iDisplayLength=json.iDisplayLength;
             $('select', oSettings.aanFeatures.l).val( json.iDisplayLength );
             this.fnSort([ [0,'desc'] ]);
+        },*/
+        "fnDrawCallback": function( oSettings ) {
+            paintTable()
         }
     });
 
-	$('#epglist_length,#recordlist_length,#clist_length,#loglist_length').change( function() {
+	/*$('#epglist_length,#recordlist_length,#clist_length,#loglist_length').change( function() {
 	    var thisid = this.id.replace("_length","");
 	    var lengthVal = $('#' + thisid + '').dataTable().fnSettings()._iDisplayLength;
         post('/savetable', { myid:thisid, mylen:lengthVal }, 0);
-	} );
+	} );*/
 
     
     
     if (here("config")) {
-	    $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
-		$( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
+        $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
+	$( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
     	$("#cfg_purgedelta,#cfg_delta_for_epg,#cfg_grab_max_duration").spinner();
-	    $("#cfg_grab_zoom").spinner( { step: 0.1 } );
+        $("#cfg_grab_zoom").spinner( { step: 0.1 } );
 	    
     	$("#cfg_switch_epglist_mode").slickswitch();
     	$("#cfg_switch_xmltv_auto").slickswitch();
     	$("#cfg_switch_grab_auto").slickswitch();
-   	
+        
         $.get( "/getconfig", function( data )  {
             var p = new Function('return ' + data + ';')();
             var data = p.configdata;
             for (var i = 0; i < data.length; i++) {
             	if (data[i][0].startsWith('cfg_switch')) {
-            		switchMe( "#" + data[i][0], data[i][2]=='1');
+                    switchMe( "#" + data[i][0], data[i][2]=='1');
             	} else {            			
-            		$("#" + data[i][0]).val(data[i][2]);
+                    $("#" + data[i][0]).val(data[i][2]);
             	}
             }
         });
@@ -925,14 +950,14 @@ $(function() {
                 } else if ($(this).attr('id').startsWith('cfg_switch')) {
                 	value = ($(this).attr('checked')=="checked") ? "1" : "0";  
                 }
-                
-                
+                               
                 if(value != "null") my_config_data.push(new Array($(this).attr('id'), value));
             });
+            
             if (!myalert) {            	
                 var my_config_data_str = JSON.stringify(my_config_data);
-                post("/config", {configdata:my_config_data_str}, 0);
-                $("#label_config_saved").text("Configuration saved!");
+                post("/config", {configdata:my_config_data_str}, 1);                
+                $("#label_config_saved").text("Saving configuration...");
             }            
         });
 

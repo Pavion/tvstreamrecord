@@ -1,5 +1,5 @@
 log.txt
-settings.db
+settings*.db*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -48,3 +48,4 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/channels.m3u
+/nbproject/

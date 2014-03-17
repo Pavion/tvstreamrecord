@@ -30,7 +30,8 @@ import xmltv
 import json
 import urllib2
 import threading 
-import os, sys
+import os
+import sys
 from mylogging import logInit, logRenew, logStop
 
 records = []    
@@ -38,7 +39,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.5.8' 
+version = '0.6.0' 
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -61,15 +62,20 @@ def server_static7():
 @route('/js/<filename>')
 def server_static1(filename):
     return static_file(filename, root='./js')
-@route('/css/smoothness/<filename>')
-def server_static2(filename):
-    return static_file(filename, root='./css/smoothness')
+
+#curstyle = "Aristo";
+
+
+@route('/css/<curstyle>/<filename>')
+def server_static2(curstyle,filename):
+    return static_file(filename, root='./css/'+curstyle)
+@route('/css/<curstyle>/images/<filename>')
+def server_static4(curstyle,filename):
+    return static_file(filename, root='./css/'+curstyle+'/images')
+
 @route('/css/<filename>')
 def server_static3(filename):
     return static_file(filename, root='./css')
-@route('/css/smoothness/images/<filename>')
-def server_static4(filename):
-    return static_file(filename, root='./css/smoothness/images')
 @route('/images/<filename>')
 def server_static5(filename):
     return static_file(filename, root='./images')
@@ -87,26 +93,26 @@ def getWeekdays(i):
 
 #--------------------------------- Common --------------------------------
 
-@post('/savetable')
-def savetable():
-    myid = request.forms.get("myid")
-    mylen = request.forms.get("mylen")
-    sqlRun("INSERT OR REPLACE INTO config VALUES (?, '', ?)",['table_'+myid,mylen])
-    return
-
-def getListLength(myid):
-    mylen = 10
-    row = sqlRun("SELECT value FROM config WHERE param='table_%s'" % myid)
-    if row:
-        mylen = row[0][0]
-    return mylen
+#@post('/savetable')
+#def savetable():
+#    myid = request.forms.get("myid")
+#    mylen = request.forms.get("mylen")
+#    sqlRun("INSERT OR REPLACE INTO config VALUES (?, '', ?)",['table_'+myid,mylen])
+#    return
+#
+#def getListLength(myid):
+#    mylen = 10
+#    row = sqlRun("SELECT value FROM config WHERE param='table_%s'" % myid)
+#    if row:
+#        mylen = row[0][0]
+#    return mylen
 
 #------------------------------- Main menu -------------------------------
 
 @route('/')
 @route('/about')
 def about_s():    
-    return template('about', ver = version)
+    return template('about', curstyle=config.cfg_theme, version=version)
 
 #------------------------------- Logging -------------------------------
         
@@ -123,7 +129,7 @@ def log_reset():
 
 @route('/log')
 def log_s():
-    return template('log')
+    return template('log', curstyle=config.cfg_theme, version=version)
 
 @route('/logget')
 def log_get():
@@ -133,7 +139,7 @@ def log_get():
         if len(lline)>24:
             l.append([ lline[0:19], lline[20:23], lline[24:] ])
     lfile.close()    
-    return json.dumps({"aaData": l, "iDisplayLength": getListLength('loglist') } )
+    return json.dumps( {"aaData": l } )
 
 #------------------------------- Channel List -------------------------------
 
@@ -144,11 +150,11 @@ def chanlist():
     for row in rows:
         m3u = "<a href=\"live/" + str(row[0]) + ".m3u\">" + row[1] + "</a>"
         l.append([row[0], m3u, row[2], row[3], row[4], row[5]])
-    return json.dumps({"aaData": l, "iDisplayLength": getListLength('clist') } )
+    return json.dumps({"aaData": l } )
 
 @route('/list')
 def list_s():
-    return template('list',rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'))
+    return template('list',rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'),curstyle=config.cfg_theme, version=version)
     
 @post('/list')
 def list_p():
@@ -167,7 +173,7 @@ def list_p():
 
 @post('/clgen')
 def clgen_p():
-    rows  = sqlRun("select cid, cname, cpath from channels where cenabled=1 ORDER BY cid")
+    rows = sqlRun("select cid, cname, cpath from channels where cenabled=1 ORDER BY cid")
     if rows:
         f = open("channels.m3u", "w")
         f.write("#EXTM3U\n")
@@ -294,7 +300,14 @@ def config_p():
 
 @route('/config')
 def config_s():    
-    return template('config')
+    themes = list()
+    for theme in os.listdir("css"):
+        if os.path.isdir("css/"+theme) == True:            
+            for css in os.listdir("css/"+theme+"/"):
+                if css.endswith(".css"):
+                    themes.append([theme+'/'+css,theme])
+                    break
+    return template('config', curstyle=config.cfg_theme, version=version, themes=themes)
 
 @route('/getconfig')
 def getconfig():
@@ -508,11 +521,11 @@ def epg_s():
                 rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], title, fulltext, event[4], row[2], event[5]])
                 #print event[5]
         ret.append(rtemp)
-    return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret, grabstate=grabthread.getState(), zoom=config.cfg_grab_zoom)            
+    return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret, grabstate=grabthread.getState(), zoom=config.cfg_grab_zoom, curstyle=config.cfg_theme, version=version)            
 
 @route('/epglist')
 def epglist_s():    
-    return template('epglist', grabstate=grabthread.getState(), listmode=config.cfg_switch_epglist_mode)
+    return template('epglist', grabstate=grabthread.getState(), listmode=config.cfg_switch_epglist_mode, curstyle=config.cfg_theme, version=version)
     
 @route('/epglist_getter')
 def epglist_getter():
@@ -572,11 +585,11 @@ def getrecordlist():
                     rec += weekdays[index]
         m3u = "<a href=\"live/" + str(row[10]) + ".m3u\">" + row[1] + "</a>"
         l.append([row[0], m3u, row[2], row[3], rec, row[5], row[6], row[7], row[8], row[9]])
-    return json.dumps({"aaData": l, "iDisplayLength": getListLength('recordlist')} )
+    return json.dumps({"aaData": l} )
 
 @route('/records')
 def records_s():    
-    return template('records', rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'))
+    return template('records', rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), curstyle=config.cfg_theme, version=version)
 
 @post('/records')
 def records_p():
@@ -692,22 +705,22 @@ class record(threading.Thread):
             attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'error', '-t', deltasec] + ffargs + [fn] 
             print "FFMPEG (%s) record '%s' called with:" % (streamtype, self.name)
             print attr
-#            try:
-            self.process = subprocess.Popen(attr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            out, err = self.process.communicate()
-            self.process.wait()
-            #errpos = 0
-            if err:
-                print "FFMPEG record '%s' ended with an error:\n%s" % (self.name, err)
-            else:
-                print "FFMPEG record '%s' ended" % self.name
+            try:
+                self.process = subprocess.Popen(attr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                out, err = self.process.communicate()
+                self.process.wait()
+                #errpos = 0
+                if err:
+                    print "FFMPEG record '%s' ended with an error:\n%s" % (self.name, err)
+                else:
+                    print "FFMPEG record '%s' ended" % self.name
 #                    errpos = err.lower().rfind("error")
 #                    if errpos > 0:
 #                        i = err.rfind("\n", 0, errpos)+1
 #                print err#[i:]
 #            print "FFMPEG record '%s' ended%" % (self.name, (" with an error:%s\n" % err) if err else "")
-#            except:
-#                print "FFMPEG could not be started"
+            except:
+                print "FFMPEG could not be started"
         else:        
             block_sz = 8192
             print "Record: '%s' started" % (self.name)

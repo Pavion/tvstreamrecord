@@ -1,17 +1,13 @@
-%include header 
+%include header style=curstyle, version=version 
 
 <div id="about">
-<p><b>Tvstreamrecord v.{{ver}}</b></p>
+<p><b>Tvstreamrecord v.{{version}}</b></p>
 
 <p><b>Quick guide</b></p>
 <ol>
-<li><p><b>What's new in {{ver}}?</b></p>
+<li><p><b>What's new in 0.6?</b></p>
 <ul>
-<li>TVxb support (XMLTV format)</li>
-<li>Automatic XMLTV import option implemented</li>
-<li>Structured config page with built-in plausibility control</li>
-<li>Disable channels from EPG chart</li>
-<li>Switch between client and server sided EPG list for besser compatibility</li>
+<li>UI redisign with theme support</li>
 </ul>
 </li>
 <li><p><b>Introduction</b></p>

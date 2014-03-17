@@ -110,6 +110,12 @@ configuration = [
 'cfg_switch_epglist_mode',
 "EPG list mode",
 '0'
+],
+
+[
+'cfg_theme',
+"UI theme",
+'smoothness/jquery-ui-1.10.4.custom.min.css'
 ]
 
 ]

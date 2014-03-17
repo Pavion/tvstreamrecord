@@ -1,14 +1,9 @@
-%include header 
-
+%include header style=curstyle, version=version
 <div id="users-contain" class="ui-widget">
 <h1>Configuration:
 <button id="submit_cfg">Submit changes</button>
 <div id="label_config_saved"></div>
 </h1>
-
-<!--<form method='POST' enctype='multipart/form-data' action='/config' name='submit_cfg_form'>-->
-<!--<table id="clist">  -->
-
 <div id="configtabs">
 <ul>
 <li><a href="#configtabs-1">General</a></li>
@@ -18,11 +13,7 @@
 </ul>
 <div id="configtabs-1">
 <!--General configuration-->
-<table width="90%">
-<colgroup>
-    <col width="50%">
-    <col width="50%">
-</colgroup>
+<table id="configtable-1">
 <thead>
 <tr class="ui-widget-header ">
 <th>Parameter name</th>
@@ -32,17 +23,21 @@
 <tbody>
 <tr><td>Path for your recordings</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_recordpath" value="" autocomplete="off" /></td></tr>
 <tr><td>File extension for the recorded stream (default='.ts')</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_file_extension" value="" autocomplete="off" /></td></tr>
+<tr><td>Interface theme (default='smoothness')</td>
+    <td>
+        <select id='cfg_theme' class="text ui-widget-content ui-corner-all">            
+%for theme in themes:
+            <option value='{{theme[0]}}'>{{theme[1]}}</option>
+%end              
+        </select>
+    </td>
+</tr>
 </tbody>
 </table>
-
 </div>
 <div id="configtabs-2">
 <!--EPG configuration-->
-<table width="90%">
-<colgroup>
-    <col width="50%">
-    <col width="50%">
-</colgroup>
+<table id="configtable-2">
 <thead>
 <tr class="ui-widget-header ">
 <th>Parameter name</th>
@@ -64,11 +59,7 @@
 </div>
 <div id="configtabs-3">
 <!--FFMPEG configuration-->
-<table width="90%">
-<colgroup>
-    <col width="50%">
-    <col width="50%">
-</colgroup>
+<table id="configtable-3">
 <thead>
 <tr class="ui-widget-header ">
 <th>Parameter name</th>
@@ -84,11 +75,7 @@
 </div>
 <div id="configtabs-4">
 <!--Advanced configuration-->
-<table width="90%">
-<colgroup>
-    <col width="50%">
-    <col width="50%">
-</colgroup>
+<table id="configtable-4">
 <thead>
 <tr class="ui-widget-header ">
 <th>Parameter name</th>

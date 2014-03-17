@@ -1,5 +1,5 @@
 %# coding=UTF-8
-%include header 
+%include header style=curstyle, version=version 
 <div id="zoom" zoom="{{zoom}}"></div>
 <div id="users-contain" class="ui-widget">
 <form method='POST' enctype='multipart/form-data' action='/epg' name='daychooser'>
@@ -22,9 +22,9 @@
 %if rows[0][0] == -1:
 <div id="epg_cname" cnt="{{cnt}}">
 %else:
-<div id="epg_cname" cnt="{{cnt}}"><h1><b><a href="live/{{rows[0][0]}}.m3u">{{rows[0][7]}}</a></b>
+<div id="epg_cname" cnt="{{cnt}}"><div><b><a href="live/{{rows[0][0]}}.m3u">{{rows[0][7]}}</a></b>
 <label title="Disable channel" id="iconsDisable-{{rows[0][0]}}" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-close"></span></label>
-</h1>
+</div>
 %end
 </div>
 <div id="selectable">

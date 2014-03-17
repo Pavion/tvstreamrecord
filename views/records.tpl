@@ -1,4 +1,4 @@
-%include header 
+%include header style=curstyle, version=version 
 %include create
 <div id="users-contain" class="ui-widget">
 <h1>Records:

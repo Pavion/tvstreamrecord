@@ -1,4 +1,3 @@
-%# coding=UTF-8
 %include header style=curstyle, version=version 
 <div id="zoom" zoom="{{zoom}}"></div>
 <div id="users-contain" class="ui-widget">
@@ -8,14 +7,8 @@
 <div id="float">Keyword:</div>
 <input type="text" maxlength="50" id="searchepg" class="text ui-widget-content ui-corner-all" name="searchepg" value=""/> 
 <button id="searchepgbutton">Highlight</button>
-<button id="getepg">Load XMLTV information</button>
-%if grabstate[0] == False:
-<button id="grabepgstart">Grab EPG from {{grabstate[2]}} sources</button>
-%else:
-<button id="grabepgstop">Stop loading EPG (State: {{grabstate[1]}}/{{grabstate[2]}})</button>
-%end
+<button id="grabepg" state0="{{grabstate[0]}}" state1="{{grabstate[1]}}" state2="{{grabstate[2]}}"></button>
 </h1></form>
-</div>
 %cnt=0
 %for rows in rowss:
 %if len(rows)>0:
@@ -37,10 +30,14 @@
 %end
 </div>
 <div id="record_from_epg" title="Detail view">
-<div id="dialog_content"></div></div>
+    <div id="dialog_content">
+        <!-- Empty -->
+    </div>
+</div>
 <form method='POST' enctype='multipart/form-data' action='/createepg' name='returnform'>
-<input type="text" style="display: none;" name="ret" id="ret" value="X"/>
+    <input type="text" style="display: none;" name="ret" id="ret" value="X"/>
 </form>
+</div>
 <div id="dialog_channel_disable" title="Channel disable">
 	<p>Do you want to disable this channel? You can enable it again at the channel list page.</p>
 </div>

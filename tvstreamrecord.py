@@ -29,7 +29,7 @@ import grabber
 import xmltv
 import json
 import urllib2
-import threading 
+from threading import Thread, Timer
 import os
 import sys
 from mylogging import logInit, logRenew, logStop
@@ -56,32 +56,32 @@ def server_static9(filename):
 @route('/channels.m3u')
 def server_static8():
     return static_file("/channels.m3u", root='')
+# Log file
 @route('/log.txt')
 def server_static7():
     return static_file("/log.txt", root='', download="log.txt")
+# JavaScript
 @route('/js/<filename>')
 def server_static1(filename):
     return static_file(filename, root='./js')
-
-#curstyle = "Aristo";
-
-
+# CSS handling
 @route('/css/<curstyle>/<filename>')
 def server_static2(curstyle,filename):
     return static_file(filename, root='./css/'+curstyle)
 @route('/css/<curstyle>/images/<filename>')
 def server_static4(curstyle,filename):
     return static_file(filename, root='./css/'+curstyle+'/images')
-
 @route('/css/<filename>')
 def server_static3(filename):
     return static_file(filename, root='./css')
+# Common images
 @route('/images/<filename>')
 def server_static5(filename):
     return static_file(filename, root='./images')
 
 #------------------------------- Recurring records -------------------------------
 weekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
+
 def getWeekdays(i):
     if i==0: i=127
     l = []
@@ -90,22 +90,6 @@ def getWeekdays(i):
     s = s[::-1]    
     for c in s: l.append(c=='1')
     return l
-
-#--------------------------------- Common --------------------------------
-
-#@post('/savetable')
-#def savetable():
-#    myid = request.forms.get("myid")
-#    mylen = request.forms.get("mylen")
-#    sqlRun("INSERT OR REPLACE INTO config VALUES (?, '', ?)",['table_'+myid,mylen])
-#    return
-#
-#def getListLength(myid):
-#    mylen = 10
-#    row = sqlRun("SELECT value FROM config WHERE param='table_%s'" % myid)
-#    if row:
-#        mylen = row[0][0]
-#    return mylen
 
 #------------------------------- Main menu -------------------------------
 
@@ -294,8 +278,11 @@ def upload_p():
 @post('/config')
 def config_p():    
     configdata = json.loads(request.forms.get('configdata'))
-    config.setConfig(configdata)    
-    grabthread.run()
+    for cfg in configdata: 
+        if cfg[0]=="cfg_grab_time":
+            if cfg[1]!=config.cfg_grab_time:
+                grabthread.run()
+    config.setConfig(configdata)
     return
 
 @route('/config')
@@ -316,7 +303,7 @@ def getconfig():
     
 #------------------------------- EPG Grabbing part -------------------------------
 
-class epggrabthread(threading.Thread):
+class epggrabthread(Thread):
     stopflag = False
     running = False 
     epggrabberstate = [0,0]
@@ -337,7 +324,7 @@ class epggrabthread(threading.Thread):
     
     def __init__(self):
         self.setChannelCount()
-        threading.Thread.__init__(self)
+        Thread.__init__(self)
     
     def kill(self):
         if not self.timer == None:             
@@ -353,18 +340,21 @@ class epggrabthread(threading.Thread):
                     mydatetime = mydatetime + timedelta(days=1)
                 td = mydatetime-datetime.now()
                 deltas = td.total_seconds()
-                self.timer = threading.Timer(deltas, self.doIt)
+                self.timer = Timer(deltas, self.doGrab)
                 self.timer.start()
                 if deltas>0:
                     print "EPG Thread timer waiting till %s (%d seconds)" % (config.cfg_grab_time, deltas)                        
             except:
                 print "Something went wrong with EPG thread. Please check your config settings regarding your start time"
     
-    def doIt(self):
+    def doGrab(self, override=False):
+        print "3"
         self.kill()
         self.running = True        
-        if config.cfg_switch_grab_auto=="1" and not self.stopflag:  self.grabStream()
-        if config.cfg_switch_xmltv_auto=="1" and not self.stopflag: self.grabXML()
+        if (config.cfg_switch_grab_auto=="1" or override) and not self.stopflag:  self.grabStream()
+        print "4"
+        if (config.cfg_switch_xmltv_auto=="1" or override) and not self.stopflag: self.grabXML()
+        print "5"
         self.epggrabberstate[0]=0
         self.running = False
         sleep(61)        
@@ -425,15 +415,16 @@ class epggrabthread(threading.Thread):
         self.stopflag = True
         
 @post('/grabepg')
-def grabepgstart():
+def grabepg():
     mode = int(request.forms.mode)
+    print mode
     if not grabthread.isRunning():
         if mode == 0:
-            grabthread.grabStream()
-        elif mode == 1:
-            grabthread.stop()
-        elif mode == 2:
-            grabthread.grabXML()
+            print "1"
+            doGrab = Thread(target=grabthread.doGrab, args=("True", ))
+            doGrab.start()
+    elif mode == 1:
+        grabthread.stop()
     return 
 
 #------------------------------- EPG painting part -------------------------------
@@ -646,7 +637,7 @@ def getBool(stri):
     return r
 
     
-class record(threading.Thread):
+class record(Thread):
     running = 0
     id = -1
     stopflag = 0 
@@ -658,7 +649,7 @@ class record(threading.Thread):
     myrow = None
         
     def __init__(self, row):
-        threading.Thread.__init__(self)
+        Thread.__init__(self)
         self.id = row[0]
         self.von = datetime.strptime(row[2],"%Y-%m-%d %H:%M:%S")
         self.bis = datetime.strptime(row[3],"%Y-%m-%d %H:%M:%S")        
@@ -684,12 +675,12 @@ class record(threading.Thread):
     def run(self): 
         td = self.von-datetime.now()
         deltas = td.total_seconds()
-        self.timer = threading.Timer(deltas, self.doIt)
+        self.timer = Timer(deltas, self.doRecord)
         self.timer.start()
         if deltas>0:
             print "Record: Thread timer for '%s' started for %d seconds" % (self.name, deltas)
         
-    def doIt(self):
+    def doRecord(self):
         self.running = 1
         fn = config.cfg_recordpath+datetime.now().strftime("%Y%m%d%H%M%S") + " - "        
         fn = fn + "".join([x if x.isalnum() else "_" for x in self.name])
@@ -709,16 +700,10 @@ class record(threading.Thread):
                 self.process = subprocess.Popen(attr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 out, err = self.process.communicate()
                 self.process.wait()
-                #errpos = 0
                 if err:
                     print "FFMPEG record '%s' ended with an error:\n%s" % (self.name, err)
                 else:
                     print "FFMPEG record '%s' ended" % self.name
-#                    errpos = err.lower().rfind("error")
-#                    if errpos > 0:
-#                        i = err.rfind("\n", 0, errpos)+1
-#                print err#[i:]
-#            print "FFMPEG record '%s' ended%" % (self.name, (" with an error:%s\n" % err) if err else "")
             except:
                 print "FFMPEG could not be started"
         else:        
@@ -743,7 +728,7 @@ class record(threading.Thread):
                 print "Record: '%s' ended" % (self.name)
                 if self in records: records.remove(self) 
         if self.mask > 0:
-            rectimer = threading.Timer(5, setRecords)
+            rectimer = Timer(5, setRecords)
             rectimer.start()
     
     def stop(self):
@@ -797,7 +782,6 @@ grabthread.run()
     
 print "Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port)
 run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
-
 
 print "Server aborted. Stopping all records before exiting..."
 for t in records:

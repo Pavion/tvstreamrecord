@@ -18,7 +18,13 @@
 var dialognr = -1;
 var weekdays = new Array('Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su');
 
-if (typeof String.prototype.startsWith != 'function') {
+if(typeof String.prototype.trim !== 'function') {
+  String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/g, '');
+  };
+}
+
+if (typeof String.prototype.startsWith !== 'function') {
   String.prototype.startsWith = function (str){
     return this.slice(0, str.length) == str;
   };
@@ -357,7 +363,6 @@ $(function() {
             $(this).css("margin-top", '-10px');
             $(this).css("margin-left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');
             $(this).css("z-index", '1');
-
         }
     });
 
@@ -366,7 +371,7 @@ $(function() {
             if(zoom!=1) {
             	$("body").css("width", (zoom*100)+"%");
             }
-            $("#mybody").css("height", (maxcnt * 100 + 100) +"px");
+            $("#mybody").css("height", (maxcnt * 100 + 200) +"px");
             $("[id=selectable]").each(function(i) { $(this).css("clear", "left"); });
         } else {
             $("[id=selectable]").each(function(i) {
@@ -380,18 +385,15 @@ $(function() {
     }
 
     $( "#searchepg" ).change(function() {
-        var tofind = $(this).val().toLowerCase();
-        if (tofind.length>0) {
-
-            $( "[id=event]" ).each(function(i) {
-                var text = $(this).attr('fulltext').toLowerCase();
-                if(text.indexOf(tofind)!=-1) {
-                    $(this).addClass("ui-selected");
-                } else {
-                    $(this).removeClass("ui-selected");
-                }
-            });
-        }
+        var tofind = $(this).val().toLowerCase().trim();
+        $( "[id=event]" ).each(function(i) {
+            var text = $(this).attr('fulltext').toLowerCase();
+            if(text.indexOf(tofind)!=-1 && tofind.length>0) {
+                $(this).addClass("ui-selected");
+            } else {
+                $(this).removeClass("ui-selected");
+            }
+        });
     });
 
     $( "#searchepgbutton" )
@@ -697,14 +699,14 @@ var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" 
         	$( "#confirm01" ).dialog( "open" );
         });
 
-    $( "#getepg" )
+/*    $( "#getepg" )
         .button()
         .click(function(event ) {
             post("/grabepg", {"mode": 2}, 0);
             event.preventDefault();
-        });
+        });*/
 
-    $( "#grabepgstart" )
+/*    $( "#grabepgstart" )
         .button()
         .click(function(event ) {
             post("/grabepg", {"mode": 0}, 0);
@@ -712,14 +714,36 @@ var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" 
             $(this).css('height', "20px");
             $(this).addClass( "ui-state-disabled" );
             event.preventDefault();
-        });
+        });*/
 
-    $( "#grabepgstop" )
+    if (here('epg') || here('epglist')) {
+        var state0 = $( "#grabepg" ).attr("state0");
+        var state1 = $( "#grabepg" ).attr("state1");
+        var state2 = $( "#grabepg" ).attr("state2");        
+        var epgmode = 0;
+        if (state2==='0') {
+            $( "#grabepg" ).hide();
+        } else {
+            if (state0 === 'False') {
+                $( "#grabepg" ).html("Grab EPG from " + state2 + " source" + (state2==="1"?"":"s"))
+            } else {
+                $( "#grabepg" ).html("Stop loading EPG (State: " + state1 + '/' + state2 + ")");
+                epgmode = 1;
+            }        
+            $( "#grabepg" ).button()
+            .click(function(event) {
+                post("/grabepg", {"mode": epgmode}, 1);
+                event.preventDefault();
+            });
+        }
+    }
+
+/*    $( "#grabepgstop" )
         .button()
         .click(function(event ) {
             post("/grabepg", {"mode": 1}, 1);
             event.preventDefault();
-        });
+        });*/
 
     $( "#removeepg" )
         .button()
@@ -773,10 +797,10 @@ var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" 
         });
 
 
-     $( "#wday" ).button();
+    $( "#wday" ).button();
     $( "#weekday" ).buttonset();
 
-     $('#clist').dataTable({
+    $('#clist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bProcessing": true,

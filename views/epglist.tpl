@@ -1,12 +1,7 @@
 %include header style=curstyle, version=version 
 <div id="users-contain" class="ui-widget">
 <h1>Electronic Program Guide List:
-<button id="getepg">Load XMLTV information</button>
-%if grabstate[0] == False:
-<button id="grabepgstart">Grab EPG from {{grabstate[2]}} sources</button>
-%else:
-<button id="grabepgstop">Stop loading EPG (State: {{grabstate[1]}}/{{grabstate[2]}})</button>
-%end
+<button id="grabepg" state0="{{grabstate[0]}}" state1="{{grabstate[1]}}" state2="{{grabstate[2]}}"></button>
 <div id="listmode" value="{{listmode}}"></div>
 </h1>
 <table id="epglist">

@@ -1,7 +1,7 @@
 %include header style=curstyle, version=version 
 <div id="users-contain" class="ui-widget">
 <h1>Electronic Program Guide List:
-<button id="grabepg" state0="{{grabstate[0]}}" state1="{{grabstate[1]}}" state2="{{grabstate[2]}}"></button>
+<button id="grabepg"></button>
 <div id="listmode" value="{{listmode}}"></div>
 </h1>
 <table id="epglist">

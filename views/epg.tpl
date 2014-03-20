@@ -7,8 +7,9 @@
 <div id="float">Keyword:</div>
 <input type="text" maxlength="50" id="searchepg" class="text ui-widget-content ui-corner-all" name="searchepg" value=""/> 
 <button id="searchepgbutton">Highlight</button>
-<button id="grabepg" state0="{{grabstate[0]}}" state1="{{grabstate[1]}}" state2="{{grabstate[2]}}"></button>
+<button id="grabepg"></button>
 </h1></form>
+</div>
 %cnt=0
 %for rows in rowss:
 %if len(rows)>0:
@@ -37,7 +38,6 @@
 <form method='POST' enctype='multipart/form-data' action='/createepg' name='returnform'>
     <input type="text" style="display: none;" name="ret" id="ret" value="X"/>
 </form>
-</div>
 <div id="dialog_channel_disable" title="Channel disable">
 	<p>Do you want to disable this channel? You can enable it again at the channel list page.</p>
 </div>

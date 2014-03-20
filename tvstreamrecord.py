@@ -302,7 +302,6 @@ def getconfig():
     return json.dumps({"configdata": rows } )    
     
 #------------------------------- EPG Grabbing part -------------------------------
-
 class epggrabthread(Thread):
     stopflag = False
     running = False 
@@ -310,7 +309,7 @@ class epggrabthread(Thread):
     timer = None
     
     def getState(self):
-        return [self.running, self.epggrabberstate[0], self.epggrabberstate[1]]
+        return [self.running, self.epggrabberstate[0], self.epggrabberstate[1], self.stopflag]
     
     def isRunning(self):
         return self.running
@@ -320,7 +319,8 @@ class epggrabthread(Thread):
         rows = sqlRun("SELECT count(cname) FROM channels WHERE epgscan = 1 AND cenabled = 1;")
         if rows:
             self.epggrabberstate[1] = rows[0][0]
-        if config.cfg_switch_xmltv_auto=="1": self.epggrabberstate[1] += 1     
+        #if config.cfg_switch_xmltv_auto=="1": 
+        self.epggrabberstate[1] += 1     
     
     def __init__(self):
         self.setChannelCount()
@@ -348,13 +348,10 @@ class epggrabthread(Thread):
                 print "Something went wrong with EPG thread. Please check your config settings regarding your start time"
     
     def doGrab(self, override=False):
-        print "3"
         self.kill()
         self.running = True        
         if (config.cfg_switch_grab_auto=="1" or override) and not self.stopflag:  self.grabStream()
-        print "4"
         if (config.cfg_switch_xmltv_auto=="1" or override) and not self.stopflag: self.grabXML()
-        print "5"
         self.epggrabberstate[0]=0
         self.running = False
         sleep(61)        
@@ -370,7 +367,7 @@ class epggrabthread(Thread):
  
     def grabStream(self):
         rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
-        self.epggrabberstate[1] = len(rows)        
+        #self.epggrabberstate[1] = len(rows)        
         for row in rows:
             if self.stopflag: 
                 break
@@ -413,14 +410,16 @@ class epggrabthread(Thread):
     
     def stop(self):
         self.stopflag = True
+
+@route('/getepgstate')
+def getepgstate():
+    return json.dumps( {"grabState": grabthread.getState() } )
         
 @post('/grabepg')
 def grabepg():
     mode = int(request.forms.mode)
-    print mode
     if not grabthread.isRunning():
         if mode == 0:
-            print "1"
             doGrab = Thread(target=grabthread.doGrab, args=("True", ))
             doGrab.start()
     elif mode == 1:
@@ -500,8 +499,6 @@ def epg_s():
                     fulltext = ""
                     pass
 
-
-            #print d_von, d_bis
             if d_von < daystart:
                 d_von = daystart
             if d_bis.date() > daystart.date():
@@ -510,13 +507,12 @@ def epg_s():
             w = d_bis - d_von
             if x.total_seconds()>=0 and w.total_seconds()>0:
                 rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], title, fulltext, event[4], row[2], event[5]])
-                #print event[5]
         ret.append(rtemp)
-    return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret, grabstate=grabthread.getState(), zoom=config.cfg_grab_zoom, curstyle=config.cfg_theme, version=version)            
+    return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret, zoom=config.cfg_grab_zoom, curstyle=config.cfg_theme, version=version)            
 
 @route('/epglist')
 def epglist_s():    
-    return template('epglist', grabstate=grabthread.getState(), listmode=config.cfg_switch_epglist_mode, curstyle=config.cfg_theme, version=version)
+    return template('epglist', listmode=config.cfg_switch_epglist_mode, curstyle=config.cfg_theme, version=version)
     
 @route('/epglist_getter')
 def epglist_getter():

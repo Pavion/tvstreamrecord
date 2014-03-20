@@ -18,6 +18,7 @@
 var dialognr = -1;
 var weekdays = new Array('Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su');
 
+// Common functions
 if(typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/g, '');
@@ -326,8 +327,6 @@ $(function() {
         values: [ 17, 67 ]
     });
 
-    //var selcount = 0;
-
     var zoom = +$("#zoom").attr('zoom');
     if (zoom==0) zoom=1;
     var maxcnt=0;
@@ -378,9 +377,9 @@ $(function() {
                 $(this).css("float", "left");
                 $(this).css("height", (-zoom*800)+"px");
             });
-            $("#tabs").css("width", (250*maxcnt+100)+"px");
+//            $("#tabs").css("width", (250*maxcnt+100)+"px");
             $("body").css("width", (250*maxcnt+100)+"px");
-            $("#mybody").css("height", (-zoom*800+80)+"px");
+            $("#mybody").css("height", (-zoom*800+200)+"px");
         }
     }
 
@@ -417,7 +416,7 @@ $(function() {
     });
 
 
-var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" ).add("#cname").add("#ccid").add("#cpath");
+    var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" ).add("#cname").add("#ccid").add("#cpath");
 
     $( "#dialog-form" ).dialog({
         autoOpen: false,
@@ -716,26 +715,44 @@ var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker" 
             event.preventDefault();
         });*/
 
+    function getEpgState() {
+        //$.ajax({type: "POST", url: "/getepgstate", dataType: "json", success: 
+        $.get("/getepgstate", 
+            function(data) {
+                console.log(data);
+                var state = data.grabState;
+                var epgmode = 0;
+                if (state[2]==='0') {
+                    $( "#grabepg" ).hide();
+                } else {
+                    if (state[0] === false) {
+                        $( "#grabepg" ).html("Grab EPG from " + state[2] + " source" + (state[2]==="1"?"":"s"))
+                    } else {
+                        if (state[3] === false) {
+                            $( "#grabepg" ).html("Stop loading EPG (State: " + state[1] + '/' + state[2] + ")");
+                        } else {
+                            $( "#grabepg" ).html("Stopping loading EPG, please wait");
+                            $( "#grabepg" ).prop("disabled", true);
+                        }                    
+                        epgmode = 1;
+                    }        
+                    $( "#grabepg" ).button()
+                    .click(function(event) {
+                        $.ajax({type: "POST", url: "/grabepg", dataType: "json", data: {"mode": epgmode}, success: 
+                            function(data) {
+                                getEpgState();                            
+                            }                
+                        });
+                        event.preventDefault();
+                    });
+                }
+            }, "json");
+    }
+
+
+
     if (here('epg') || here('epglist')) {
-        var state0 = $( "#grabepg" ).attr("state0");
-        var state1 = $( "#grabepg" ).attr("state1");
-        var state2 = $( "#grabepg" ).attr("state2");        
-        var epgmode = 0;
-        if (state2==='0') {
-            $( "#grabepg" ).hide();
-        } else {
-            if (state0 === 'False') {
-                $( "#grabepg" ).html("Grab EPG from " + state2 + " source" + (state2==="1"?"":"s"))
-            } else {
-                $( "#grabepg" ).html("Stop loading EPG (State: " + state1 + '/' + state2 + ")");
-                epgmode = 1;
-            }        
-            $( "#grabepg" ).button()
-            .click(function(event) {
-                post("/grabepg", {"mode": epgmode}, 1);
-                event.preventDefault();
-            });
-        }
+        getEpgState();      
     }
 
 /*    $( "#grabepgstop" )

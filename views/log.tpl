@@ -4,7 +4,7 @@
 <h1>Log:
 <button id="downlog">Download log</button>
 </h1>
-<table id="loglist"> 
+<table id="table_loglist"> 
 <thead>
 <tr class="ui-widget-header ">
 <th class="ldatetime">Date/time</th>

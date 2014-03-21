@@ -4,7 +4,7 @@
 <h1>Records:
 <button id="create-user">Create new record</button>
 <button id="purge-records">Purge old records</button></h1>
-<table id="recordlist"><!--<table id="clist1"><table id="users" class="ui-widget ui-widget-content">-->
+<table id="table_recordlist">
 <thead>
 <tr class="ui-widget-header ">
 <th class="rname">Record name</th>
@@ -24,10 +24,10 @@
 </table>
 </div>
     
-<div id="dialog" title="Record removal">
+<div id="dialog_remove" title="Record removal">
 	<p>Shall I delete this record?</p>
 </div>
-<div id="confirm01" title="Purging records">
+<div id="dialog_purge" title="Purging records">
 	<p>All old records will be deleted! Are you sure?</p>
 </div>
 %include footer

@@ -2,9 +2,9 @@
 <div id="zoom" zoom="{{zoom}}"></div>
 <div id="users-contain" class="ui-widget">
 <form method='POST' enctype='multipart/form-data' action='/epg' name='daychooser'>
-<h1><div id="float">Electronic Program Guide. Current date:</div>
+<h1><div id="label_epg_1">Electronic Program Guide. Current date:</div>
 <input type="text" maxlength="10" id="datepicker3" class="text ui-widget-content ui-corner-all" name="datepicker3" value="{{curr}}"/> 
-<div id="float">Keyword:</div>
+<div id="label_epg_2">Keyword:</div>
 <input type="text" maxlength="50" id="searchepg" class="text ui-widget-content ui-corner-all" name="searchepg" value=""/> 
 <button id="searchepgbutton">Highlight</button>
 <button id="grabepg"></button>
@@ -21,7 +21,7 @@
 </div>
 %end
 </div>
-<div id="selectable">
+<div id="channelgroup">
 %for row in rows:
 <div class="ui-state-default" id="event" cnt="{{cnt}}" x="{{row[1]}}" width="{{row[2]}}" cid="{{row[0]}}" rid="{{row[6]}}" fulltext="{{row[5]}}" recording="{{row[8]}}" title="{{row[4]}}">{{row[3]}}</div>
 %end

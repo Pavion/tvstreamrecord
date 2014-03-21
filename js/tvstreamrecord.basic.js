@@ -132,7 +132,7 @@ function initIcons() {
 
     $( "[id^=iconsERec-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("iconsERec-",""));
-        oTable = $('#epglist').dataTable();
+        oTable = $('#table_epglist').dataTable();
         var data = oTable.fnGetData();
         var len = data.length;
         if (len>0) {
@@ -247,7 +247,7 @@ $(function() {
     });
 
 
-    $( "#dialog" ).dialog({
+    $( "#dialog_remove" ).dialog({
         autoOpen: false,
         width: 300,
         buttons: [
@@ -284,7 +284,7 @@ $(function() {
         ]
     });
 
-    $( "#confirm01" ).dialog({
+    $( "#dialog_purge" ).dialog({
         autoOpen: false,
         width: 300,
         buttons: [
@@ -371,9 +371,9 @@ $(function() {
             	$("body").css("width", (zoom*100)+"%");
             }
             $("#mybody").css("height", (maxcnt * 100 + 200) +"px");
-            $("[id=selectable]").each(function(i) { $(this).css("clear", "left"); });
+            $("#[id=channelgroup]").each(function(i) { $(this).css("clear", "left"); });
         } else {
-            $("[id=selectable]").each(function(i) {
+            $("[id=channelgroup]").each(function(i) {
                 $(this).css("float", "left");
                 $(this).css("height", (-zoom*800)+"px");
             });
@@ -439,7 +439,7 @@ $(function() {
                 text: "Delete", click: function()
                 {
                     $( this ).dialog( "close" );
-                    $( "#dialog" ).dialog( "open" );
+                    $( "#dialog_remove" ).dialog( "open" );
                 }
             };
 
@@ -484,7 +484,7 @@ $(function() {
             if((dialognr!=-1 && !here('list'))) {
                 $( this ).dialog( "option", "buttons", [deletebutton, updatebutton, cancelbutton] );
 
-                oTable = $('#recordlist').dataTable();
+                oTable = $('#table_recordlist').dataTable();
                 var data = oTable.fnGetData();
                 var len = data.length;
                 if (len>0) {
@@ -643,14 +643,14 @@ $(function() {
                 text: "Delete", click: function()
                 {
                     $( this ).dialog( "close" );
-                    $( "#dialog" ).dialog( "open" );
+                    $( "#dialog_remove" ).dialog( "open" );
                 }
             };
 
             if(dialognr!=-1) {
                 $( this ).dialog( "option", "buttons", [deletebutton, updatebutton, cancelbutton] );
 
-                oTable = $('#clist').dataTable();
+                oTable = $('#table_channellist').dataTable();
                 var data = oTable.fnGetData();
                 var len = data.length;
                 if (len>0) {
@@ -695,7 +695,7 @@ $(function() {
     $( "#purge-records" )
         .button()
         .click(function() {
-        	$( "#confirm01" ).dialog( "open" );
+        	$( "#dialog_purge" ).dialog( "open" );
         });
 
 /*    $( "#getepg" )
@@ -722,6 +722,7 @@ $(function() {
                 console.log(data);
                 var state = data.grabState;
                 var epgmode = 0;
+                $( "#grabepg" ).removeProp("disabled");
                 if (state[2]==='0') {
                     $( "#grabepg" ).hide();
                 } else {
@@ -738,11 +739,10 @@ $(function() {
                     }        
                     $( "#grabepg" ).button()
                     .click(function(event) {
-                        $.ajax({type: "POST", url: "/grabepg", dataType: "json", data: {"mode": epgmode}, success: 
-                            function(data) {
+                        $.post("/grabepg", {"mode": epgmode},  
+                            function() {
                                 getEpgState();                            
-                            }                
-                        });
+                            }, "json");
                         event.preventDefault();
                     });
                 }
@@ -765,7 +765,7 @@ $(function() {
     $( "#removeepg" )
         .button()
         .click(function(event ) {
-            $( "#dialog" ).dialog( "open" );
+            $( "#dialog_remove" ).dialog( "open" );
             event.preventDefault();
         });
 
@@ -817,7 +817,7 @@ $(function() {
     $( "#wday" ).button();
     $( "#weekday" ).buttonset();
 
-    $('#clist').dataTable({
+    $('#table_channellist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bProcessing": true,
@@ -850,7 +850,7 @@ $(function() {
     if (here("epglist")) {
     	var serverSide = ($("#listmode").attr("value") == "1");  
 
-	    $('#epglist').dataTable({
+	    $('#table_epglist').dataTable({
 	        "bJQueryUI": true,
 	        "sPaginationType": "full_numbers",
 	        "bProcessing": true,
@@ -884,7 +884,7 @@ $(function() {
 	}
 
     
-     $('#recordlist').dataTable({
+     $('#table_recordlist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bProcessing": true,
@@ -917,7 +917,7 @@ $(function() {
 
     });
 
-     $('#loglist').dataTable({
+     $('#table_loglist').dataTable({
         "bJQueryUI": true,
         "sPaginationType": "full_numbers",
         "bProcessing": true,
@@ -934,7 +934,7 @@ $(function() {
         }
     });
 
-	/*$('#epglist_length,#recordlist_length,#clist_length,#loglist_length').change( function() {
+	/*$('#epglist_length,#table_recordlist_length,#table_channellist_length,#loglist_length').change( function() {
 	    var thisid = this.id.replace("_length","");
 	    var lengthVal = $('#' + thisid + '').dataTable().fnSettings()._iDisplayLength;
         post('/savetable', { myid:thisid, mylen:lengthVal }, 0);

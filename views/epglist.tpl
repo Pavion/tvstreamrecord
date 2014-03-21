@@ -4,7 +4,7 @@
 <button id="grabepg"></button>
 <div id="listmode" value="{{listmode}}"></div>
 </h1>
-<table id="epglist">
+<table id="table_epglist">
 <thead>
 <tr class="ui-widget-header">
 <th class="echan">Channel</th>

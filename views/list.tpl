@@ -6,7 +6,7 @@
 <button id="upload-user">Import</button>
 <button id="downcl">Export</button>
 </h1>
-<table id="clist"> <!-- <table id="users" class="ui-widget ui-widget-content">-->
+<table id="table_channellist"> 
 <thead>
 <tr class="ui-widget-header ">
 <th class="cid">ID</th>
@@ -24,7 +24,7 @@
 	<p align="center">Channel list export finished<br> 
     <a href="channels.m3u">right click to save as</a></p>
 </div>
-<div id="dialog" title="Confirmation request">
+<div id="dialog_remove" title="Confirmation request">
 	<p>Shall I delete this channel?</p>
 </div>
 <div id="createchannel-form" title="Create/edit a channel">

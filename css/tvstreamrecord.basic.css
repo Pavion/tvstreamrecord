@@ -87,9 +87,6 @@ h1 {
     left: 0px;
     min-width: 750px;
 }
-div#users-contain { margin: 20px 0px; }
-div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
-div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left;  }
 [id^=configtabs-] table th { width: 50%; }
 
 .ui-dialog .ui-state-error { padding: .3em; }
@@ -105,16 +102,36 @@ label#append {float: left; margin-top: 3px;}
 
 .ui-button-text-only .ui-button-text  { padding: 0px 3px; }
 
-#feedback { font-size: 1.4em; }
+/*#feedback { font-size: 1.4em; }*/
 
-#selectable .ui-selecting { background: #FECA40; }
-#selectable .ui-selected { background: #F39814; color: white; }
-#selectable { position: relative; margin-top: 20px; }
-#selectable div { text-align: center; position: absolute; overflow:hidden; }
-#epg_cname { position: absolute; }
+#channelgroup .ui-selecting { background: #FECA40; }
+#channelgroup .ui-selected { background: #F39814; color: white; }
 
-#datepicker1, #datepicker3, #searchepg { width: 100px; float:left; margin-left: 5px; margin-right: 5px;}
-#float { float:left; margin-top: 3px; }
+#channelgroup { 
+    position: relative; 
+    margin-top: 20px; 
+}
+
+#channelgroup div { 
+    text-align: center; 
+    position: absolute; 
+    overflow:hidden; 
+}
+
+#epg_cname { 
+    position: absolute; 
+}
+
+#datepicker1, #datepicker3, #searchepg { 
+    width: 100px; 
+    float:left; 
+    margin-left: 5px; 
+    margin-right: 5px;
+}
+
+#label_epg_1, label_epg_2 { 
+    float:left; margin-top: 3px; 
+}
 
 th.ccontrols { width: 120px; }
 th.cid { width: 40px; }
@@ -163,3 +180,7 @@ table.dataTable tr.even td.sorting_1 { background-color: #D5FFD5; }
 
 table.dataTable { color:black; }
 table.dataTable a { color:black; }
+
+div#users-contain { margin: 20px 0px; }
+div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
+div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left;  }

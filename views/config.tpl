@@ -93,7 +93,7 @@
 </div>
 <!--</form>-->
 </div>
-<div id="dialog" title="Confirmation request">
+<div id="dialog_remove" title="Confirmation request">
 	<p>Do you want to delete all of your EPG data?</p>
 </div>
 %include footer

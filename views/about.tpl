@@ -7,7 +7,7 @@
 <ol>
 <li><p><b>What's new in 0.6?</b></p>
 <ul>
-<li>UI redisign with theme support</li>
+<li>UI redesign with theme roller support</li>
 </ul>
 </li>
 <li><p><b>Introduction</b></p>
@@ -44,7 +44,7 @@ You shouldn't need any special permissions.</p></li>
 <i>Delete/reset all EPG data</i> should be used to clear your database in case of EPG issues <br />
 <b>FFMPEG support tab</b><br />
 <i>Stream types</i> would be forwarded to ffmpeg. If your stream can be recorded with, you can add its prefix here.<br />
-<i>Full path to ffmpeg</i> is needed for experimental <i>ffmpeg</i> support. <i>ffmpeg</i> is not included within this software. On Synology DS <i>ffmpeg</i> is preinstalled with Video Station and the default value should not be changed.<br />
+<i>Full path to ffmpeg</i> is needed for experimental <i>ffmpeg</i> support. <i>ffmpeg</i> is not included within this software. On Synology DS <i>ffmpeg</i> is preinstalled with Video/Audio/Media Station and the default value should not be changed. See corresponding section for more info.<br />
 <i>Additional output arguments for ffmpeg</i> can be used to change your output. Please check the next part for details.<br />
 <b>Advanced tab</b><br />
 <i>Purge database records</i> will be used to automatically delete old EPG and records information and shouldn't normally be changed.<br />
@@ -54,16 +54,23 @@ You shouldn't need any special permissions.</p></li>
 </p></li>
 <li><p><b>FFMPEG support</b></p>
 <p>This software can forward your streams to external software <a href='http://www.ffmpeg.org/'>ffmpeg</a> thus providing support for non-HTTP streams. If you can record your stream with ffmpeg, you can also do it through my software. On Synology systems ffmpeg is preinstalled, for other systems please check <a href='http://www.ffmpeg.org/'>ffmpeg</a> page. Here is a small tutorial for checking and adding your stream support:<br />
-<ul>
+<ul>    
 <li>Make sure, that you have ffmpeg installed by running ffmpeg from the console. You should see no error but ffmpeg output. You may need to download and install ffmpeg for your operating system first and provide full path to this installation (e.g. c:\ffmpeg\ffmpeg.exe)</li>	
 <li>Check your stream foo://10.0.0.1:1000 with following command:<br />
 <i>ffmpeg -i foo://10.0.0.1:1000 -t 30 -acodec copy -vcodec copy out.mpg</i><br />
 If it works, you should be able to locate the generated file out.mpg in current folder. Else you should check for any errors in console output. Make sure that you've provided an correct extension for your stream (.ts, .mpg, .avi, .mk4, .mkv and such): ffmpeg uses this to determine output file type. Look into ffmpeg documentation and experiment with your stream till you get your file. I ask you to understand that I'm unable to test any possible stream myself or to provide any technical support for ffmpeg.</li>   
 <li>If you've got your file and can play it with your favorite media player, you can now add your stream type at the 'Config' page (e.g. rtmp rtm foo).</li>	
-<li>Check your ffmpeg path at config page.</li>	
+<li>
+    Check your ffmpeg path at config page. If you encounter issues with your stream protocol on Synology systems, you may want to try other versions of ffmpeg, which are supplied with their respective applications and commonly located under:
+    <ul>
+        <li>/volume1/@appstore/VideoStation/bin/ffmpeg</li>
+        <li>/volume1/@appstore/AudioStation/bin/ffmpeg</li>
+        <li>/volume1/@appstore/MediaServer/bin/ffmpeg</li>
+    </ul>
+</li>	
 <li>If you want to provide additional output arguments for ffmpeg, you can also do it in config. First arguments are always <i>-i inputstreamname -t recordduration</i> and last argument <i>outputstreamname.extension</i> (you will see all arguments used in my log file after each ffmpeg recording).</li>	
 <li>You can now create a channel with some name, your stream address and your file extension.</li>
-<li>Congratulation, you can now start using this software.</li>
+<li>Congratulations, you can now start using this software.</li>
 </ul>          	
 </p>	
 <li><p><b>Channels manipulation</b></p>

@@ -19,7 +19,7 @@
 </tbody>
 </table>
 </div>
-<div id="record_from_epg" title="Detail view">
+<div id="dialog_record_from_epg" title="Detail view">
 <div id="dialog_content"></div></div>
 <form method='POST' enctype='multipart/form-data' action='/createepg' name='returnform'>
 <input type="text" style="display: none;" name="ret" id="ret" value="X"/>

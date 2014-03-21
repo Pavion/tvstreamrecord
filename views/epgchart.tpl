@@ -3,7 +3,7 @@
 <div id="users-contain" class="ui-widget">
 <form method='POST' enctype='multipart/form-data' action='/epg' name='daychooser'>
 <h1><div id="label_epg_1">Electronic Program Guide. Current date:</div>
-<input type="text" maxlength="10" id="datepicker3" class="text ui-widget-content ui-corner-all" name="datepicker3" value="{{curr}}"/> 
+<input type="text" maxlength="10" id="datepicker_epg" class="text ui-widget-content ui-corner-all" name="datepicker_epg" value="{{curr}}"/> 
 <div id="label_epg_2">Keyword:</div>
 <input type="text" maxlength="50" id="searchepg" class="text ui-widget-content ui-corner-all" name="searchepg" value=""/> 
 <button id="searchepgbutton">Highlight</button>
@@ -30,7 +30,7 @@
 %end
 %end
 </div>
-<div id="record_from_epg" title="Detail view">
+<div id="dialog_record_from_epg" title="Detail view">
     <div id="dialog_content">
         <!-- Empty -->
     </div>

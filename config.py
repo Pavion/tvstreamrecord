@@ -116,6 +116,12 @@ configuration = [
 'cfg_theme',
 "UI theme",
 'smoothness/jquery-ui-1.10.4.custom.min.css'
+],
+
+[
+'cfg_epg_max_events',
+"Max events to be sent",
+'5000'
 ]
 
 ]

@@ -43,7 +43,6 @@ div#about {
     padding-top: 30px;        
 }
 
-
 [id^=icons-], [id^=iconsEPG-], [id^=iconsRec-] , [id^=iconsERec-]  {
     position: relative;
     cursor: pointer;
@@ -69,6 +68,10 @@ div#about {
     margin-left: -1px;
 }
 
+.ui-tooltip {
+    max-width: 800px;
+}
+
 .fakewindowcontain .ui-widget-overlay {
     position: absolute;
 }
@@ -90,7 +93,10 @@ h1 {
 [id^=configtabs-] table th { width: 50%; }
 
 .ui-dialog .ui-state-error { padding: .3em; }
-.validateTips { border: 1px solid transparent; padding: 0.3em; }
+.validateTips { 
+    border: 1px solid transparent; 
+    /*padding: 0.3em; */
+}
 #timepicker_inline_div1 { width:45%; float:left; }
 #timepicker_inline_div2 { width:45%; float:left; margin-left:10px; }
 select#channel { width:85%; float:left; margin-bottom:8px; padding: .2em; } 
@@ -102,11 +108,12 @@ label#append {float: left; margin-top: 3px;}
 
 .ui-button-text-only .ui-button-text  { padding: 0px 3px; }
 
-/*#feedback { font-size: 1.4em; }*/
+#weekday {
+    min-width: 300px;
+}
 
 #channelgroup .ui-selecting { background: #FECA40; }
 #channelgroup .ui-selected { background: #F39814; color: white; }
-
 #channelgroup { 
     position: relative; 
     margin-top: 20px; 
@@ -122,15 +129,16 @@ label#append {float: left; margin-top: 3px;}
     position: absolute; 
 }
 
-#datepicker1, #datepicker3, #searchepg { 
+#datepicker_epg, #searchepg { 
     width: 100px; 
     float:left; 
     margin-left: 5px; 
     margin-right: 5px;
 }
 
-#label_epg_1, label_epg_2 { 
-    float:left; margin-top: 3px; 
+#label_epg_1, #label_epg_2 { 
+    float:left; 
+    margin-top: 3px; 
 }
 
 th.ccontrols { width: 120px; }
@@ -143,7 +151,7 @@ th.rrecu { width: 100px; }
 th.rtill { width: 15%; }
 th.rat { width: 15%; }
 
-th.ldatetime { width: 150px; }
+th.ldatetime { width: 210px; }
 th.lout { width: 30px; }
 
 th.echan { width: 150px; }

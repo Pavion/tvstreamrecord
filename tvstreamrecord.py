@@ -52,7 +52,7 @@ def server_static9(filename):
         f.close()
         return static_file("/live.m3u", root='', mimetype='video')
     else:
-        redirect("/epg")
+        redirect("/epgchart")
 @route('/channels.m3u')
 def server_static8():
     return static_file("/channels.m3u", root='')
@@ -245,7 +245,7 @@ def upload_p():
     else:    
         header = upfile.file.read(7)
         if header.startswith("#EXTM3U"):
-            how = getBool(request.forms.get("switch03"))
+            how = getBool(request.forms.get("switch_list_append"))
             upfilecontent = upfile.file.read()        
             rowid = 1
             if how==0:
@@ -437,12 +437,12 @@ def removeepg():
 
 @post('/epg')
 def epg_p():    
-    day = request.forms.datepicker3
+    day = request.forms.datepicker_epg
     global dayshown
     dayshown = datetime.strptime(day,localdate)
-    redirect("/epg") 
+    redirect("/epgchart") 
 
-@route('/epg')
+@route('/epgchart')
 def epg_s():    
     grabthread.setChannelCount()
 
@@ -495,8 +495,8 @@ def epg_s():
                     title.decode("UTF-8")
                 except:
                     title = title[:296]+"..."
-                    title = ""
-                    fulltext = ""
+                    #title = ""
+                    #fulltext = ""
                     pass
 
             if d_von < daystart:
@@ -508,7 +508,7 @@ def epg_s():
             if x.total_seconds()>=0 and w.total_seconds()>0:
                 rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], title, fulltext, event[4], row[2], event[5]])
         ret.append(rtemp)
-    return template('epg', curr=datetime.strftime(d_von, localdate), rowss=ret, zoom=config.cfg_grab_zoom, curstyle=config.cfg_theme, version=version)            
+    return template('epgchart', curr=datetime.strftime(d_von, localdate), rowss=ret, zoom=config.cfg_grab_zoom, curstyle=config.cfg_theme, version=version)            
 
 @route('/epglist')
 def epglist_s():    
@@ -544,10 +544,12 @@ def epglist_getter():
         
         rows=sqlRun(query)
     else: # Client-side processing
-        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg))    
+        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_epg_max_events))    
 
     for row in rows:
         retlist.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], ""])
+            
+    print len(retlist)
     return json.dumps(
                       {"aaData": retlist, 
                        "sEcho": sEcho,

@@ -2,8 +2,8 @@
 %include create
 <div id="users-contain" class="ui-widget">
 <h1>Records:
-<button id="create-user">Create new record</button>
-<button id="purge-records">Purge old records</button></h1>
+<button id="button_create_record">Create new record</button>
+<button id="button_purge_records">Purge old records</button></h1>
 <table id="table_recordlist">
 <thead>
 <tr class="ui-widget-header ">

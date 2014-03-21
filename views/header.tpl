@@ -1,7 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--<!DOCTYPE html> PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">-->
 
-<HTML>	
+<!DOCTYPE HTML>	
     <head>
     <link rel="shortcut icon" href="images/favicon.ico?v=2" type="image/x-icon" /> 
     <meta charset="utf-8">
@@ -29,7 +29,7 @@
   <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
     <li id="menu-0" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/records">Records</a></li>
     <li id="menu-1" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/list">Channels</a></li>
-    <li id="menu-2" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epg">EPG Chart</a></li>
+    <li id="menu-2" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epgchart">EPG Chart</a></li>
     <li id="menu-3" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epglist">EPG List</a></li>
     <li id="menu-4" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/config">Config</a></li>
     <li id="menu-5" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/log">Log</a></li>

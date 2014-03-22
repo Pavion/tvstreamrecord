@@ -36,6 +36,7 @@ div#mybody {
     line-height:normal;
     border-bottom:1px solid #BCD2E6;
     padding: 20px 20px 0px 20px; 
+    min-height: 100vh;
 }
 
 div#about {

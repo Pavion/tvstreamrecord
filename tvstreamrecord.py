@@ -549,7 +549,6 @@ def epglist_getter():
     for row in rows:
         retlist.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], ""])
             
-    print len(retlist)
     return json.dumps(
                       {"aaData": retlist, 
                        "sEcho": sEcho,

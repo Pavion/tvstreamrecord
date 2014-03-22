@@ -154,6 +154,7 @@ function initProgressbar() {
  * Function to initialize all icons in a table
  * @returns {undefined}
  */
+var dialognr = -1;
 function initIcons() {
     $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsERec-], [id^=iconsDisable-]" ).hover(
         function() {
@@ -271,7 +272,6 @@ function paintTable() {
 function getEpgState() {
     $.get("/getepgstate", 
         function(data) {
-            console.log(data);
             var state = data.grabState;
             var epgmode = 0;
             $( "#grabepg" ).removeProp("disabled");
@@ -303,7 +303,6 @@ function getEpgState() {
 }
 
 $(function() {
-    var dialognr = -1;
     var weekdays = new Array('Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su');
     var pickerform = "dd.mm.yy";
 
@@ -1000,6 +999,4 @@ $(function() {
         });
     }
     
-    
-
 });

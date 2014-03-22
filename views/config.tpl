@@ -53,7 +53,7 @@
 <tr><td>Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)</td><td><input type="text" maxlength="5" id="cfg_grab_time" class="text ui-widget-content ui-corner-all" /></td></tr>
 <tr><td>Zoom level for EPG view. Positive values for horizontal, negative for vertical view (default '1' for old style)</td><td><input id="cfg_grab_zoom" /></td></tr>
 <tr><td>EPG list mode. Disable for client-side processing (more network load), enable for server-side processing (more server load)</td><td><input type="checkbox" class="switch icons" id="cfg_switch_epglist_mode" /></td></tr>
-<tr><td>Client-side only: maximal number of events to request (earlier first) to solve perfomance issues</td><td><input id="cfg_epg_max_events" /></td></tr>
+<tr><td>Client-side only: maximal number of events to request from server (earlier first), solves some perfomance issues</td><td><input id="cfg_epg_max_events" /></td></tr>
 <tr><td>Delete/reset all EPG data</td><td><button id="button_removeepg">Delete EPG data</button></td></tr>
 </tbody>
 </table>

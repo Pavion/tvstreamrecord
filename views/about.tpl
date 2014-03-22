@@ -8,6 +8,7 @@
 <li><p><b>What's new in 0.6?</b></p>
 <ul>
 <li>UI redesign with theme roller support</li>
+<li>New state save for tables, please adjust table sort to be saved</li>
 </ul>
 </li>
 <li><p><b>Introduction</b></p>

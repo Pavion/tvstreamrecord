@@ -39,7 +39,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.6.0' 
+version = '0.6.1' 
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -56,6 +56,10 @@ def server_static9(filename):
 @route('/channels.m3u')
 def server_static8():
     return static_file("/channels.m3u", root='')
+# Languages
+@route('/lang/<filename>')
+def server_static10(filename):
+    return static_file(filename, root='./lang')
 # Log file
 @route('/log.txt')
 def server_static7():
@@ -64,6 +68,9 @@ def server_static7():
 @route('/js/<filename>')
 def server_static1(filename):
     return static_file(filename, root='./js')
+@route('/js/i18n/<filename>')
+def server_static11(filename):
+    return static_file(filename, root='./js/i18n')
 # CSS handling
 @route('/css/<curstyle>/<filename>')
 def server_static2(curstyle,filename):
@@ -80,23 +87,54 @@ def server_static5(filename):
     return static_file(filename, root='./images')
 
 #------------------------------- Recurring records -------------------------------
-weekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
+def getWeekdays(mask):
+    mask = 127 if mask == 0 else mask
+    ret = list()
+    for i in range(0, 7):
+        ret.append( ( mask & pow(2,i) ) == pow(2,i)  )
+    return ret
 
-def getWeekdays(i):
-    if i==0: i=127
-    l = []
-    s = bin(i)[2:]
-    while len(s)<7: s = '0'+s
-    s = s[::-1]    
-    for c in s: l.append(c=='1')
-    return l
+#------------------------------- Internalization -------------------------
+
+def checkLocale():
+    if not config.cfg_language == "english.local":
+        ret = False
+        try:
+            lang = config.cfg_language.split(".")
+            if os.path.isfile("lang/tvstreamrecord." + lang[0] + "." + lang[1] + ".json") and os.path.isfile("lang/dataTables." + lang[0] + ".json") and os.path.isfile("js/i18n/jquery.ui.datepicker-" + lang[1] + ".js") and os.path.isfile("js/i18n/jquery-ui-timepicker-" + lang[1] + ".js"):
+                ret = True
+        except: 
+            pass
+        if not ret:
+            config.cfg_language = "english.local"
+            print "Locale not found, resetting to default language"
+
+
+def internationalize(templ):
+    checkLocale() 
+    header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language.split(".") )
+    footer = template('footer')
+    templ = header + templ + footer
+    try:
+        json_data=open('lang/tvstreamrecord.' + config.cfg_language + '.json')
+        data = json.load(json_data)
+        for word in data:
+            if data[word]:
+                templ = templ.replace(u"§"+word+u"§", data[word])
+            else:
+                templ = templ.replace(u"§"+word+u"§", word)
+        json_data.close()
+    except:
+        pass        
+    templ = templ.replace(u"§","")
+    return templ 
 
 #------------------------------- Main menu -------------------------------
 
 @route('/')
 @route('/about')
-def about_s():    
-    return template('about', curstyle=config.cfg_theme, version=version)
+def about_s(): 
+    return internationalize(template('about'))
 
 #------------------------------- Logging -------------------------------
         
@@ -113,7 +151,7 @@ def log_reset():
 
 @route('/log')
 def log_s():
-    return template('log', curstyle=config.cfg_theme, version=version)
+    return internationalize(template('log'))
 
 @route('/logget')
 def log_get():
@@ -138,7 +176,7 @@ def chanlist():
 
 @route('/list')
 def list_s():
-    return template('list',rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'),curstyle=config.cfg_theme, version=version)
+    return internationalize(template('list',rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid')))
     
 @post('/list')
 def list_p():
@@ -294,7 +332,17 @@ def config_s():
                 if css.endswith(".css"):
                     themes.append([theme+'/'+css,theme])
                     break
-    return template('config', curstyle=config.cfg_theme, version=version, themes=themes)
+    languages = list() 
+    languages.append(["english", "local"])
+    for langfile in os.listdir("lang"):
+        if langfile.startswith("tvstreamrecord") and langfile.endswith("json"):
+            try:
+                lang = langfile[15:-5].split(".")
+                if os.path.isfile("lang/dataTables." + lang[0] + ".json") and os.path.isfile("js/i18n/jquery.ui.datepicker-" + lang[1] + ".js") and os.path.isfile("js/i18n/jquery-ui-timepicker-" + lang[1] + ".js"):
+                    languages.append(lang)
+            except:
+                pass
+    return internationalize(template('config', themes=themes, languages=languages))
 
 @route('/getconfig')
 def getconfig():
@@ -316,11 +364,12 @@ class epggrabthread(Thread):
     
     def setChannelCount(self):
         self.epggrabberstate[1] = 0
-        rows = sqlRun("SELECT count(cname) FROM channels WHERE epgscan = 1 AND cenabled = 1;")
-        if rows:
-            self.epggrabberstate[1] = rows[0][0]
-        #if config.cfg_switch_xmltv_auto=="1": 
-        self.epggrabberstate[1] += 1     
+        if config.cfg_switch_grab_auto == "1": 
+            rows = sqlRun("SELECT count(cname) FROM channels WHERE epgscan = 1 AND cenabled = 1;")
+            if rows:
+                self.epggrabberstate[1] += rows[0][0]
+        if config.cfg_switch_xmltv_auto=="1": 
+            self.epggrabberstate[1] += 1     
     
     def __init__(self):
         self.setChannelCount()
@@ -350,11 +399,12 @@ class epggrabthread(Thread):
     def doGrab(self, override=False):
         self.kill()
         self.running = True        
-        if (config.cfg_switch_grab_auto=="1" or override) and not self.stopflag:  self.grabStream()
-        if (config.cfg_switch_xmltv_auto=="1" or override) and not self.stopflag: self.grabXML()
+        if config.cfg_switch_grab_auto=="1"  and not self.stopflag: self.grabStream()
+        if config.cfg_switch_xmltv_auto=="1" and not self.stopflag: self.grabXML()
         self.epggrabberstate[0]=0
         self.running = False
-        sleep(61)        
+        if not override:
+            sleep(61)        
         self.stopflag = False
         self.run()
         
@@ -367,11 +417,10 @@ class epggrabthread(Thread):
  
     def grabStream(self):
         rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
-        #self.epggrabberstate[1] = len(rows)        
         for row in rows:
             if self.stopflag: 
                 break
-            self.epggrabberstate[0] = self.epggrabberstate[0] + 1
+            self.epggrabberstate[0] += 1
             fulllist = grabber.startgrab(row)
             sqllist = list()
             sqlchlist = list()
@@ -439,8 +488,8 @@ def removeepg():
 def epg_p():    
     day = request.forms.datepicker_epg
     global dayshown
-    dayshown = datetime.strptime(day,localdate)
-    redirect("/epgchart") 
+    dayshown = datetime.strptime(day,"%Y-%m-%d")
+    return
 
 @route('/epgchart')
 def epg_s():    
@@ -508,11 +557,11 @@ def epg_s():
             if x.total_seconds()>=0 and w.total_seconds()>0:
                 rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], title, fulltext, event[4], row[2], event[5]])
         ret.append(rtemp)
-    return template('epgchart', curr=datetime.strftime(d_von, localdate), rowss=ret, zoom=config.cfg_grab_zoom, curstyle=config.cfg_theme, version=version)            
+    return internationalize(template('epgchart', curr=datetime.strftime(d_von, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom))
 
 @route('/epglist')
 def epglist_s():    
-    return template('epglist', listmode=config.cfg_switch_epglist_mode, curstyle=config.cfg_theme, version=version)
+    return internationalize(template('epglist', listmode=config.cfg_switch_epglist_mode))
     
 @route('/epglist_getter')
 def epglist_getter():
@@ -547,7 +596,7 @@ def epglist_getter():
         rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_epg_max_events))    
 
     for row in rows:
-        retlist.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], ""])
+        retlist.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
             
     return json.dumps(
                       {"aaData": retlist, 
@@ -561,23 +610,16 @@ def epglist_getter():
 @route('/getrecordlist')
 def getrecordlist():
     l = []
-    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")     
+#    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")     
+    rows=sqlRun("SELECT recname, cname, rvon, rbis, rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")     
     for row in rows:
-        rec = ""
-        if row[4]==0: 
-            rec = "no"
-        else: 
-            wd = getWeekdays(row[4])
-            for index, item in enumerate(wd): 
-                if item: 
-                    rec += weekdays[index]
         m3u = "<a href=\"live/" + str(row[10]) + ".m3u\">" + row[1] + "</a>"
-        l.append([row[0], m3u, row[2], row[3], rec, row[5], row[6], row[7], row[8], row[9]])
+        l.append([row[0], m3u, row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]])
     return json.dumps({"aaData": l} )
 
 @route('/records')
 def records_s():    
-    return template('records', rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), curstyle=config.cfg_theme, version=version)
+    return internationalize(template('records', rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid')))
 
 @post('/records')
 def records_p():
@@ -612,8 +654,10 @@ def create_p():
     aktiv = getBool(request.forms.aktiv)    
     recurr = request.forms.recurr
 
-    d_von = datetime.strptime(am + " " + von, "%d.%m.%Y %H:%M")
-    d_bis = datetime.strptime(am + " " + bis, "%d.%m.%Y %H:%M")
+    d_von = datetime.strptime(am + " " + von, "%Y-%m-%d %H:%M")
+    d_bis = datetime.strptime(am + " " + bis, "%Y-%m-%d %H:%M")
+#    d_von = datetime.strptime(am + " " + von, "%d.%m.%Y %H:%M")
+#    d_bis = datetime.strptime(am + " " + bis, "%d.%m.%Y %H:%M")
     delta = timedelta(days=1)
     if d_bis < d_von:
         d_bis = d_bis + delta         

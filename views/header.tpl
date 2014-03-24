@@ -8,32 +8,39 @@
 	<title>tvstreamrecord {{version}}</title>
 <!--	<link href="css/smoothness/jquery-ui-1.9.2.custom.css" rel="stylesheet">-->
 	<link href="css/{{style}}" rel="stylesheet">
-	<link href="css/jquery.ui.timepicker.css" rel="stylesheet">
+	<link href="css/jquery-ui-timepicker-addon.min.css" rel="stylesheet">
 	<link href="css/jquery.dataTables_themeroller.css" rel="stylesheet">
 	<link href="css/slickswitch.css" rel="stylesheet">
-        <link rel="stylesheet" href="css/tvstreamrecord.basic.css" type="text/css" />
+    <link rel="stylesheet" href="css/tvstreamrecord.basic.css" type="text/css" />
+      
 
 	<script src="js/jquery-1.8.3.js"></script>
 	<script src="js/jquery-ui-1.9.2.custom.js"></script>
-        <script src="js/jquery.ui.timepicker.js"></script>
+        <script src="js/jquery-ui-timepicker-addon.min.js"></script>
 	<script src="js/jquery.slickswitch.js"></script>
-	<script src="js/tvstreamrecord.basic.js"></script>
 	<script src="js/jquery.dataTables.min.js"></script>	
+%if not language[1] == 'local':         
+	<script src="js/i18n/jquery-ui-timepicker-{{language[1]}}.js"></script>	
+	<script src="js/i18n/jquery.ui.datepicker-{{language[1]}}.js"></script>	
+%end
+	<script src="js/tvstreamrecord.basic.js"></script>
 </head><BODY>
-<div id="mybody" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+<div id="datepicker_local" style="display: none;"></div>
+<div id="timepicker_local" style="display: none;"></div>
+<div id="mybody" class="ui-tabs-panel ui-widget-content ui-corner-bottom" language="{{language[0]}}" locale="{{language[1]}}">
 <div id="menus">
 <div id="logo">
 	<a href="http://pavion.github.io/tvstreamrecord/"><img src="images/tvstreamrecordlogo.png"></a> 
 </div>
 <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
   <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
-    <li id="menu-0" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/records">Records</a></li>
-    <li id="menu-1" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/list">Channels</a></li>
-    <li id="menu-2" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epgchart">EPG Chart</a></li>
-    <li id="menu-3" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epglist">EPG List</a></li>
-    <li id="menu-4" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/config">Config</a></li>
-    <li id="menu-5" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/log">Log</a></li>
-    <li id="menu-6" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/about">About</a></li>
+    <li id="menu-0" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/records">§Records§</a></li>
+    <li id="menu-1" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/list">§Channels§</a></li>
+    <li id="menu-2" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epgchart">§EPG Chart§</a></li>
+    <li id="menu-3" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epglist">§EPG List§</a></li>
+    <li id="menu-4" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/config">§Config§</a></li>
+    <li id="menu-5" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/log">§Log§</a></li>
+    <li id="menu-6" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/about">§About§</a></li>
   </ul>
 </div>
 </div>

@@ -82,6 +82,8 @@ def sqlCreateAll(version):
                     sql += 'INSERT OR IGNORE INTO guide_chan_neu SELECT * FROM guide_chan;'
                     sql += 'DROP TABLE guide_chan;'
                     sql += 'ALTER TABLE guide_chan_neu RENAME TO guide_chan;'
+                if oldver < '0.6.1':
+                    sql += 'UPDATE records SET rmask = case when (rmask & 64)=64 then ((rmask - 64) << 1) + 1 else rmask << 1 end;'
                 if oldver > version:
                     print "Critical error: Version mismatch!!!"     
                

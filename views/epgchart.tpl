@@ -1,14 +1,13 @@
-%include header style=curstyle, version=version 
 <div id="zoom" zoom="{{zoom}}"></div>
 <div id="users-contain" class="ui-widget">
-<form method='POST' enctype='multipart/form-data' action='/epg' name='daychooser'>
-<h1><div id="label_epg_1">Electronic Program Guide. Current date:</div>
-<input type="text" maxlength="10" id="datepicker_epg" class="text ui-widget-content ui-corner-all" name="datepicker_epg" value="{{curr}}"/> 
-<div id="label_epg_2">Keyword:</div>
+<!--<form method='POST' enctype='multipart/form-data' action='/epg' name='daychooser'>-->
+<h1><div id="label_epg_1">§Electronic Program Guide. Current date§:</div>
+<input type="text" maxlength="10" id="datepicker_epg" class="text ui-widget-content ui-corner-all" name="datepicker_epg" dbvalue="{{curr}}"/> 
+<div id="label_epg_2">§Keyword§:</div>
 <input type="text" maxlength="50" id="searchepg" class="text ui-widget-content ui-corner-all" name="searchepg" value=""/> 
-<button id="searchepgbutton">Highlight</button>
-<button id="grabepg"></button>
-</h1></form>
+<button id="searchepgbutton">§Highlight§</button>
+<button id="grabepg" text1="§Grab EPG from§" text2="§source(s)§" text3="§Stop loading EPG§" text4="§Stopping EPG, please refresh§"></button>
+</h1><!--</form>-->
 </div>
 %cnt=0
 %for rows in rowss:
@@ -30,7 +29,7 @@
 %end
 %end
 </div>
-<div id="dialog_record_from_epg" title="Detail view">
+<div id="dialog_record_from_epg" title="§Detail view§" record="§Record§" cancel="§Cancel§">
     <div id="dialog_content">
         <!-- Empty -->
     </div>
@@ -38,8 +37,6 @@
 <form method='POST' enctype='multipart/form-data' action='/createepg' name='returnform'>
     <input type="text" style="display: none;" name="ret" id="ret" value="X"/>
 </form>
-<div id="dialog_channel_disable" title="Channel disable">
-	<p>Do you want to disable this channel? You can enable it again at the channel list page.</p>
+<div id="dialog_channel_disable" title="§Channel disable§" disable="§Disable§" cancel="§Cancel§">
+	<p>§Do you want to disable this channel? You can enable it again at the channel list page.§</p>
 </div>
-%include footer
-

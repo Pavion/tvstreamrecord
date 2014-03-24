@@ -1,13 +1,12 @@
-%include header style=curstyle, version=version 
-
 <div id="about">
-<p><b>Tvstreamrecord v.{{version}}</b></p>
+<p><b>Tvstreamrecord</b></p>
 
 <p><b>Quick guide</b></p>
 <ol>
 <li><p><b>What's new in 0.6?</b></p>
 <ul>
 <li>UI redesign with theme roller support</li>
+<li>Localization support added. New languages supported: german, russian</li>
 <li>New state save for tables, please adjust table sort to be saved</li>
 </ul>
 </li>
@@ -35,9 +34,9 @@ You shouldn't need any special permissions.</p></li>
 <i>File extension for the recorded stream</i> will be added as suffix to the filename. Mostly it would be MPEG transport stream (.ts). Changing this parameter doesn't affect anything beside filename.<br />
 <b>EPG tab</b><br />
 <i>Lenghten an EPG record</i> will be used to prolong the record and avoid any small time shifts in TV charts. Please note, that your system time will be used for recording and should be exact.<br />
-<i>Automatic XMLTV import</i> will be performed once per day at specified time if enabled. <br />
+<i>Enable XMLTV import</i> for manual import or to be performed once per day at specified time. <br />
 <i>Initial path for an XMLTV-Import</i> can be used to import EGP (electronic program guide) from free XMLTV-compatible pages. <br />
-<i>Automatic stream scan/grab</i> will be performed once per day at specified time if enabled. <br />
+<i>Enable stream scan/grab</i> for manual import or to be performed once per day at specified time. <br />
 <i>Maximal EPG scan duration <b>per channel</b> in seconds</i>. Some channels resend all their EPG information each minute, some channels have much longer cycles. Increasing duration can result in receiving more guide information.<br /> 
 <i>Time to perform daily EPG/XMLTV grab</i> can be used to automatically refresh your EPG guide using your streams and/or your XMLTV provider. Please read the corresponding sections for more details.<br />
 <i>Zoom level for EPG view</i>. You can change your default EPG view here. Enter negative values for vertical and positive values for default horizontal view (i.e. 2=200% horizontal, -3=300% vertical). Default is '1' for classic horizontal one-page view.<br /> 
@@ -122,5 +121,3 @@ Please contact me if you have a same issue with a different URL.</p>
 </li>
 <ol />
 </div>
-
-%include footer         

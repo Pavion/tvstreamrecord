@@ -1,4 +1,4 @@
-/*
+/**
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License,
@@ -15,7 +15,7 @@
     @author: Pavion
 */
 
-/* 
+/** 
  * Common functions
  */
 
@@ -73,13 +73,16 @@ function here(url) {
  */
 function switchMe(sw,  how) {
     if (how) {
-        $(sw).attr("checked","checked");
+        $(sw).trigger('ss-toggleOn');
+    
+    /*    $(sw).attr("checked","checked");
         $("a"+sw).children(".ss-on").attr("style", "");
-        $("a"+sw).children(".ss-slider").attr("style", "left: 13px;");
+        $("a"+sw).children(".ss-slider").attr("style", "left: 13px;");*/
     } else {
-        $(sw).removeAttr("checked");
+        $(sw).trigger('ss-toggleOff');
+    /*    $(sw).removeAttr("checked");
         $("a"+sw).children(".ss-on").attr("style", "display: none;");
-        $("a"+sw).children(".ss-slider").attr("style", "left: 0px;");
+        $("a"+sw).children(".ss-slider").attr("style", "left: 0px;");*/
     }
 }
 
@@ -199,7 +202,10 @@ function initIcons() {
                 if(data[i][6]==dialognr) {
                     $("#ret").val(dialognr);
 //                    $("#dialog_content").html ("<b>" + data[i][1] + "<br>"+data[i][3]+" - " + data[i][4] + "</b><br><br>" + data[i][2]);
-                    $("#dialog_content").html (data[i][7]);
+//                    $("#dialog_content").html (data[i][7]);
+                    var dat_v = data[i][3].split(" ")[1].substr(0,5); 
+                    var dat_b = data[i][4].split(" ")[1].substr(0,5); 
+                    $( "#dialog_content" ).html ("<b>" + data[i][1] + ": "+dat_v + " - " + dat_b + "</b><BR><BR>" + data[i][2]);
                     $( "#dialog_record_from_epg" ).dialog( "open" );
                     break;
                 }
@@ -275,17 +281,19 @@ function getEpgState() {
             var state = data.grabState;
             var epgmode = 0;
             $( "#grabepg" ).removeProp("disabled");
-            if (state[2]==='0') {
+            $( "#grabepg" ).removeClass("ui-state-disabled");
+            if (state[2]=='0') {
                 $( "#grabepg" ).hide();
             } else {
-                if (state[0] === false) {
-                    $( "#grabepg" ).html("Grab EPG from " + state[2] + " source" + (state[2]==="1"?"":"s"))
+                if (state[0] == false) {
+                    $( "#grabepg" ).html($( "#grabepg" ).attr("text1") + " " + state[2] + " " + $( "#grabepg" ).attr("text2") );
                 } else {
-                    if (state[3] === false) {
-                        $( "#grabepg" ).html("Stop loading EPG (State: " + state[1] + '/' + state[2] + ")");
+                    if (state[3] == false) {
+                        $( "#grabepg" ).html($( "#grabepg" ).attr("text3") + " (" + state[1] + '/' + state[2] + ")");
                     } else {
-                        $( "#grabepg" ).html("Stopping loading EPG, please wait");
+                        $( "#grabepg" ).html($( "#grabepg" ).attr("text4"));
                         $( "#grabepg" ).prop("disabled", true);
+                        $( "#grabepg" ).addClass("ui-state-disabled");
                     }                    
                     epgmode = 1;
                 }        
@@ -303,10 +311,17 @@ function getEpgState() {
 }
 
 $(function() {
-    var weekdays = new Array('Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su');
-    var pickerform = "dd.mm.yy";
-
     $(document).tooltip();
+
+// Localization    
+    var language = $("#mybody").attr("language");
+
+    $( "#datepicker_local" ).datepicker();
+    //$( "#timepicker_local" ).timepicker();
+    var mydateformat = $( "#datepicker_local" ).datepicker( "option", "dateFormat" );
+    var mytimeformat = "HH:mm"; //$( "#timepicker_local" ).datepicker( "option", "timeFormat" );
+    var weekdays = $( "#datepicker_local" ).datepicker( "option", "dayNamesMin");
+    var firstday = $( "#datepicker_local" ).datepicker( "option", "firstDay");
     
 // Common menu handling
     var menu = new Array("/records","/list","/epgchart","/epglist","/config","/log","/about");
@@ -321,39 +336,49 @@ $(function() {
 // Common dialogs and forms
     $("#timepicker_inline_div1,#timepicker_inline_div2,#cfg_grab_time").timepicker({
         constrainInput: true,
-        showPeriodLabels: false
+        showPeriodLabels: false,
+        timeFormat: mytimeformat 
     });
 
     $( "#dialog_remove" ).dialog({
         autoOpen: false,
-        buttons: {
-            "Delete": function() {
+        buttons: [{
+            text: $( "#dialog_remove" ).attr("delete"),
+            click: function() {
                 if (here("config")) {
                     post("/removeepg", {}, 1);
                 } else {
                     post(where(), { myid:dialognr, what:"-1" }, 1);
                 }
                 $( this ).dialog( "close" );
-            },
-            Cancel: function() {
+            }
+        }, 
+        {
+            text: $( "#dialog_remove" ).attr("cancel"),
+            click: function() {
                 $( this ).dialog( "close" );
             }
-        }
-        
+        }]
     });
 
 // Record create dialogs and forms
     var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker_create" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" ).add("#cname").add("#ccid").add("#cpath");
 
+    for(var i=0;i<7;i++) {
+        $("#wwd"+i).text(weekdays[i]);
+    }    
+    for(var i=0;i<firstday;i++) {
+        $( "#wwd"+i ).insertAfter( $( "#wwd" + (i===0?6:i-1) ));        
+    }
     $( "#weekday" ).buttonset();
+    
 
     $( "#switch_create").slickswitch();
 
     $( "#datepicker_create" ).datepicker({
         constrainInput: true,
         minDate: -1,
-        defaultDate: 0,
-        dateFormat: pickerform
+        defaultDate: 0
     });
 
     $( "#dialog_create_record" ).dialog({
@@ -362,18 +387,25 @@ $(function() {
         modal: true,
         open: function( event, ui ) {
 
+/*            $("#weekday").empty();
+            for(var i=0;i<7;i++) {
+                
+                $("#weekday").append($ ('<input type="checkbox" id="wday' + i + '" /><label id="wwd' + i + '" for="wday' + i + '">§xMo§</label>') );
+            }            */
+
+            
             for(var i=0;i<7;i++) {
                 $("#wwd"+i).removeClass("ui-state-active");
             }
 
             var cancelbutton = {
-                text: "Cancel", click: function() {
+                text: $(this).attr("cancel"), click: function() {
                     $( this ).dialog( "close" );
                 }
             };
 
             var deletebutton = {
-                text: "Delete", click: function()
+                text: $(this).attr("delete"), click: function()
                 {
                     $( this ).dialog( "close" );
                     $( "#dialog_remove" ).dialog( "open" );
@@ -381,15 +413,15 @@ $(function() {
             };
 
             var updatebutton = {
-                text: ((dialognr==-1 || here('list'))?"Schedule a record":"Change a record"), click: function()
+                text: ((dialognr==-1 || here('list'))?$(this).attr("schedule"):$(this).attr("change")), click: function()
                 {
                     var bValid = true;
                     allFields.removeClass( "ui-state-error" );
                     bValid = bValid && checkLength( "recname", "record name", 1, 255 );
                     bValid = bValid && checkRegexp( "recname", /^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\";|//]+$/, "No special chars in this field please" );
-                    bValid = bValid && checkLength( "channel", "channel", 1, 50 );
-                    bValid = bValid && checkLength( "datepicker_create", "date", 10, 10 );
-                    bValid = bValid && checkRegexp( "datepicker_create", /^((((0?[1-9]|[12]\d|3[01])[\.\-\/](0?[13578]|1[02])[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|((0?[1-9]|[12]\d|30)[\.\-\/](0?[13456789]|1[012])[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|((0?[1-9]|1\d|2[0-8])[\.\-\/]0?2[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|(29[\.\-\/]0?2[\.\-\/]((1[6-9]|[2-9]\d)?(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)|00)))|(((0[1-9]|[12]\d|3[01])(0[13578]|1[02])((1[6-9]|[2-9]\d)?\d{2}))|((0[1-9]|[12]\d|30)(0[13456789]|1[012])((1[6-9]|[2-9]\d)?\d{2}))|((0[1-9]|1\d|2[0-8])02((1[6-9]|[2-9]\d)?\d{2}))|(2902((1[6-9]|[2-9]\d)?(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)|00))))$/, "Please use DD.MM.YYYY for this field" );
+//                    bValid = bValid && checkLength( "channel", "channel", 1, 50 );
+//                    bValid = bValid && checkLength( "datepicker_create", "date", 10, 10 );
+//                    bValid = bValid && checkRegexp( "datepicker_create", /^((((0?[1-9]|[12]\d|3[01])[\.\-\/](0?[13578]|1[02])[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|((0?[1-9]|[12]\d|30)[\.\-\/](0?[13456789]|1[012])[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|((0?[1-9]|1\d|2[0-8])[\.\-\/]0?2[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|(29[\.\-\/]0?2[\.\-\/]((1[6-9]|[2-9]\d)?(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)|00)))|(((0[1-9]|[12]\d|3[01])(0[13578]|1[02])((1[6-9]|[2-9]\d)?\d{2}))|((0[1-9]|[12]\d|30)(0[13456789]|1[012])((1[6-9]|[2-9]\d)?\d{2}))|((0[1-9]|1\d|2[0-8])02((1[6-9]|[2-9]\d)?\d{2}))|(2902((1[6-9]|[2-9]\d)?(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)|00))))$/, "Please use DD.MM.YYYY for this field" );
                     bValid = bValid && checkLength( "timepicker_inline_div1", "start time", 5, 5 );
                     bValid = bValid && checkRegexp( "timepicker_inline_div1", /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/, "Please use HH:MM format for this field" );
                     bValid = bValid && checkLength( "timepicker_inline_div2", "end time", 5, 5 );
@@ -410,7 +442,7 @@ $(function() {
                             Sender:$("#channel").val(),
                             von:$("#timepicker_inline_div1").val(),
                             bis:$("#timepicker_inline_div2").val(),
-                            am:$("#datepicker_create").val(),
+                            am:  $.datepicker.formatDate("yy-mm-dd", $("#datepicker_create").datepicker( "getDate" )),
                             aktiv:akt,
                             recurr:mask
                         }, 1);
@@ -428,13 +460,8 @@ $(function() {
                     for(var i=0;i<len;i++) {
                         if(data[i][7]==dialognr) {
 
-                            var recur = data[i][4];
-                            if(data!="no") {
-                                for(var j=0;j<7;j++) {
-                                    if(recur.search(weekdays[j])!=-1) {
-                                        $("#wwd"+j).addClass("ui-state-active");
-                                    }
-                                }
+                            for(var j=0;j<7;j++) {
+                                if ( (data[i][4] & Math.pow(2,j)) == Math.pow(2,j)) $("#wwd"+j).addClass("ui-state-active");
                             }
 
                             var kids = $("#channel").children();
@@ -450,7 +477,9 @@ $(function() {
                             $("#recname").val(data[i][0]);
                             $("#timepicker_inline_div1").val(data[i][2].slice(11,16));
                             $("#timepicker_inline_div2").val(data[i][3].slice(11,16));
-                            $("#datepicker_create").val(data[i][2].slice(0,10));
+                            //$("#datepicker_create").val(data[i][2].slice(0,10)); //??
+                            //$("#datepicker_create").datepicker( "setDate", mydatetime );      
+                            $("#datepicker_create").val( localDate(data[i][2]) );
                             break;
                         }
                     }
@@ -463,11 +492,14 @@ $(function() {
                 var mm = today.getMonth()+1; //January is 0!
                 var hr = today.getHours();
                 var min = today.getMinutes();
-
                 var yyyy = today.getFullYear();
-                if(dd<10){dd='0'+dd;} if(mm<10){mm='0'+mm;} today = dd+'.'+mm+'.'+yyyy;
-                $("#datepicker_create").val(today);
-                if(hr<10){hr='0'+hr;} if(min<10){min='0'+min;} today = hr+':'+min;
+                if(dd<10){dd='0'+dd;} if(mm<10){mm='0'+mm;} today = yyyy+'-'+mm+'-'+dd;
+                //$("#datepicker_create").datepicker( "setDate", localDate(today) );
+                $("#datepicker_create").val( localDate(today) );
+
+                //console.log(localDate(today));
+    
+                if(hr<10){hr='0'+hr;} if(min<10){min='0'+min;} today = hr+':'+min;//+':00';
                 $("#timepicker_inline_div1").val(today);
                 today = new Date();
                 hr = today.getHours() + 1;
@@ -497,15 +529,19 @@ $(function() {
         autoOpen: false,
         modal: true,
         width: 600,
-        buttons: {
-            "Record": function() {
+        buttons: [{
+            text: $( "#dialog_record_from_epg" ).attr("record"),
+            click: function() {
                 $( this ).dialog( "close" );
                 document.returnform.submit();
-            },
-            Cancel: function() {
-                $( this ).dialog( "close" );
             }
         },
+        {
+            text: $( "#dialog_record_from_epg" ).attr("cancel"),
+            click: function() {
+                $( this ).dialog( "close" );
+            }
+        }],
         close: function() {
             $("#dialog_content").html("");
         }
@@ -528,49 +564,66 @@ $(function() {
         
         $( "#dialog_purge" ).dialog({
             autoOpen: false,
-            buttons: {
-                "OK": function() {
+            buttons: [{
+                text: $( "#dialog_purge" ).attr("ok"),
+                click: function() {
                     post(where(), { myid:'-1', what:"-2" }, 1);
                     $( this ).dialog( "close" );
-                }, 
-                "Cancel": function() {
+                },
+            },
+            {
+                text: $( "#dialog_purge" ).attr("cancel"),
+                click: function() {
                     $( this ).dialog( "close" );
                 }
-            }
+            }]
         });
 
 
 
         $('#table_recordlist').dataTable({
-           "bJQueryUI": true,
-           "sPaginationType": "full_numbers",
-           "bProcessing": true,
-           "bAutoWidth": false,
-           "sAjaxSource": "/getrecordlist",
-           "bStateSave": true,
-           "fnStateSave": function (oSettings, oData) {
-               localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
-           },
-           "fnStateLoad": function (oSettings) {
-               return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
-           },
-           "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 6,7,8,9 ] },
-                             { "iDataSort": 8, "aTargets": [ 2 ] },
-                             { "iDataSort": 9, "aTargets": [ 3 ] } ],
-           "fnDrawCallback": function( oSettings ) {
-               initSwitch();
-               initIcons();
-               initProgressbar();
-               paintTable();
-           },
-           "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-               var chk = "";
-               if (aData[5] == 1) chk = 'checked="checked"';
-               htmltext  = '<div id="progressbar' + aData[6] + '"></div>';
-               htmltext += '<input type="checkbox" class="switch icons" id="switch-' + aData[7] + '" ' + chk + ' />';
-               htmltext += '<a href="#" id="icons-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>';
-               $('td:eq(5)', nRow).html(htmltext);
-           }
+            "oLanguage": {"sUrl": "lang/dataTables." + language + ".json"},
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "bProcessing": true,
+            "bAutoWidth": false,
+            "sAjaxSource": "/getrecordlist",
+            "bStateSave": true,
+            "fnStateSave": function (oSettings, oData) {
+                localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
+            },
+            "fnStateLoad": function (oSettings) {
+                return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
+            },
+            "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 6,7,8,9 ] },
+                              { "iDataSort": 8, "aTargets": [ 2 ] },
+                              { "iDataSort": 9, "aTargets": [ 3 ] } ],
+            "fnDrawCallback": function( oSettings ) {
+                initSwitch();
+                initIcons();
+                initProgressbar();
+                paintTable();
+            },
+            "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                $('td:eq(2)', nRow).html( localDateTime( aData[2] ) );
+                $('td:eq(3)', nRow).html( localDateTime( aData[3] ) );
+                var recurr="";
+                if (aData[4] == 0) {
+                    recurr = $('#table_recordlist').attr("recurr");
+                } else {
+                    for(var i=firstday; i<7+firstday; i++) {
+                        var day = i>=7?i-7:i;
+                        if ( (aData[4] & Math.pow(2,day)) == Math.pow(2,day)) recurr += weekdays[day];
+                    }
+                }                
+                $('td:eq(4)', nRow).html(recurr);
+                var chk = "";
+                if (aData[5] == 1) chk = 'checked="checked"';
+                htmltext  = '<div id="progressbar' + aData[6] + '"></div>';
+                htmltext += '<input type="checkbox" class="switch icons" id="switch-' + aData[7] + '" ' + chk + ' />';
+                htmltext += '<a href="#" id="icons-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>';
+                $('td:eq(5)', nRow).html(htmltext);
+            }
 
        });
     } else if (here("list")) {
@@ -611,29 +664,35 @@ $(function() {
         $( "#dialog_import_clist" ).dialog({
             autoOpen: false,
             modal: true,
-            buttons: {
-                "Upload file": function() {
+            buttons: [{
+                text: $( "#dialog_import_clist" ).attr("upload"),
+                click: function() {
                     $( this ).dialog( "close" );
                     document.uploader.submit();
-                },
-                Cancel: function() {
+                }
+            },
+            {
+                text: $("#dialog_import_clist").attr("cancel"),
+                click: function() {
                     $( this ).dialog( "close" );
                 }
-            }
+            }] 
         });
     
         $( "#dialog_download_clist" ).dialog({
             autoOpen: false,
-            buttons: {
-                "OK": function() {
+            buttons: [{
+                text: $( "#dialog_download_clist" ).attr("ok"),
+                click: function() {
                     $( this ).dialog( "close" );
                 }
-            }
+            }]
         });
 
         $( "#dialog_create_channel" ).dialog({
             autoOpen: false,
             modal: true,
+            width: 400,
             close: function() {
                 $( ".validateTips" ).html("");
                 allFields.val( "" ).removeClass( "ui-state-error" );
@@ -641,18 +700,18 @@ $(function() {
             open: function( event, ui ) {
 
                 var cancelbutton = {
-                    text: "Cancel", click: function() {
+                    text: $( this ).attr("cancel"), click: function() {
                         $( this ).dialog( "close" );
                     }
                 };
                 var updatebutton = {
-                    text: (dialognr==-1?"Create channel":"Update"), click: function()
+                    text: (dialognr==-1?$( this ).attr("create"):$( this ).attr("update")), click: function()
                     {
                         var bValid = true;
                         allFields.removeClass( "ui-state-error" );
-                        bValid = bValid & checkRegexp(  "ccid", /^[0-9]{1,5}$/, "Please enter a valid number" );
-                        bValid = bValid & checkRegexp(  "cname", /^(?=\s*\S).*$/, "Please enter a valid name" );
-                        bValid = bValid & checkRegexp(  "cpath", /^(?=\s*\S).*$/, "Please enter a valid URL" );
+                        bValid = bValid & checkRegexp(  "ccid", /^[0-9]{1,5}$/, $(this).attr("errid") );
+                        bValid = bValid & checkRegexp(  "cname", /^(?=\s*\S).*$/, $(this).attr("errname") );
+                        bValid = bValid & checkRegexp(  "cpath", /^(?=\s*\S).*$/, $(this).attr("errurl") );
                         if (bValid) {
                             var akt = 0;
                             var epggrab = 0;
@@ -672,7 +731,7 @@ $(function() {
                     }
                 };
                 var deletebutton = {
-                    text: "Delete", click: function()
+                    text: $( this ).attr("delete"), click: function()
                     {
                         $( this ).dialog( "close" );
                         $( "#dialog_remove" ).dialog( "open" );
@@ -718,6 +777,7 @@ $(function() {
         });
 
         $('#table_channellist').dataTable({
+            "oLanguage": {"sUrl": "lang/dataTables." + language + ".json"},
             "bJQueryUI": true,
             "sPaginationType": "full_numbers",
             "bProcessing": true,
@@ -754,11 +814,11 @@ $(function() {
             minDate: 0,
             defaultDate: 0,
             onSelect: function() {
-                document.daychooser.submit();
-            },
-            dateFormat: pickerform
+                post("epg", { datepicker_epg: $.datepicker.formatDate("yy-mm-dd", $(this).datepicker( "getDate" )) }, 1);
+            }
         });
-
+        $( "#datepicker_epg" ).val( localDate( $( "#datepicker_epg" ).attr("dbvalue") ) );
+        
         $( "[id^=event]" ).each(function(i) {
             w = +$(this).attr('width');
             x = +$(this).attr('x');
@@ -799,7 +859,7 @@ $(function() {
                     $("body").css("width", (zoom*100)+"%");
                 }
                 $("#mybody").css("height", (maxcnt * 100 + 200) +"px");
-                $("#[id=channelgroup]").each(function(i) { $(this).css("clear", "left"); });
+                $("[id=channelgroup]").each(function(i) { $(this).css("clear", "left"); });
             } else {
                 $("[id=channelgroup]").each(function(i) {
                     $(this).css("float", "left");
@@ -844,15 +904,19 @@ $(function() {
 
         $( "#dialog_channel_disable" ).dialog({
             autoOpen: false,
-            buttons: {
-                "Disable": function() {
+            buttons: [{
+                text: $( "#dialog_channel_disable" ).attr("disable"),
+                click: function() {
                     post("list", { myid:dialognr, what:"0" }, 1);
                     $( this ).dialog( "close" );
-                },
-                Cancel: function() {
+                }
+            },
+            {
+                text: $( "#dialog_channel_disable" ).attr("cancel"),
+                click: function() {
                     $( this ).dialog( "close" );
                 }
-            }            
+            }]
         });
 
         initIcons();
@@ -863,6 +927,7 @@ $(function() {
     	var serverSide = ($("#listmode").attr("value") == "1");  
 
         $('#table_epglist').dataTable({
+            "oLanguage": {"sUrl": "lang/dataTables." + language+ ".json"},
             "bJQueryUI": true,
             "sPaginationType": "full_numbers",
             "bProcessing": true,
@@ -880,13 +945,14 @@ $(function() {
                 return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
             },
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                    var dat_v = aData[3].split(" "); 
-                    var dat_b = aData[4].split(" "); 
-                    aData[7]="<b>"+aData[1]+": "+dat_v[1] + " - " + dat_b[1] + "</b><BR><BR>"+aData[2];
-                            var myday = $.datepicker.parseDate('yy-mm-dd', dat_v[0]);
-                            $('td:eq(3)', nRow).html($.datepicker.formatDate('dd.mm.yy', myday)+" "+dat_v[1]);			
-                            myday = $.datepicker.parseDate('yy-mm-dd', dat_b[0]);
-                            $('td:eq(4)', nRow).html($.datepicker.formatDate('dd.mm.yy', myday)+" "+dat_b[1]);
+                $('td:eq(3)', nRow).html( localDateTime( aData[3] ) );
+                $('td:eq(4)', nRow).html( localDateTime( aData[4] ) );                
+                //aData[7]="<b>"+aData[1]+": "+dat_v[1] + " - " + dat_b[1] + "</b><BR><BR>"+aData[2];
+
+                /*var myday = $.datepicker.parseDate('yy-mm-dd', dat_v[0]);
+                $('td:eq(3)', nRow).html($.datepicker.formatDate(mydateformat, myday)+" "+dat_v[1]);			
+                myday = $.datepicker.parseDate('yy-mm-dd', dat_b[0]);
+                $('td:eq(4)', nRow).html($.datepicker.formatDate(mydateformat, myday)+" "+dat_b[1]);*/
 
                 $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
             }
@@ -898,21 +964,39 @@ $(function() {
     } else if (here("config")) { 
 // ------------------------------------ Configuration tab only
         $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
-	$( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
+        $( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
     	$("#cfg_purgedelta,#cfg_delta_for_epg,#cfg_grab_max_duration").spinner();
         $("#cfg_grab_zoom").spinner( { step: 0.1 } );
         $("#cfg_epg_max_events").spinner( { step: 1000 } );       
 	    
     	$("#cfg_switch_epglist_mode").slickswitch();
-    	$("#cfg_switch_xmltv_auto").slickswitch();
-    	$("#cfg_switch_grab_auto").slickswitch();
+    	$("#cfg_switch_xmltv_auto").slickswitch({
+            toggledOn: function() {
+                $("#cfg_xmltvinitpath").removeAttr("disabled");
+                $("#cfg_xmltvinitpath").removeClass("ui-state-disabled");
+            },
+            toggledOff: function() {
+                $("#cfg_xmltvinitpath").prop("disabled", "true");
+                $("#cfg_xmltvinitpath").addClass("ui-state-disabled");
+            }
+        });
+    	$("#cfg_switch_grab_auto").slickswitch({
+            toggledOn: function() {
+                $("#cfg_grab_max_duration").spinner( "enable"  );
+            },
+            toggledOff: function() {
+                $("#cfg_grab_max_duration").spinner( "disable" );
+            }
+        });
         
         $.get( "/getconfig", function( data )  {
             var p = new Function('return ' + data + ';')();
             var data = p.configdata;
             for (var i = 0; i < data.length; i++) {
             	if (data[i][0].startsWith('cfg_switch')) {
+                    //$("#" + data[i][0]).trigger('ss-toggleOn');
+                
                     switchMe( "#" + data[i][0], data[i][2]=='1');
             	} else {            			
                     $("#" + data[i][0]).val(data[i][2]);
@@ -982,6 +1066,7 @@ $(function() {
         });
 
         $('#table_loglist').dataTable({
+            "oLanguage": {"sUrl": "lang/dataTables." + language + ".json"},
             "bJQueryUI": true,
             "sPaginationType": "full_numbers",
             "bProcessing": true,
@@ -997,6 +1082,18 @@ $(function() {
                 paintTable();
             }
         });
+    }
+
+    function localDate(sqldate) {
+        var myday = $.datepicker.parseDate('yy-mm-dd', sqldate.substr(0,10));
+        return $.datepicker.formatDate(mydateformat, myday);    
+    }
+    function localTime(sqltime) {
+        var mytime = $.datepicker.parseTime('HH:mm:ss', sqltime);
+        return $.datepicker.formatTime(mytimeformat, mytime);    
+    }
+    function localDateTime(sqldatetime) {
+        return localDate(sqldatetime.substr(0,10)) + " " + localTime(sqldatetime.substr(11,19));
     }
     
 });

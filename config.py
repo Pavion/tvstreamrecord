@@ -119,6 +119,12 @@ configuration = [
 ],
 
 [
+'cfg_language',
+"UI language",
+'english.local'
+],
+
+[
 'cfg_epg_max_events',
 "Max events to be sent",
 '5000'

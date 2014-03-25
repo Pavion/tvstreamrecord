@@ -1,7 +1,7 @@
 <div id="users-contain" class="ui-widget">
 <h1>§Configuration§:
 <button id="submit_cfg">§Submit changes§</button>
-<div id="label_config_saved"></div>
+<div id="label_config_saved" info="§Saving configuration...§"></div>
 </h1>
 <div id="configtabs">
 <ul>
@@ -35,7 +35,16 @@
     <td>
         <select id='cfg_language' class="text ui-widget-content ui-corner-all">            
 %for language in languages:
-            <option value='{{language[0]}}.{{language[1]}}'>{{language[0]}} ({{language[1]}})</option>
+            <option value='{{language}}'>{{language}}</option>
+%end              
+        </select>
+    </td>
+</tr>
+<tr><td>§Date/time locale (default='default')§</td>
+    <td>
+        <select id='cfg_locale' class="text ui-widget-content ui-corner-all">            
+%for locale in locales:
+            <option value='{{locale}}'>{{locale}}</option>
 %end              
         </select>
     </td>
@@ -58,8 +67,8 @@
 <tr><td>§Initial path for an XMLTV import§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_xmltvinitpath" value="" autocomplete="off" /></td></tr>
 <tr><td>§Enable stream scan/grab§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_grab_auto" /></td></tr>
 <tr><td>§Maximal EPG scan duration per channel, [seconds] (default: '60')§</td><td><input id="cfg_grab_max_duration" /></td></tr>
-<tr><td>§Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)§</td><td><input type="text" maxlength="5" id="cfg_grab_time" class="text ui-widget-content ui-corner-all" /></td></tr>
-<tr><td>§Zoom level for EPG view. Positive values for horizontal, negative for vertical view (default '1' for old style)§</td><td><input id="cfg_grab_zoom" /></td></tr>
+<tr><td>§Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)§</td><td><input type="text" maxlength="5" id="cfg_grab_time" class="text ui-widget-content ui-corner-all" alert="§Invalid grab time, please check your settings§"/></td></tr>
+<tr><td>§Zoom level for EPG view. Positive values for horizontal, negative for vertical view (default '1' for old style)§</td><td><input id="cfg_grab_zoom" alert="§Invalid EPG zoom, please check your settings§"/></td></tr>
 <tr><td>§EPG list mode. Disable for client-side processing (more network load), enable for server-side processing (more server load)§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_epglist_mode" /></td></tr>
 <tr><td>§Client-side only: maximal number of events to request from server (earlier first), solves some perfomance issues§</td><td><input id="cfg_epg_max_events" /></td></tr>
 <tr><td>§Delete/reset all EPG data§</td><td><button id="button_removeepg">§Delete§</button></td></tr>
@@ -93,8 +102,8 @@
 </thead>
 <tbody>
 <tr><td>§Purge database records older than [days]§</td><td><input id="cfg_purgedelta" /></td></tr>
-<tr><td>§Server bind address (restart needed)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_server_bind_address" value="" autocomplete="off" /></td></tr>
-<tr><td>§Server port (restart needed)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_server_port" value="" autocomplete="off" /></td></tr>
+<tr><td>§Server bind address (restart needed)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_server_bind_address" value="" autocomplete="off" alert="§Invalid bind address, please check your settings§" /></td></tr>
+<tr><td>§Server port (restart needed)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_server_port" value="" autocomplete="off" alert="§Invalid port, please check your settings§"/></td></tr>
 <tr><td>§Reset the log file§</td><td><button id="button_resetlog">§Reset log§</button></td></tr>
 </tbody>
 </table>

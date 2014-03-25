@@ -1,7 +1,7 @@
 <div id="zoom" zoom="{{zoom}}"></div>
 <div id="users-contain" class="ui-widget">
 <!--<form method='POST' enctype='multipart/form-data' action='/epg' name='daychooser'>-->
-<h1><div id="label_epg_1">§Electronic Program Guide. Current date§:</div>
+<h1><div id="label_epg_1">§Electronic Program Guide§. §Current date§:</div>
 <input type="text" maxlength="10" id="datepicker_epg" class="text ui-widget-content ui-corner-all" name="datepicker_epg" dbvalue="{{curr}}"/> 
 <div id="label_epg_2">§Keyword§:</div>
 <input type="text" maxlength="50" id="searchepg" class="text ui-widget-content ui-corner-all" name="searchepg" value=""/> 

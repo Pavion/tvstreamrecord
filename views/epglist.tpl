@@ -1,5 +1,5 @@
 <div id="users-contain" class="ui-widget">
-<h1>§Electronic Program Guide List§:
+<h1>§Electronic Program Guide§ - §list view§:
 <button id="grabepg" text1="§Grab EPG from§" text2="§source(s)§" text3="§Stop loading EPG§" text4="§Stopping EPG, please refresh§"></button>
 <div id="listmode" value="{{listmode}}"></div>
 </h1>

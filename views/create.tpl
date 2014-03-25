@@ -18,15 +18,15 @@
         <input type="text" maxlength="5" name="email" id="timepicker_inline_div2" class="text ui-widget-content ui-corner-all" />
         <label for="recurr">§Recurrent records§</label>
         <div id="weekday">
-            <input type="checkbox" id="wday0" /><label id="wwd0" for="wday0">§Mo§</label>
-            <input type="checkbox" id="wday1" /><label id="wwd1" for="wday1">§Tu§</label>
-            <input type="checkbox" id="wday2" /><label id="wwd2" for="wday2">§We§</label>
-            <input type="checkbox" id="wday3" /><label id="wwd3" for="wday3">§Th§</label>
-            <input type="checkbox" id="wday4" /><label id="wwd4" for="wday4">§Fr§</label>
-            <input type="checkbox" id="wday5" /><label id="wwd5" for="wday5">§Sa§</label>
-            <input type="checkbox" id="wday6" /><label id="wwd6" for="wday6">§Su§</label>
+            <input type="checkbox" id="wday0" /><label id="wwd0" for="wday0"></label>
+            <input type="checkbox" id="wday1" /><label id="wwd1" for="wday1"></label>
+            <input type="checkbox" id="wday2" /><label id="wwd2" for="wday2"></label>
+            <input type="checkbox" id="wday3" /><label id="wwd3" for="wday3"></label>
+            <input type="checkbox" id="wday4" /><label id="wwd4" for="wday4"></label>
+            <input type="checkbox" id="wday5" /><label id="wwd5" for="wday5"></label>
+            <input type="checkbox" id="wday6" /><label id="wwd6" for="wday6"></label>
         </div>
     </fieldset>
 </form>
-<p class="validateTips"></p>
+<!--<p class="validateTips"></p>-->
 </div>

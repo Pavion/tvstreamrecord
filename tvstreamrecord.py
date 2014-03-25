@@ -96,36 +96,45 @@ def getWeekdays(mask):
 
 #------------------------------- Internalization -------------------------
 
-def checkLocale():
-    if not config.cfg_language == "english.local":
-        ret = False
-        try:
-            lang = config.cfg_language.split(".")
-            if os.path.isfile("lang/tvstreamrecord." + lang[0] + "." + lang[1] + ".json") and os.path.isfile("lang/dataTables." + lang[0] + ".json") and os.path.isfile("js/i18n/jquery.ui.datepicker-" + lang[1] + ".js") and os.path.isfile("js/i18n/jquery-ui-timepicker-" + lang[1] + ".js"):
-                ret = True
-        except: 
-            pass
-        if not ret:
-            config.cfg_language = "english.local"
-            print "Locale not found, resetting to default language"
+def checkLang():
+    if not config.cfg_language == "english":
+        ret_lng = ( os.path.isfile("lang/tvstreamrecord." + config.cfg_language + ".json") and os.path.isfile("lang/dataTables." + config.cfg_language + ".json") )
+        if not ret_lng:
+            config.cfg_language = "english"
+            print "Language not found, reverting to default language"
+    else:
+        ret_lng = True
+    if not config.cfg_locale == "default":
+        ret_loc = ( os.path.isfile("js/i18n/jquery.ui.datepicker-" + config.cfg_locale + ".js") and os.path.isfile("js/i18n/jquery-ui-timepicker-" + config.cfg_locale + ".js" ) )
+        if not ret_loc:
+            config.cfg_locale = "default"
+            print "Locale not found, reverting to default locale"
+    else:
+        ret_loc = True
+    ret_style = ( os.path.isfile("css/" + config.cfg_theme) )
+    if not ret_style:
+        config.cfg_theme = "smoothness/jquery-ui-1.10.4.custom.min.css"
+        print "Theme not found, reverting to default theme"
+    if not (ret_loc and ret_lng and ret_style):
+        config.saveConfig()
 
 
 def internationalize(templ):
-    checkLocale() 
-    header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language.split(".") )
+    header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale )
     footer = template('footer')
     templ = header + templ + footer
-    try:
-        json_data=open('lang/tvstreamrecord.' + config.cfg_language + '.json')
-        data = json.load(json_data)
-        for word in data:
-            if data[word]:
-                templ = templ.replace(u"§"+word+u"§", data[word])
-            else:
-                templ = templ.replace(u"§"+word+u"§", word)
-        json_data.close()
-    except:
-        pass        
+    if not config.cfg_language == "english":
+        try:
+            json_data=open('lang/tvstreamrecord.' + config.cfg_language + '.json')
+            data = json.load(json_data)
+            for word in data:
+                if data[word]:
+                    templ = templ.replace(u"§"+word+u"§", data[word])
+                else:
+                    templ = templ.replace(u"§"+word+u"§", word)
+            json_data.close()
+        except:
+            pass
     templ = templ.replace(u"§","")
     return templ 
 
@@ -332,17 +341,21 @@ def config_s():
                 if css.endswith(".css"):
                     themes.append([theme+'/'+css,theme])
                     break
-    languages = list() 
-    languages.append(["english", "local"])
+    languages = list()
+    languages.append("english")
     for langfile in os.listdir("lang"):
-        if langfile.startswith("tvstreamrecord") and langfile.endswith("json"):
-            try:
-                lang = langfile[15:-5].split(".")
-                if os.path.isfile("lang/dataTables." + lang[0] + ".json") and os.path.isfile("js/i18n/jquery.ui.datepicker-" + lang[1] + ".js") and os.path.isfile("js/i18n/jquery-ui-timepicker-" + lang[1] + ".js"):
-                    languages.append(lang)
-            except:
-                pass
-    return internationalize(template('config', themes=themes, languages=languages))
+        if langfile.startswith("tvstreamrecord.") and langfile.endswith(".json"):
+            lang = langfile[15:-5]
+            if os.path.isfile("lang/dataTables." + lang + ".json"):# and os.path.isfile("js/i18n/jquery.ui.datepicker-" + lang[1] + ".js") and os.path.isfile("js/i18n/jquery-ui-timepicker-" + lang[1] + ".js"):
+                languages.append(lang)
+    locales = list()
+    locales.append("default")
+    for locfile in os.listdir("js/i18n"):
+        if locfile.startswith("jquery.ui.datepicker-") and locfile.endswith(".js"):
+            locale = locfile[21:-3]
+            if os.path.isfile("js/i18n/jquery-ui-timepicker-" + locale + ".js"):
+                locales.append(locale)
+    return internationalize(template('config', themes=themes, languages=languages, locales=locales))
 
 @route('/getconfig')
 def getconfig():
@@ -539,14 +552,13 @@ def epg_s():
 #            fulltext = fulltext.replace(chr(138), "").replace(chr(0xE4),"").replace(chr(0xF6),"").replace(chr(0xFC),"")
             title = fulltext
             if len(title)>300:
-                title = title[:297]+"..."
-                try:
-                    title.decode("UTF-8")
-                except:
-                    title = title[:296]+"..."
-                    #title = ""
-                    #fulltext = ""
-                    pass
+                for char in range (300, 280, -1):
+                    try:
+                        title = title[:char]+"..."
+                        title.decode("UTF-8")
+                        break
+                    except:
+                        pass
 
             if d_von < daystart:
                 d_von = daystart
@@ -757,7 +769,7 @@ class record(Thread):
                 print "Stream could not be parsed (URL=%s), aborting..." % (self.url)  
                 pass
             except:
-                print "Output file %s could not be created. Please check your settings." % (fn+".mkv")  
+                print "Output file %s could not be created. Please check your settings." % (fn)
                 pass
             else:
                 while self.bis > datetime.now() and self.stopflag==0:
@@ -815,6 +827,8 @@ sqlCreateAll(version)
 purgeDB()          
 print "Initializing config..."
 config.loadConfig()
+print "Checking internationalization..."
+checkLang() 
 print "Initializing records..."
 setRecords()
 print "Initializing EPG import thread..."

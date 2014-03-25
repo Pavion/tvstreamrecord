@@ -107,7 +107,7 @@ label#append {float: left; margin-top: 3px;}
 
 [id^=cfg_].text { margin-bottom:0px; width:95%; padding-left: 0.4em; }
 
-.ui-button-text-only .ui-button-text  { padding: 0px 3px; }
+.ui-button-text-only .ui-button-text  { padding: 2px 2px; }
 
 #weekday {
     min-width: 300px;

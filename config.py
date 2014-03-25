@@ -121,7 +121,13 @@ configuration = [
 [
 'cfg_language',
 "UI language",
-'english.local'
+'english'
+],
+
+[
+'cfg_locale',
+"UI locale",
+'default'
 ],
 
 [

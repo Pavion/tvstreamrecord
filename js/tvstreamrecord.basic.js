@@ -108,7 +108,7 @@ function updateTips( t ) {
  * @param {type} max maximal value
  * @returns {Boolean}
  */
-function checkLength( o, n, min, max ) {
+/*function checkLength( o, n, min, max ) {
     x = document.getElementById(o);
     if ( x.value.length > max || x.value.length < min ) {
         $("#"+o).addClass( "ui-state-error" );
@@ -117,7 +117,7 @@ function checkLength( o, n, min, max ) {
     } else {
         return true;
     }
-}
+}*/
 
 /**
  * Common REGEXP check function
@@ -417,15 +417,21 @@ $(function() {
                 {
                     var bValid = true;
                     allFields.removeClass( "ui-state-error" );
-                    bValid = bValid && checkLength( "recname", "record name", 1, 255 );
-                    bValid = bValid && checkRegexp( "recname", /^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\";|//]+$/, "No special chars in this field please" );
+                    
+                    if ( $( "#recname" ).val().length == 0 ) { $( "#recname" ).addClass( "ui-state-error" ); bValid = false; }
+                    if ( ! $.datepicker.parseTime("H:m", $( "#timepicker_inline_div1" ).val()) ) { $( "#timepicker_inline_div1" ).addClass( "ui-state-error" ); bValid = false; }
+                    if ( ! $.datepicker.parseTime("H:m", $( "#timepicker_inline_div2" ).val()) ) { $( "#timepicker_inline_div2" ).addClass( "ui-state-error" ); bValid = false; }
+                                      
+//                    bValid = bValid && checkLength( "recname", "record name", 1, 255 );
+//                    bValid = bValid && checkRegexp( "recname", /^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\";|//]+$/, "No special chars in this field please" );
 //                    bValid = bValid && checkLength( "channel", "channel", 1, 50 );
 //                    bValid = bValid && checkLength( "datepicker_create", "date", 10, 10 );
+                    
 //                    bValid = bValid && checkRegexp( "datepicker_create", /^((((0?[1-9]|[12]\d|3[01])[\.\-\/](0?[13578]|1[02])[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|((0?[1-9]|[12]\d|30)[\.\-\/](0?[13456789]|1[012])[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|((0?[1-9]|1\d|2[0-8])[\.\-\/]0?2[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|(29[\.\-\/]0?2[\.\-\/]((1[6-9]|[2-9]\d)?(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)|00)))|(((0[1-9]|[12]\d|3[01])(0[13578]|1[02])((1[6-9]|[2-9]\d)?\d{2}))|((0[1-9]|[12]\d|30)(0[13456789]|1[012])((1[6-9]|[2-9]\d)?\d{2}))|((0[1-9]|1\d|2[0-8])02((1[6-9]|[2-9]\d)?\d{2}))|(2902((1[6-9]|[2-9]\d)?(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)|00))))$/, "Please use DD.MM.YYYY for this field" );
-                    bValid = bValid && checkLength( "timepicker_inline_div1", "start time", 5, 5 );
-                    bValid = bValid && checkRegexp( "timepicker_inline_div1", /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/, "Please use HH:MM format for this field" );
-                    bValid = bValid && checkLength( "timepicker_inline_div2", "end time", 5, 5 );
-                    bValid = bValid && checkRegexp( "timepicker_inline_div2", /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/, "Please use HH:MM format for this field" );
+//                    bValid = bValid && checkLength( "timepicker_inline_div1", "start time", 5, 5 );
+//                    bValid = bValid && checkRegexp( "timepicker_inline_div1", /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/, "Please use HH:MM format for this field" );
+//                    bValid = bValid && checkLength( "timepicker_inline_div2", "end time", 5, 5 );
+//                    bValid = bValid && checkRegexp( "timepicker_inline_div2", /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/, "Please use HH:MM format for this field" );
                     var mask = 0;
                     for (var i=0; i<7; i++) {
                         if ( $("#wwd" + i).hasClass("ui-state-active") ) {
@@ -435,7 +441,7 @@ $(function() {
                     if ( bValid ) {
                         $( this ).dialog( "close" );
                         var akt = 0;
-                        if ($("#switch_create").attr("checked") == "checked") {akt = 1;}
+                        if ($("#switch_create").attr("checked") == "checked") akt = 1;
                         post("/create", {
                             prev:$("#prev").val(),
                             recname:$("#recname").val(),
@@ -520,7 +526,7 @@ $(function() {
 
         },
         close: function() {
-            $( ".validateTips" ).html("");
+//            $( ".validateTips" ).html("");
             allFields.removeClass( "ui-state-error" );
         }
     });
@@ -1026,17 +1032,22 @@ $(function() {
                 if ($(this).attr('id')=="cfg_server_port") {
                     var port = parseInt(value);
                     if (!checkRegexp("cfg_server_port", /^[0-9]{1,5}$/, "") || port<80 || isNaN(port) || port > 65535 ) {
-                        alert("Invalid port, please check your settings");
+                        alert( $(this).attr('alert') );
                         myalert = true; 
                     }                    
                 } else if ($(this).attr('id')=="cfg_server_bind_address") {
                     if ( value != "localhost") if ( !checkRegexp( "cfg_server_bind_address", /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/, "" ) ) {
-                        alert("Invalid bind address, please check your settings");
+                        alert( $(this).attr('alert') );
                         myalert = true; 
                     }                    
                 } else if ($(this).attr('id')=="cfg_grab_time") {
-                    if ( value.trim() != "0" ) if ( !checkRegexp( "cfg_grab_time", /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "" ) ) {
-                        alert("Invalid grab time, please check your settings");
+                    if ( value.trim() != "0" ) if ( ! $.datepicker.parseTime("H:m", $( "#cfg_grab_time" ).val()) ) {
+                        alert( $(this).attr('alert') );
+                        myalert = true; 
+                    }                    
+                } else if ($(this).attr('id')=="cfg_grab_zoom") {
+                    if (!( value.trim() > 0 || value.trim() < 0 )) {
+                        alert( $(this).attr('alert') );
                         myalert = true; 
                     }                    
                 } else if ($(this).attr('id').startsWith('cfg_switch') && $(this).attr('type')!="checkbox") {
@@ -1051,7 +1062,7 @@ $(function() {
             if (!myalert) {            	
                 var my_config_data_str = JSON.stringify(my_config_data);
                 post("/config", {configdata:my_config_data_str}, 1);                
-                $("#label_config_saved").text("Saving configuration...");
+                $("#label_config_saved").text($("#label_config_saved").attr("info"));
             }            
         });
 

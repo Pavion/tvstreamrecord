@@ -12,22 +12,20 @@
 	<link href="css/jquery.dataTables_themeroller.css" rel="stylesheet">
 	<link href="css/slickswitch.css" rel="stylesheet">
     <link rel="stylesheet" href="css/tvstreamrecord.basic.css" type="text/css" />
-      
-
 	<script src="js/jquery-1.8.3.js"></script>
 	<script src="js/jquery-ui-1.9.2.custom.js"></script>
         <script src="js/jquery-ui-timepicker-addon.min.js"></script>
 	<script src="js/jquery.slickswitch.js"></script>
 	<script src="js/jquery.dataTables.min.js"></script>	
-%if not language[1] == 'local':         
-	<script src="js/i18n/jquery-ui-timepicker-{{language[1]}}.js"></script>	
-	<script src="js/i18n/jquery.ui.datepicker-{{language[1]}}.js"></script>	
+%if not locale == 'default':
+	<script src="js/i18n/jquery-ui-timepicker-{{locale}}.js"></script>	
+	<script src="js/i18n/jquery.ui.datepicker-{{locale}}.js"></script>	
 %end
 	<script src="js/tvstreamrecord.basic.js"></script>
 </head><BODY>
 <div id="datepicker_local" style="display: none;"></div>
 <div id="timepicker_local" style="display: none;"></div>
-<div id="mybody" class="ui-tabs-panel ui-widget-content ui-corner-bottom" language="{{language[0]}}" locale="{{language[1]}}">
+<div id="mybody" class="ui-tabs-panel ui-widget-content ui-corner-bottom" language="{{language}}">
 <div id="menus">
 <div id="logo">
 	<a href="http://pavion.github.io/tvstreamrecord/"><img src="images/tvstreamrecordlogo.png"></a> 
@@ -40,7 +38,7 @@
     <li id="menu-3" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epglist">§EPG List§</a></li>
     <li id="menu-4" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/config">§Config§</a></li>
     <li id="menu-5" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/log">§Log§</a></li>
-    <li id="menu-6" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/about">§About§</a></li>
+    <li id="menu-6" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="http://pavion.github.io/tvstreamrecord/">§About§</a></li>
   </ul>
 </div>
 </div>

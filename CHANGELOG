@@ -1,5 +1,8 @@
-2014-03-xx 0.6.1 UI redesign and theme roller
-                 Localization added  
+2014-03-27 0.6.2 UI redesign and theme roller
+                 Added english, german and russian translations (excl. About page)
+                 jQuery date/time locale support also for other countries
+                 Massive refactoring and fixes for client code
+                 Table state saving in browser cache
 
 2014-02-23 0.5.8 TVxb support
                  Structured config page with built-in plausibility control

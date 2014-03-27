@@ -5,9 +5,11 @@
 <ol>
 <li><p><b>What's new in 0.6?</b></p>
 <ul>
-<li>UI redesign with theme roller support</li>
-<li>Localization support added. New languages supported: german, russian</li>
-<li>New state save for tables, please adjust table sort to be saved</li>
+<li>UI redesign and theme roller</li>
+<li>Added english, german and russian translations (excluding About page)</li>
+<li>jQuery date/time locale support also for other countries</li>
+<li>Massive refactoring and fixes for client code</li>
+<li>Table state saving in browser cache</li>
 </ul>
 </li>
 <li><p><b>Introduction</b></p>
@@ -29,10 +31,13 @@ You shouldn't need any special permissions.</p></li>
 <p>To access the software you should open your favorite browser and navigate to your target IP with the port 8030, e.g. <a href="http://localhost:8030">http://localhost:8030.</a> Now you should see the web based interface of my software. First you should proceed to the config page and review following settings:</p>
 <li><p><b>Settings</b></p>
 <p>
-<b>General tab</b><br />
+<br /><b>General tab</b><br />
 <i>Path for your recordings</i> is a vital setting and should be set. On Synology DS you can use any shared folder, which can be accessed with the root user (e.g. /volume1/common/). On Windows systems you can use any path (e.g. d:\records\). Be sure to close your path string with an path char (/ or \), as the path string will be added to the filename. Otherwise you can use this to add prefixes to your recordings. As example, providing the path <i>/volume1/films/rec</i> will result in files with names: rec20130101000000<br />
 <i>File extension for the recorded stream</i> will be added as suffix to the filename. Mostly it would be MPEG transport stream (.ts). Changing this parameter doesn't affect anything beside filename.<br />
-<b>EPG tab</b><br />
+<i>Interface theme</i> specifies the theme to be used. Some standart jQuery UI themes are already supplied, advanced users can also add other themes by copying the theme folder into /css folder.<br />
+<i>Interface language</i>. There are three languages supported. You can also make your own translation using a dummy language file in /lang folder. In that case, please send me your translation to be included in further versions.<br />
+<i>Interface locale</i> is supplied with jQuery UI and adds local date/time support for several countries. You can also create your own locales, see /js/i18n folder for more examples.<br />
+<br /><b>EPG tab</b><br />
 <i>Lenghten an EPG record</i> will be used to prolong the record and avoid any small time shifts in TV charts. Please note, that your system time will be used for recording and should be exact.<br />
 <i>Enable XMLTV import</i> for manual import or to be performed once per day at specified time. <br />
 <i>Initial path for an XMLTV-Import</i> can be used to import EGP (electronic program guide) from free XMLTV-compatible pages. <br />
@@ -42,11 +47,11 @@ You shouldn't need any special permissions.</p></li>
 <i>Zoom level for EPG view</i>. You can change your default EPG view here. Enter negative values for vertical and positive values for default horizontal view (i.e. 2=200% horizontal, -3=300% vertical). Default is '1' for classic horizontal one-page view.<br /> 
 <i>EPG list mode</i>. Disabled for classic client side processing with greater network load, enabled for server side processing with greater server load but lesser traffic.<br /> 
 <i>Delete/reset all EPG data</i> should be used to clear your database in case of EPG issues <br />
-<b>FFMPEG support tab</b><br />
+<br /><b>FFMPEG support tab</b><br />
 <i>Stream types</i> would be forwarded to ffmpeg. If your stream can be recorded with, you can add its prefix here.<br />
 <i>Full path to ffmpeg</i> is needed for experimental <i>ffmpeg</i> support. <i>ffmpeg</i> is not included within this software. On Synology DS <i>ffmpeg</i> is preinstalled with Video/Audio/Media Station and the default value should not be changed. See corresponding section for more info.<br />
 <i>Additional output arguments for ffmpeg</i> can be used to change your output. Please check the next part for details.<br />
-<b>Advanced tab</b><br />
+<br /><b>Advanced tab</b><br />
 <i>Purge database records</i> will be used to automatically delete old EPG and records information and shouldn't normally be changed.<br />
 <i>Server bind address</i> does exactly what it says. Default 0.0.0.0 will make your server available from any local address. Any other choices (i.e. 127.0.0.1) may be used to limit the access. This setting should not normally be changed. Changing it requires restart.<br />
 <i>Server port</i> is the port the server runs on. You can change it, if you need it. Changing it requires restart.<br />
@@ -115,7 +120,8 @@ Please contact me if you have a same issue with a different URL.</p>
 <li>Sideshowbob for his ffmpeg support idea and testing</li>
 <li>plusulli for his Dreambox feedback</li>
 <li>zmueller, DSL-Hexe for EPG grabbing ideas and testing</li>
-<li>Honu, zamp411, z-smoker, tjeh and other supporters for their feedback and trust</li>
+<li>Honu, zamp411, z-smoker, tjeh</li>
+<li>Many thanks also to the users of german Synology forum and all other supporters for their feedback and trust</li>
 </ul>
 </p>
 </li>

@@ -26,6 +26,6 @@
 <div id="dialog_remove" title="§Confirmation request§" cancel="§Cancel§" delete="§Delete§"> 
 	<p>§Shall I delete this record?§</p>
 </div>
-<div id="dialog_purge" title="§Purging records§" ok="§OK§", cancel="§Cancel§">
+<div id="dialog_purge" title="§Purging records§" ok="§OK§" cancel="§Cancel§">
 	<p>§All old records will be deleted! Are you sure?§</p>
 </div>

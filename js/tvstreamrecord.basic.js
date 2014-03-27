@@ -575,7 +575,7 @@ $(function() {
                 click: function() {
                     post(where(), { myid:'-1', what:"-2" }, 1);
                     $( this ).dialog( "close" );
-                },
+                }
             },
             {
                 text: $( "#dialog_purge" ).attr("cancel"),

@@ -1,27 +1,26 @@
-<!--<!DOCTYPE html> PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">-->
-
-<!DOCTYPE HTML>	
-    <head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
     <link rel="shortcut icon" href="images/favicon.ico?v=2" type="image/x-icon" /> 
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
 	<title>tvstreamrecord {{version}}</title>
-<!--	<link href="css/smoothness/jquery-ui-1.9.2.custom.css" rel="stylesheet">-->
-	<link href="css/{{style}}" rel="stylesheet">
-	<link href="css/jquery-ui-timepicker-addon.min.css" rel="stylesheet">
-	<link href="css/jquery.dataTables_themeroller.css" rel="stylesheet">
-	<link href="css/slickswitch.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/tvstreamrecord.basic.css" type="text/css" />
-	<script src="js/jquery-1.8.3.js"></script>
-	<script src="js/jquery-ui-1.9.2.custom.js"></script>
-        <script src="js/jquery-ui-timepicker-addon.min.js"></script>
-	<script src="js/jquery.slickswitch.js"></script>
-	<script src="js/jquery.dataTables.min.js"></script>	
+	<link rel="stylesheet" href="css/{{style}}" />
+	<link rel="stylesheet" href="css/jquery-ui-timepicker-addon.min.css" />
+	<link rel="stylesheet" href="css/jquery.dataTables_themeroller.css" />
+	<link rel="stylesheet" href="css/slickswitch.css" />
+        <link rel="stylesheet" href="css/tvstreamrecord.basic.css" type="text/css" />
+
+        <script type="text/javascript" src="js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="js/jquery-ui-1.9.2.custom.js"></script>
+        <script type="text/javascript" src="js/jquery-ui-timepicker-addon.min.js"></script>
+	<script type="text/javascript" src="js/jquery.slickswitch.js"></script>
+	<script type="text/javascript" src="js/jquery.dataTables.min.js"></script>	
 %if not locale == 'default':
-	<script src="js/i18n/jquery-ui-timepicker-{{locale}}.js"></script>	
-	<script src="js/i18n/jquery.ui.datepicker-{{locale}}.js"></script>	
+	<script type="text/javascript" src="js/i18n/jquery-ui-timepicker-{{locale}}.js"></script>	
+	<script type="text/javascript" src="js/i18n/jquery.ui.datepicker-{{locale}}.js"></script>	
 %end
-	<script src="js/tvstreamrecord.basic.js"></script>
+	<script type="text/javascript" src="js/tvstreamrecord.basic.js"></script>
 </head><BODY>
 <div id="datepicker_local" style="display: none;"></div>
 <div id="timepicker_local" style="display: none;"></div>

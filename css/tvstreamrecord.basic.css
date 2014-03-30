@@ -9,9 +9,12 @@ body {
     right: 20px;
     font-size:130%;
     height: 40px;
+    /*position: relative;*/
 }
 
 #tabs {
+    position: absolute;
+    min-width: 1000px;
     float:left;
 }
     
@@ -160,6 +163,8 @@ th.etit{ width: 200px; }
 th.estart { width: 200px; }
 th.estop { width: 200px; }
 th.econtrol { width: 30px; }
+
+th.fdatetime { width: 300px; }
 
 [id^=wwd] { width: 13.3%; }
 [id^=wwd].ui-state-active { background: #accccc; }

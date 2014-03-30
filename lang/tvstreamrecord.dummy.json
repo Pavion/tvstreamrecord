@@ -127,6 +127,8 @@
     "Invalid bind address, please check your settings": "",
     "Invalid grab time, please check your settings": "",
     "Invalid EPG zoom, please check your settings": "",
-    "Saving configuration...": ""
-    
+    "Saving configuration...": "",
+ 
+    "Archive": ""
+
 }

@@ -127,6 +127,8 @@
     "Invalid bind address, please check your settings": "Falsche Serveradresse, bitte überprüfen", 
     "Invalid grab time, please check your settings": "Falsche Uhrzeit für EPG-Import, bitte überprüfen",
     "Invalid EPG zoom, please check your settings": "Falsche EPG-Zoomstufe, bitte überprüfen",
-    "Saving configuration...": "Konfiguration wird gespeichert..."
-    
+    "Saving configuration...": "Konfiguration wird gespeichert...",
+ 
+    "Archive": "Archiv"
+
 }

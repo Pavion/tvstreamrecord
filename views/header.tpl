@@ -30,14 +30,15 @@
 	<a href="http://pavion.github.io/tvstreamrecord/"><img src="images/tvstreamrecordlogo.png"></a> 
 </div>
 <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
-  <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+  <ul id="mainmenu" class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
     <li id="menu-0" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/records">§Records§</a></li>
+    <li id="menu-7" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/archive">§Archive§</a></li>
     <li id="menu-1" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/list">§Channels§</a></li>
     <li id="menu-2" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epgchart">§EPG Chart§</a></li>
     <li id="menu-3" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epglist">§EPG List§</a></li>
     <li id="menu-4" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/config">§Config§</a></li>
     <li id="menu-5" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/log">§Log§</a></li>
-    <li id="menu-6" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/about">§About§</a></li>
+    <li id="menu-6" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/">§About§</a></li>
   </ul>
 </div>
 </div>

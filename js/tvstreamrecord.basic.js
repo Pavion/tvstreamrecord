@@ -324,14 +324,25 @@ $(function() {
     var firstday = $( "#datepicker_local" ).datepicker( "option", "firstDay");
     
 // Common menu handling
-    var menu = new Array("/records","/list","/epgchart","/epglist","/config","/log","/about");
-    if (where()=="/") $("#menu-6").addClass('ui-tabs-active ui-state-active');
+//    if (where()=="/") {
+//        $("#menu-6").addClass('ui-tabs-active ui-state-active');
+//    } else {
+        for ( var m = 0; m < $("#mainmenu").children().length; m ++ ) {
+            if (where() ==  $( $("#mainmenu").children()[m] ).children().attr("href") ) {
+                $( $("#mainmenu").children()[m] ).addClass('ui-tabs-active ui-state-active');
+                break; 
+            }
+        }
+//    }
+
+/*    var menu = new Array("/records","/list","/epgchart","/epglist","/config","/log","/about","/files");
     for (var m = 0; m < menu.length; m ++) {
     	if (where()==menu[m]) {	    	
-    		$("#menu-" + m.toString()).addClass('ui-tabs-active ui-state-active');
-    		break; 
+            $("#menu-" + m.toString()).addClass('ui-tabs-active ui-state-active');
+            break; 
     	} 
     }
+*/
 
 // Common dialogs and forms
     $("#timepicker_inline_div1,#timepicker_inline_div2,#cfg_grab_time").timepicker({
@@ -553,7 +564,29 @@ $(function() {
         }
     });
 
-    if (here("records")) {
+    if (here("archive")) {
+        $('#table_files').dataTable({
+            "oLanguage": {"sUrl": "lang/dataTables." + language + ".json"},
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "bProcessing": true,
+            "sAjaxSource": "/filesget",
+            "bStateSave": true,
+            "fnStateSave": function (oSettings, oData) {
+                localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
+            },
+            "fnStateLoad": function (oSettings) {
+                return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
+            },
+            "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                $('td:eq(1)', nRow).html( localDateTime( aData[1] ) );
+            },
+            "fnDrawCallback": function( oSettings ) {
+                paintTable();
+            }
+        });
+        
+    } else if (here("records")) {
 // ------------------------------------ Records tab only        
         $( "#button_create_record" )
         .button()
@@ -872,7 +905,11 @@ $(function() {
                     $(this).css("height", (-zoom*800)+"px");
                 });
     //            $("#tabs").css("width", (250*maxcnt+100)+"px");
-                $("body").css("width", (250*maxcnt+100)+"px");
+                if (250*maxcnt+100<1200) {
+                    $("body").css("width", "100%");
+                } else {
+                    $("body").css("width", (250*maxcnt+100)+"px");
+                }
                 $("#mybody").css("height", (-zoom*800+200)+"px");
             }
         }

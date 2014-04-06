@@ -324,25 +324,12 @@ $(function() {
     var firstday = $( "#datepicker_local" ).datepicker( "option", "firstDay");
     
 // Common menu handling
-//    if (where()=="/") {
-//        $("#menu-6").addClass('ui-tabs-active ui-state-active');
-//    } else {
-        for ( var m = 0; m < $("#mainmenu").children().length; m ++ ) {
-            if (where() ==  $( $("#mainmenu").children()[m] ).children().attr("href") ) {
-                $( $("#mainmenu").children()[m] ).addClass('ui-tabs-active ui-state-active');
-                break; 
-            }
-        }
-//    }
-
-/*    var menu = new Array("/records","/list","/epgchart","/epglist","/config","/log","/about","/files");
-    for (var m = 0; m < menu.length; m ++) {
-    	if (where()==menu[m]) {	    	
-            $("#menu-" + m.toString()).addClass('ui-tabs-active ui-state-active');
+    for ( var m = 0; m < $("#mainmenu").children().length; m ++ ) {
+        if (where() ==  $( $("#mainmenu").children()[m] ).children().attr("href") ) {
+            $( $("#mainmenu").children()[m] ).addClass('ui-tabs-active ui-state-active');
             break; 
-    	} 
+        }
     }
-*/
 
 // Common dialogs and forms
     $("#timepicker_inline_div1,#timepicker_inline_div2,#cfg_grab_time").timepicker({

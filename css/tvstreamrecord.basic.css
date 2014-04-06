@@ -14,7 +14,7 @@ body {
 
 #tabs {
     position: absolute;
-    /*min-width: 1000px;*/
+    min-width: 1000px;
     float:left;
 }
     

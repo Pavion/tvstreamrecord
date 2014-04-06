@@ -564,29 +564,7 @@ $(function() {
         }
     });
 
-    if (here("archive")) {
-        $('#table_files').dataTable({
-            "oLanguage": {"sUrl": "lang/dataTables." + language + ".json"},
-            "bJQueryUI": true,
-            "sPaginationType": "full_numbers",
-            "bProcessing": true,
-            "sAjaxSource": "/filesget",
-            "bStateSave": true,
-            "fnStateSave": function (oSettings, oData) {
-                localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
-            },
-            "fnStateLoad": function (oSettings) {
-                return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
-            },
-            "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                $('td:eq(1)', nRow).html( localDateTime( aData[1] ) );
-            },
-            "fnDrawCallback": function( oSettings ) {
-                paintTable();
-            }
-        });
-        
-    } else if (here("records")) {
+    if (here("records")) {
 // ------------------------------------ Records tab only        
         $( "#button_create_record" )
         .button()

@@ -39,19 +39,15 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.6.2' 
+version = '0.6.3' 
 
 @route('/live/<filename>')
 def server_static9(filename):
-    if len(filename)>14:
-        write_m3u(filename[:-4], config.cfg_recordpath + filename[:-4])
-#        return static_file("/live.m3u", root='', mimetype='video')
+    rows = sqlRun("SELECT * FROM channels WHERE cid=%s" % filename.split(".")[0])
+    if rows:
+        write_m3u(rows[0][0], rows[0][1])
     else:
-        rows = sqlRun("SELECT * FROM channels WHERE cid=%s" % filename.split(".")[0])
-        if rows:
-            write_m3u(rows[0][0], rows[0][1])
-        else:
-            return
+        return
     return static_file("/live.m3u", root='', mimetype='video')
 
 def write_m3u(name, path):
@@ -153,34 +149,6 @@ def internationalize(templ):
 #@route('/about')
 def about_s(): 
     return internationalize(template('about'))
-
-#------------------------------- Files -------------------------------
-@route('/archive')
-def files_s():    
-    return internationalize(template('archive', recordpath=config.cfg_recordpath))
-
-@route('/filesget')
-def files_g():
-    i = config.cfg_recordpath.rfind("/")
-    k = config.cfg_recordpath.rfind("\\")
-    retlist = []
-    if k>i: i=k
-    path = config.cfg_recordpath[0:i+1]
-    prefix = config.cfg_recordpath[i+1:]   
-    try:
-        for file in os.listdir(path):
-            if file.startswith(prefix) and len(file)>len(prefix)+14:
-                datetext = file[len(prefix):len(prefix)+14]
-                try:
-                    mydate = datetime.strptime(datetext, "%Y%m%d%H%M%S")
-                    k = file.rfind(".")
-                    m3u = "<a href=\"live/" + file + ".m3u\">" + file[len(prefix)+14+3:k] + "</a>"
-                    retlist.append( [ m3u ,  datetime.strftime(mydate, "%Y-%m-%d %H:%M:%S") ] )
-                except:
-                    pass    
-    except: 
-        print "Could not open record path. Please check your settings"
-    return json.dumps({"aaData": retlist } )
 
 #------------------------------- Logging -------------------------------
         
@@ -752,13 +720,13 @@ class record(Thread):
         else:
             self.ext = row[7]
         if self.mask > 0:
-            w = self.bis.weekday()
+            w = self.bis.isoweekday() if self.bis.isoweekday()<7 else 0            
             if not (self.bis>=datetime.now() and getWeekdays(self.mask)[w]):
                 delta = timedelta(days=1)
                 while not (self.bis>=datetime.now() and getWeekdays(self.mask)[w]):
                     self.von = self.von + delta
                     self.bis = self.bis + delta
-                    w = self.bis.weekday()    
+                    w = self.bis.isoweekday() if self.bis.isoweekday()<7 else 0            
                 print "Recurrent record '%s' moved to %s" % (self.name, self.von)
                 sqlRun("UPDATE records SET rvon='%s', rbis='%s' WHERE rowid=%d" % (datetime.strftime(self.von,"%Y-%m-%d %H:%M:%S"), datetime.strftime(self.bis,"%Y-%m-%d %H:%M:%S"), self.id ) )    
     
@@ -858,7 +826,7 @@ def setRecords():
                 break
         if chk == False:
             t.stop()
-           
+
 print "Initializing database..."
 sqlCreateAll(version)
 purgeDB()          

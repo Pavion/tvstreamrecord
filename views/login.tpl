@@ -13,9 +13,12 @@
             </div>
             <form action="/login" method="post">
                 <div>
-                    Password <input type="password" id="pw" name="pw">
-                    <input type="checkbox" value="1" name="store_pw">Remember me
-                    <input type="submit" value="OK">
+                    <center>
+                    Password<br />
+                    <input type="password" id="pw" name="pw"><br />
+                    <input type="checkbox" value="1" name="store_pw">Remember me<br />
+                    <input type="submit" value="Login">
+                    </center>
                 </div>
             </form>
         </div>

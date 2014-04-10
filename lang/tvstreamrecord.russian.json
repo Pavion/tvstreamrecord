@@ -127,6 +127,13 @@
     "Invalid bind address, please check your settings": "Неправильный адрес сервера, пожалуйста проверьте настройки",
     "Invalid grab time, please check your settings": "Неверное время дня для импортирования EPG, пожалуйста проверьте настройки",
     "Invalid EPG zoom, please check your settings": "Неверный масштаб для EPG картинки, пожалуйста проверьте настройки",
-    "Saving configuration...": "Конфигурация сохраняется..."
-
+    "Saving configuration...": "Конфигурация сохраняется...",
+    
+    "Set remote access password (leave blank for none)": "Задать пароль для удалённого доступа (оставить пустым для отмены)",
+    "password": "пароль",
+    "Set": "Задать",
+    "Old": "Старый",
+    "New": "Новый",
+    "Repeat": "Повторить"
+ 
 }

@@ -61,7 +61,9 @@ def sqlCreateAll(version):
         sql += 'CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT UNIQUE, g_name TEXT collate nocase UNIQUE, g_lasttime TEXT);'
         sql += 'CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT, g_stop TEXT, g_desc TEXT, PRIMARY KEY (g_id, g_start, g_stop));'
         sql += 'CREATE TABLE IF NOT EXISTS config (param TEXT UNIQUE, desc TEXT, value TEXT);'
+        sql += 'CREATE TABLE IF NOT EXISTS blacklist (ip TEXT UNIQUE, trycount INTEGER, lasttry TEXT);'
         sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version           
+        sql += "INSERT OR REPLACE INTO config VALUES ('credentials', '', '');"
     else: 
         rows = sqlRun("select value from config where param='cfg_version'")
         if not rows: # Version < 0.4.4
@@ -84,6 +86,9 @@ def sqlCreateAll(version):
                     sql += 'ALTER TABLE guide_chan_neu RENAME TO guide_chan;'
                 if oldver < '0.6.1':
                     sql += 'UPDATE records SET rmask = case when (rmask & 64)=64 then ((rmask - 64) << 1) + 1 else rmask << 1 end;'
+                if oldver < '0.6.4':
+                    sql += 'CREATE TABLE IF NOT EXISTS blacklist (ip TEXT UNIQUE, trycount INTEGER, lasttry TEXT);'
+                    sql += "INSERT INTO config VALUES ('credentials', '', '');"
                 if oldver > version:
                     print "Critical error: Version mismatch!!!"     
                
@@ -99,5 +104,6 @@ def purgeDB():
     sql  = "DELETE FROM caching WHERE julianday('now', 'localtime')-julianday(crTime)>%d;" % config.cfg_purgedelta
     sql += "DELETE FROM guide_chan WHERE julianday('now', 'localtime')-julianday(g_lasttime)>%d;" % config.cfg_purgedelta
     sql += "DELETE FROM guide WHERE julianday('now', 'localtime')-julianday(g_start)>%d;" % config.cfg_purgedelta
+    sql += "DELETE FROM blacklist WHERE julianday('now', 'localtime')-julianday(lasttry)>%d;" % config.cfg_purgedelta
     sqlRun(sql, -1, 1)
     return

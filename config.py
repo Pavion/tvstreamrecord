@@ -139,6 +139,7 @@ configuration = [
 ]
 
 from sql import sqlRun
+from datetime import datetime
 
 for config in configuration:
     globals()[config[0]] = config[2]
@@ -149,13 +150,31 @@ def getUser():
         return rows[0][0]
     else:
         return setUser("")
-#        sqlRun("INSERT OR INTO config VALUES ('credentials', '','')")
-#        return ""
 
 def setUser(userhash):
-    sqlRun("INSERT OR REPLACE INTO config VALUES ('credentials', '', '%s')" % userhash)
-#    sqlRun("UPDATE config SET value='%s' WHERE param='credentials'" % userhash)
+    sqlRun("UPDATE config SET value = '%s' WHERE param='credentials'" % userhash)
     return userhash
+
+def banIP(ip):
+    rows = sqlRun("SELECT trycount FROM blacklist WHERE ip='%s'" % ip)
+    now = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")
+    if rows:
+        sqlRun("UPDATE blacklist SET trycount=%s, lasttry='%s' WHERE ip='%s'" % (rows[0][0]+1, now, ip)  )
+        if rows[0][0]+1==3:
+            print "IP %s has been blacklisted for for three unsuccessful login attempts" % ip
+
+    else:
+        sqlRun("INSERT INTO blacklist VALUES ('%s', %s, '%s')" % (ip, 1, now) )
+    
+def clearIP(ip):
+    sqlRun("DELETE FROM blacklist WHERE ip='%s'" % ip)    
+    
+def checkIP(ip):
+    rows = sqlRun("SELECT trycount FROM blacklist WHERE ip='%s'" % ip)
+    if rows:
+        if rows[0][0]>=3:
+            return False 
+    return True
     
 def getDict():
     ret = []

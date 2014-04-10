@@ -971,6 +971,8 @@ $(function() {
         
     } else if (here("config")) { 
 // ------------------------------------ Configuration tab only
+        var passFields =  $( [] ).add( "#pass_old" ).add( "#pass_new_1" ).add( "#pass_new_2" );
+        
         $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
         $( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
@@ -1018,7 +1020,16 @@ $(function() {
             post("/resetlog", {}, 1);
             event.preventDefault();
         });
-       
+
+        $( "#button_setpass" )
+        .button()
+        .click(function(event ) {
+            passFields.removeClass( "ui-state-error" );
+            passFields.val("");
+            $( "#dialog_password" ).dialog( "open" );
+            event.preventDefault();
+        });
+        
         $( "#button_removeepg" )
         .button()
         .click(function(event ) {
@@ -1067,6 +1078,40 @@ $(function() {
                 $("#label_config_saved").text($("#label_config_saved").attr("info"));
             }            
         });
+
+        $( "#dialog_password" ).dialog({
+            autoOpen: false,
+            buttons: [{
+                text: $( "#dialog_password" ).attr("ok"),
+                click: function() {
+                    $.post("/setpass", 
+                        {
+                            "pass_old": $("#pass_old").val(), 
+                            "pass_new_1": $("#pass_new_1").val(), 
+                            "pass_new_2": $("#pass_new_2").val()
+                        },  
+                        function(data) {
+                            ret = data.ret;
+                            passFields.removeClass( "ui-state-error" );
+                            if (ret == 0) {
+                                $( "#dialog_password" ).dialog( "close" );
+                                window.location.reload(false);
+                            } else if (ret == 1) {
+                                $( "#pass_old" ).addClass( "ui-state-error" );
+                            } else {
+                                $( "#pass_new_1" ).add( "#pass_new_2" ).addClass( "ui-state-error" );
+                            }
+                        }, "json");
+                }
+            }, 
+            {
+                text: $( "#dialog_password" ).attr("cancel"),
+                click: function() {
+                    $( this ).dialog( "close" );
+                }
+            }]
+        });
+
 
         
     } else if (here("log")) {

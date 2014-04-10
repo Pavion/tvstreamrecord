@@ -49,6 +49,7 @@
         </select>
     </td>
 </tr>
+<tr><td>§Set remote access password (leave blank for none)§</td><td><button id="button_setpass">§Set§ §password§</button></td></tr>
 </tbody>
 </table>
 </div>
@@ -113,4 +114,15 @@
 </div>
 <div id="dialog_remove" title="§Confirmation request§" cancel="§Cancel§" delete="§Delete§"> 
 	<p>§Do you want to delete all of your EPG data?§</p>
+</div>
+<div id="dialog_password" title="§Set§ §password§" cancel="§Cancel§" ok="§OK§"> 
+	<p>§Set remote access password (leave blank for none)§</p>
+    <p>
+        §Old§ §password§<br />
+        <input type="password" class="text ui-widget-content ui-corner-all" id="pass_old" value="" autocomplete="off" /><br />
+        §New§ §password§<br /> 
+        <input type="password" class="text ui-widget-content ui-corner-all" id="pass_new_1" value="" autocomplete="off" /><br />
+        §Repeat§<br />
+        <input type="password" class="text ui-widget-content ui-corner-all" id="pass_new_2" value="" autocomplete="off" />
+    </p>
 </div>

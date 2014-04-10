@@ -96,10 +96,42 @@ def server_static5(filename):
 
 @post('/login')
 def postLogin():    
+    global credentials
     hash = hashlib.sha224(request.forms.pw).hexdigest()
+    if hash == credentials:
+        config.clearIP(request.remote_addr)
+    else:
+        config.banIP(request.remote_addr)
     expire = None if not request.forms.store_pw else 315360000
     response.set_cookie(name="tvstreamrecord_user", value=hash, max_age=expire)
     redirect("/") 
+
+@post('/setpass')
+def setPass():
+    global credentials
+    pass_old = hashlib.sha224(request.forms.pass_old).hexdigest() if request.forms.pass_old else ""
+    pass_new_1 = hashlib.sha224(request.forms.pass_new_1).hexdigest() if request.forms.pass_new_1 else ""
+    pass_new_2 = hashlib.sha224(request.forms.pass_new_2).hexdigest() if request.forms.pass_new_2 else ""
+    if pass_old == credentials and pass_new_1 == pass_new_2:
+        response.delete_cookie("tvstreamrecord_user")
+        credentials = config.setUser(pass_new_1)
+        ret = 0
+    elif pass_old != credentials:
+        ret = 1
+    else:
+        ret = 2        
+    return json.dumps( {"ret": ret } )
+    
+def checkLogin():
+    #localhost = ['192','10.'] ### ip blocking? non static! 
+    global credentials
+    if credentials:
+        if credentials != request.get_cookie("tvstreamrecord_user"): #and not request.remote_addr[:3] in localhost and request.remote_addr != '127.0.0.1':
+            if config.checkIP(request.remote_addr) == True:
+                return template('login')
+            else:
+                return "Sorry, your IP %s has been blacklisted for three unsuccessful login attempts" % request.remote_addr
+    return ""
 
 #------------------------------- Recurring records -------------------------------
 def getWeekdays(mask):
@@ -134,28 +166,27 @@ def checkLang():
         config.saveConfig()
 
 def internationalize(templ):
-    localhost = ['192','10.'] ### ip blocking? non static! 
-    if credentials:
-        if credentials != request.get_cookie("tvstreamrecord_user") and not request.remote_addr[:3] in localhost and request.remote_addr != '127.0.0.1':
-            return template('login')
-    
-    header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale )
-    footer = template('footer')
-    templ = header + templ + footer
-    if not config.cfg_language == "english":
-        try:
-            json_data=open('lang/tvstreamrecord.' + config.cfg_language + '.json')
-            data = json.load(json_data)
-            for word in data:
-                if data[word]:
-                    templ = templ.replace(u"§"+word+u"§", data[word])
-                else:
-                    templ = templ.replace(u"§"+word+u"§", word)
-            json_data.close()
-        except:
-            pass
-    templ = templ.replace(u"§","")
-    return templ 
+    login = checkLogin()
+    if login != "":
+        return login
+    else:
+        header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale )
+        footer = template('footer')
+        templ = header + templ + footer
+        if not config.cfg_language == "english":
+            try:
+                json_data=open('lang/tvstreamrecord.' + config.cfg_language + '.json')
+                data = json.load(json_data)
+                for word in data:
+                    if data[word]:
+                        templ = templ.replace(u"§"+word+u"§", data[word])
+                    else:
+                        templ = templ.replace(u"§"+word+u"§", word)
+                json_data.close()
+            except:
+                pass
+        templ = templ.replace(u"§","")
+        return templ 
 
 #------------------------------- Main menu -------------------------------
 
@@ -166,7 +197,6 @@ def about_s():
     return internationalize(template('about'))
 
 #------------------------------- Logging -------------------------------
-        
 
 logInit()    
 

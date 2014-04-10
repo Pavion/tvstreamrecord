@@ -138,8 +138,24 @@ configuration = [
 
 ]
 
+from sql import sqlRun
+
 for config in configuration:
     globals()[config[0]] = config[2]
+    
+def getUser():    
+    rows = sqlRun("SELECT value FROM config WHERE param='credentials'")
+    if rows:
+        return rows[0][0]
+    else:
+        return setUser("")
+#        sqlRun("INSERT OR INTO config VALUES ('credentials', '','')")
+#        return ""
+
+def setUser(userhash):
+    sqlRun("INSERT OR REPLACE INTO config VALUES ('credentials', '', '%s')" % userhash)
+#    sqlRun("UPDATE config SET value='%s' WHERE param='credentials'" % userhash)
+    return userhash
     
 def getDict():
     ret = []
@@ -149,7 +165,6 @@ def getDict():
     return ret
 
 def loadConfig():
-    from sql import sqlRun
     sqlRun("INSERT OR IGNORE INTO config VALUES (?, ?, ?)",configuration,1)
     rows = sqlRun("SELECT param, value FROM config WHERE param<>'cfg_version'")
     setConfig(rows)
@@ -166,7 +181,6 @@ def setConfig(attrlist = []):
             
             
 def saveConfig():
-    from sql import sqlRun
     sql = ''   
     for var in getDict():
         sql += "UPDATE config SET value='%s' WHERE param='%s';" % (globals()[var], var) 

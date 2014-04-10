@@ -1,0 +1,11 @@
+div#loginWindow {
+    margin-left: auto;
+    margin-right: auto;
+    width: 200px;
+    border: darkblue;
+    border-width: 2px;
+    border-style: solid;
+    padding: 5px;
+    text-align: center;    
+}
+

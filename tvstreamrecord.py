@@ -18,7 +18,7 @@
 """
 
 from bottle import CherryPyServer
-from bottle import route, run, template, post, request
+from bottle import route, run, template, post, request, response
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
 from time import sleep
@@ -33,13 +33,14 @@ from threading import Thread, Timer
 import os
 import sys
 from mylogging import logInit, logRenew, logStop
+import hashlib
 
 records = []    
 localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.6.3' 
+version = '0.6.4' 
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -91,6 +92,15 @@ def server_static3(filename):
 def server_static5(filename):
     return static_file(filename, root='./images')
 
+#------------------------------- Login script ------------------------------------
+
+@post('/login')
+def postLogin():    
+    hash = hashlib.sha224(request.forms.pw).hexdigest()
+    expire = None if not request.forms.store_pw else 315360000
+    response.set_cookie(name="tvstreamrecord_user", value=hash, max_age=expire)
+    redirect("/") 
+
 #------------------------------- Recurring records -------------------------------
 def getWeekdays(mask):
     mask = 127 if mask == 0 else mask
@@ -123,8 +133,12 @@ def checkLang():
     if not (ret_loc and ret_lng and ret_style):
         config.saveConfig()
 
-
 def internationalize(templ):
+    localhost = ['192','10.'] ### ip blocking? non static! 
+    if credentials:
+        if credentials != request.get_cookie("tvstreamrecord_user") and not request.remote_addr[:3] in localhost and request.remote_addr != '127.0.0.1':
+            return template('login')
+    
     header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale )
     footer = template('footer')
     templ = header + templ + footer
@@ -146,6 +160,7 @@ def internationalize(templ):
 #------------------------------- Main menu -------------------------------
 
 @route('/')
+@route('/login')
 #@route('/about')
 def about_s(): 
     return internationalize(template('about'))
@@ -832,6 +847,7 @@ sqlCreateAll(version)
 purgeDB()          
 print "Initializing config..."
 config.loadConfig()
+credentials = config.getUser()
 print "Checking internationalization..."
 checkLang() 
 print "Initializing records..."

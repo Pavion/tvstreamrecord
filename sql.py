@@ -104,6 +104,5 @@ def purgeDB():
     sql  = "DELETE FROM caching WHERE julianday('now', 'localtime')-julianday(crTime)>%d;" % config.cfg_purgedelta
     sql += "DELETE FROM guide_chan WHERE julianday('now', 'localtime')-julianday(g_lasttime)>%d;" % config.cfg_purgedelta
     sql += "DELETE FROM guide WHERE julianday('now', 'localtime')-julianday(g_start)>%d;" % config.cfg_purgedelta
-    sql += "DELETE FROM blacklist WHERE julianday('now', 'localtime')-julianday(lasttry)>%d;" % config.cfg_purgedelta
     sqlRun(sql, -1, 1)
     return

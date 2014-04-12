@@ -123,10 +123,10 @@ def setPass():
     return json.dumps( {"ret": ret } )
     
 def checkLogin():
-    #localhost = ['192','10.'] ### ip blocking? non static! 
+    localhost = ['192','10.'] 
     global credentials
     if credentials:
-        if credentials != request.get_cookie("tvstreamrecord_user"): #and not request.remote_addr[:3] in localhost and request.remote_addr != '127.0.0.1':
+        if credentials != request.get_cookie("tvstreamrecord_user") and not request.remote_addr[:3] in localhost and request.remote_addr != '127.0.0.1':
             if config.checkIP(request.remote_addr) == True:
                 return template('login')
             else:

@@ -170,6 +170,7 @@ def clearIP(ip):
     sqlRun("DELETE FROM blacklist WHERE ip='%s'" % ip)    
     
 def checkIP(ip):
+    sqlRun("DELETE FROM blacklist WHERE julianday('now', 'localtime')-julianday(lasttry)>=2;")
     rows = sqlRun("SELECT trycount FROM blacklist WHERE ip='%s'" % ip)
     if rows:
         if rows[0][0]>=3:

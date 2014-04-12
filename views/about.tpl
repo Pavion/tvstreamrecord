@@ -37,6 +37,7 @@ You shouldn't need any special permissions.</p></li>
 <i>Interface theme</i> specifies the theme to be used. Some standart jQuery UI themes are already supplied, advanced users can also add other themes by copying the theme folder into /css folder.<br />
 <i>Interface language</i>. There are three languages supported. You can also make your own translation using a dummy language file in /lang folder. In that case, please send me your translation to be included in further versions.<br />
 <i>Interface locale</i> is supplied with jQuery UI and adds local date/time support for several countries. You can also create your own locales, see /js/i18n folder for more examples.<br />
+<i>Set remote access password</i> can be used to provide a password for access from outside your local network. Warning: entering wrong password three times will block your current IP for 48 hours. Local connections doesn't require a password.<br />
 <br /><b>EPG tab</b><br />
 <i>Lenghten an EPG record</i> will be used to prolong the record and avoid any small time shifts in TV charts. Please note, that your system time will be used for recording and should be exact.<br />
 <i>Enable XMLTV import</i> for manual import or to be performed once per day at specified time. <br />

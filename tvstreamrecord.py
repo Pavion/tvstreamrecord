@@ -412,6 +412,23 @@ def getconfig():
     rows=sqlRun("SELECT param, '', value FROM config WHERE param<>'cfg_version' AND not param LIKE 'table_%'")
     return json.dumps({"configdata": rows } )    
     
+@post('/gettree')
+def gettree():
+    deny=['/etc', '/var', '/usr', '/sbin', '/bin', '/recycler']
+    r=['<ul class="jqueryFileTree" style="display: none;">']
+    try:
+        d=urllib2.unquote(request.POST.get('dir','\\'))
+        for f in os.listdir(d):
+            ff=os.path.join(d,f)
+            if os.path.isdir(ff) and not ff.lower() in deny and f[0] != '@':
+                r.append('<li class="directory collapsed"><a href="#" rel="%s/">%s</a></li>' % (ff,f))
+            else:
+                pass
+    except Exception,e:
+        pass
+    r.append('</ul>')
+    return r
+    
 #------------------------------- EPG Grabbing part -------------------------------
 class epggrabthread(Thread):
     stopflag = False

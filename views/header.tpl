@@ -8,6 +8,7 @@
 	<link rel="stylesheet" href="css/{{style}}" />
 	<link rel="stylesheet" href="css/jquery-ui-timepicker-addon.min.css" />
 	<link rel="stylesheet" href="css/jquery.dataTables_themeroller.css" />
+	<link rel="stylesheet" href="css/jqueryFileTree.css" />
 	<link rel="stylesheet" href="css/slickswitch.css" />
         <link rel="stylesheet" href="css/tvstreamrecord.basic.css" type="text/css" />
 
@@ -20,6 +21,7 @@
 	<script type="text/javascript" src="js/i18n/jquery-ui-timepicker-{{locale}}.js"></script>	
 	<script type="text/javascript" src="js/i18n/jquery.ui.datepicker-{{locale}}.js"></script>	
 %end
+	<script type="text/javascript" src="js/jqueryFileTree.js"></script>
 	<script type="text/javascript" src="js/tvstreamrecord.basic.js"></script>
 </head><BODY>
 <div id="datepicker_local" style="display: none;"></div>

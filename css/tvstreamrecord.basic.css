@@ -196,3 +196,6 @@ table.dataTable a { color:black; }
 div#users-contain { margin: 20px 0px; }
 div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
 div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left;  }
+
+#cfg_recordpath { width: 70%; float: left; }
+#button_pathchooser { width: 20%; float: right; margin-right: 20px; }

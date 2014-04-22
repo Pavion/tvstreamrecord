@@ -1030,6 +1030,14 @@ $(function() {
             event.preventDefault();
         });
         
+        $( "#button_pathchooser" )
+        .button()
+        .click(function(event ) {
+            $('#pathchooser').fileTree({ root: '/', script: '/gettree', multiFolder: false }, function(file) {});
+            $( "#dialog_pathchooser" ).dialog( "open" );
+            event.preventDefault();
+        });
+        
         $( "#button_removeepg" )
         .button()
         .click(function(event ) {
@@ -1112,6 +1120,25 @@ $(function() {
             }]
         });
 
+        $( "#dialog_pathchooser" ).dialog({
+            autoOpen: false,
+            modal: true,
+            width: 500,
+            height: 500,
+            buttons: [{
+                text: $( "#dialog_pathchooser" ).attr("ok"),
+                click: function() {   
+                    $('#cfg_recordpath').val($(".folderselected").attr("rel"));
+                    $( this ).dialog( "close" );
+                }
+            }, 
+            {
+                text: $( "#dialog_pathchooser" ).attr("cancel"),
+                click: function() {
+                    $( this ).dialog( "close" );
+                }
+            }]
+        });
 
         
     } else if (here("log")) {

@@ -20,7 +20,7 @@
 </tr>
 </thead>
 <tbody>
-<tr><td>§Path for your recordings§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_recordpath" value="" autocomplete="off" /></td></tr>
+<tr><td>§Path for your recordings§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_recordpath" value="" autocomplete="off" /><button id="button_pathchooser">§Browse§</button></td></tr>
 <tr><td>§File extension for the recorded stream (default='.ts')§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_file_extension" value="" autocomplete="off" /></td></tr>
 <tr><td>§Interface theme (default='smoothness')§</td>
     <td>
@@ -124,5 +124,10 @@
         <input type="password" class="text ui-widget-content ui-corner-all" id="pass_new_1" value="" autocomplete="off" /><br />
         §Repeat§<br />
         <input type="password" class="text ui-widget-content ui-corner-all" id="pass_new_2" value="" autocomplete="off" />
+    </p>
+</div>
+<div id="dialog_pathchooser" title="§Path for your recordings§" cancel="§Cancel§" ok="§OK§">
+    <p>        
+        <div id="pathchooser"></div>
     </p>
 </div>

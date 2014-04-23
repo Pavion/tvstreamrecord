@@ -1071,6 +1071,11 @@ $(function() {
                         alert( $(this).attr('alert') );
                         myalert = true; 
                     }                    
+                } else if ($(this).attr('id')=="cfg_record_mask") {
+                    if ( value.lastIndexOf("%date%")==-1 && value.lastIndexOf("%title%")==-1) {
+                        alert( $(this).attr('alert') );
+                        myalert = true; 
+                    }                    
                 } else if ($(this).attr('id').startsWith('cfg_switch') && $(this).attr('type')!="checkbox") {
                 	value = "null";                	                	
                 } else if ($(this).attr('id').startsWith('cfg_switch')) {

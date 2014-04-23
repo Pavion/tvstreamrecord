@@ -134,6 +134,12 @@ configuration = [
 'cfg_epg_max_events',
 "Max events to be sent",
 '5000'
+],
+
+[
+'cfg_record_mask',
+"Record name mask",
+'%date% - %title%'
 ]
 
 ]
@@ -196,6 +202,12 @@ def setConfig(attrlist = []):
             if attr[0]=="cfg_server_port":
                 if int(globals()[attr[0]]) != int(attr[1]):
                     writeWebman(int(attr[1]))
+            if attr[0]=="cfg_recordpath":
+                if attr[1][-1]!="/" and attr[1][-1]!="\\":
+                    if "\\" in attr[1]: 
+                        attr[1]+="\\" 
+                    else:
+                        attr[1]+="/" 
             globals()[attr[0]] = attr[1]                
     saveConfig()
             

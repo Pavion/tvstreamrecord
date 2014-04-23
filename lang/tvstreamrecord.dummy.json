@@ -55,6 +55,8 @@
     "Reset the log file": "",
     "Reset log": "",
     "Do you want to delete all of your EPG data?": "",
+    "Record name mask (valid placeholders: %date% and %title%, default: '%date% - %title%')": "",
+    "Record name mask must have at least one placeholder": "",
     
     "at": "",
     "till": "",

@@ -802,9 +802,9 @@ class record(Thread):
         
     def doRecord(self):
         self.running = 1
-        fn = config.cfg_recordpath+datetime.now().strftime("%Y%m%d%H%M%S") + " - "        
-        fn = fn + "".join([x if x.isalnum() else "_" for x in self.name])
-        fn = fn + self.ext
+        dateholder = datetime.now().strftime("%Y%m%d%H%M%S")
+        titleholder = "".join([x if x.isalnum() else "_" for x in self.name])
+        fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + self.ext
         fftypes = config.cfg_ffmpeg_types
         fftypes = fftypes.lower().split()
         streamtype = self.url.lower().split(':', 1)[0]

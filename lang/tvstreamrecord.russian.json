@@ -55,6 +55,8 @@
     "Reset the log file": "Очистить лог",
     "Reset log": "Очистить",
     "Do you want to delete all of your EPG data?": "Вы хотите удалить все данные EPG?",
+    "Record name mask (valid placeholders: %date% and %title%, default: '%date% - %title%')": "Маска для имени записи (возможные шаблоны: %date% и %title%, по умолчанию: '%date% - %title%'", 
+    "Record name mask must have at least one placeholder": "Маска для имени записи должна содержать как минимум один шаблон",
 
     "at": "от",
     "till": "до",

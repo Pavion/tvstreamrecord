@@ -805,6 +805,10 @@ class record(Thread):
         dateholder = datetime.now().strftime("%Y%m%d%H%M%S")
         titleholder = "".join([x if x.isalnum() else "_" for x in self.name])
         fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + self.ext
+        num = 1
+        while os.path.isfile(fn) and num<127:
+            fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + ("_%s" % num) + self.ext
+            num += 1
         fftypes = config.cfg_ffmpeg_types
         fftypes = fftypes.lower().split()
         streamtype = self.url.lower().split(':', 1)[0]

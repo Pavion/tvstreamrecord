@@ -205,9 +205,9 @@ def setConfig(attrlist = []):
             if attr[0]=="cfg_recordpath":
                 if attr[1][-1]!="/" and attr[1][-1]!="\\":
                     if "\\" in attr[1]: 
-                        attr[1]+="\\" 
+                        attr=(attr[0], attr[1]+"\\")
                     else:
-                        attr[1]+="/" 
+                        attr=(attr[0], attr[1]+"/")
             globals()[attr[0]] = attr[1]                
     saveConfig()
             

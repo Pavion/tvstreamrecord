@@ -895,7 +895,7 @@ def setRecords():
 
 print "Initializing database..."
 sqlCreateAll(version)
-purgeDB()          
+purgeDB()
 print "Initializing config..."
 config.loadConfig()
 credentials = config.getUser()
@@ -914,7 +914,7 @@ print "Server aborted. Stopping all records before exiting..."
 for t in records:
     t.stop()
 
-print "Stopping EPG grab thread..."    
+print "Stopping EPG grab thread..."
 grabthread.kill()
     
 print "tvstreamrecord v.%s: bye-bye" % version

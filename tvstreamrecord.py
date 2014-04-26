@@ -192,7 +192,10 @@ def internationalize(templ):
 
 @route('/')
 @route('/login')
-#@route('/about')
+def root_s(): 
+    redirect("/records") 
+
+@route('/about')
 def about_s(): 
     return internationalize(template('about'))
 

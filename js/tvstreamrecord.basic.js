@@ -384,13 +384,6 @@ $(function() {
         width: 400,
         modal: true,
         open: function( event, ui ) {
-
-/*            $("#weekday").empty();
-            for(var i=0;i<7;i++) {
-                
-                $("#weekday").append($ ('<input type="checkbox" id="wday' + i + '" /><label id="wwd' + i + '" for="wday' + i + '">§xMo§</label>') );
-            }            */
-
             
             for(var i=0;i<7;i++) {
                 $("#wwd"+i).removeClass("ui-state-active");
@@ -955,13 +948,6 @@ $(function() {
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                 $('td:eq(3)', nRow).html( localDateTime( aData[3] ) );
                 $('td:eq(4)', nRow).html( localDateTime( aData[4] ) );                
-                //aData[7]="<b>"+aData[1]+": "+dat_v[1] + " - " + dat_b[1] + "</b><BR><BR>"+aData[2];
-
-                /*var myday = $.datepicker.parseDate('yy-mm-dd', dat_v[0]);
-                $('td:eq(3)', nRow).html($.datepicker.formatDate(mydateformat, myday)+" "+dat_v[1]);			
-                myday = $.datepicker.parseDate('yy-mm-dd', dat_b[0]);
-                $('td:eq(4)', nRow).html($.datepicker.formatDate(mydateformat, myday)+" "+dat_b[1]);*/
-
                 $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
             }
         });

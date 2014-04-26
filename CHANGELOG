@@ -1,4 +1,7 @@
-2014-04-12 0.6.4 Password protection
+2014-04-26 0.6.4 Password protection on remote connections added
+                 Browsing for target folder selection added
+                 Record name mask added
+                 New manual and About page
  
 2014-04-06 0.6.3 Recurrent records hotfix
  

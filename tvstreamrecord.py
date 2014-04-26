@@ -197,7 +197,10 @@ def root_s():
 
 @route('/about')
 def about_s(): 
-    return internationalize(template('about'))
+    f = open("changelog", "r")
+    changelog = f.read()
+    f.close()
+    return internationalize(template('about', changelog=changelog))
 
 #------------------------------- Logging -------------------------------
 

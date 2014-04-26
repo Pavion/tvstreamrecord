@@ -44,7 +44,12 @@ div#mybody {
 
 div#about {
     font-size:140%;
-    padding-top: 30px;        
+    padding-top: 20px;        
+}
+
+div#changelog {
+    font-family: courier,monospace;
+    white-space: pre;
 }
 
 [id^=icons-], [id^=iconsEPG-], [id^=iconsRec-] , [id^=iconsERec-]  {

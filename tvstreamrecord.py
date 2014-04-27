@@ -35,12 +35,12 @@ import sys
 from mylogging import logInit, logRenew, logStop
 import hashlib
 
-records = []    
+records = []
 localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.6.4' 
+version = '0.6.4'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -57,8 +57,8 @@ def write_m3u(name, path):
     f.write("#EXTINF:0,"+name+"\n")
     f.write(path+"\n")
     f.close()
-    
-            
+
+
 @route('/channels.m3u')
 def server_static8():
     return static_file("/channels.m3u", root='')
@@ -95,7 +95,7 @@ def server_static5(filename):
 #------------------------------- Login script ------------------------------------
 
 @post('/login')
-def postLogin():    
+def postLogin():
     global credentials
     hash = hashlib.sha224(request.forms.pw).hexdigest()
     if hash == credentials:
@@ -104,7 +104,7 @@ def postLogin():
         config.banIP(request.remote_addr)
     expire = None if not request.forms.store_pw else 315360000
     response.set_cookie(name="tvstreamrecord_user", value=hash, max_age=expire)
-    redirect("/") 
+    redirect("/")
 
 @post('/setpass')
 def setPass():
@@ -119,11 +119,11 @@ def setPass():
     elif pass_old != credentials:
         ret = 1
     else:
-        ret = 2        
+        ret = 2
     return json.dumps( {"ret": ret } )
-    
+
 def checkLogin():
-    localhost = ['192','10.'] 
+    localhost = ['192','10.']
     global credentials
     if credentials:
         if credentials != request.get_cookie("tvstreamrecord_user") and not request.remote_addr[:3] in localhost and request.remote_addr != '127.0.0.1':
@@ -186,25 +186,27 @@ def internationalize(templ):
             except:
                 pass
         templ = templ.replace(u"§","")
-        return templ 
+        return templ
 
 #------------------------------- Main menu -------------------------------
 
 @route('/')
 @route('/login')
-def root_s(): 
-    redirect("/records") 
+def root_s():
+    redirect("/records")
 
 @route('/about')
-def about_s(): 
-    f = open("changelog", "r")
-    changelog = f.read()
-    f.close()
+def about_s():
+    changelog=""
+    if os.path.isfile("CHANGELOG"):
+        f = open("CHANGELOG", "r")
+        changelog = f.read()
+        f.close()
     return internationalize(template('about', changelog=changelog))
 
 #------------------------------- Logging -------------------------------
 
-logInit()    
+logInit()
 
 print "Starting tvstreamrecord v.%s" % version
 print "Logging output initialized"
@@ -225,7 +227,7 @@ def log_get():
     for lline in lfile:
         if len(lline)>24:
             l.append([ lline[0:19], lline[20:23], lline[24:] ])
-    lfile.close()    
+    lfile.close()
     return json.dumps( {"aaData": l } )
 
 #------------------------------- Channel List -------------------------------
@@ -233,7 +235,7 @@ def log_get():
 @route('/channellist')
 def chanlist():
     l = []
-    rows=sqlRun('SELECT channels.cid, cname, cpath, cext, epgscan, cenabled FROM channels')    
+    rows=sqlRun('SELECT channels.cid, cname, cpath, cext, epgscan, cenabled FROM channels')
     for row in rows:
         m3u = "<a href=\"live/" + str(row[0]) + ".m3u\">" + row[1] + "</a>"
         l.append([row[0], m3u, row[2], row[3], row[4], row[5]])
@@ -242,7 +244,7 @@ def chanlist():
 @route('/list')
 def list_s():
     return internationalize(template('list',rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid')))
-    
+
 @post('/list')
 def list_p():
     what = request.forms.get("what")
@@ -250,7 +252,7 @@ def list_p():
     if what=="-1":
         sqlRun("DELETE FROM channels WHERE cid=%s" % (myid))
         sqlRun("DELETE FROM records WHERE cid=%s" % (myid))
-    else: 
+    else:
         sqlRun("UPDATE channels SET cenabled=%s WHERE cid=%s" % (what, myid))
         sqlRun("UPDATE records SET renabled=%s WHERE cid=%s" % (what, myid))
     setRecords()
@@ -273,9 +275,9 @@ def clgen_p():
 @post('/grab_channel')
 def grabchannel():
     myid = request.forms.myid
-    sqlRun("UPDATE channels SET epgscan=-epgscan+1 WHERE cid = %s" % myid)                
+    sqlRun("UPDATE channels SET epgscan=-epgscan+1 WHERE cid = %s" % myid)
     return
-    
+
 @post('/create_channel')
 def createchannel():
     prev = request.forms.prev
@@ -285,10 +287,10 @@ def createchannel():
     aktiv = getBool(request.forms.aktiv)
     epggrab = getBool(request.forms.epggrab)
     cext = request.forms.cext
-    
+
     if prev=="":
         prev = -1
-    elif prev.isdigit():    
+    elif prev.isdigit():
         prev = int(prev)
     else:
         print "Wrong number found for the previous ID. Aborting creation/update."
@@ -301,43 +303,43 @@ def createchannel():
     else:
         print "Wrong number found for the new ID. Aborting creation/update."
         return
-        
-    if cext!='': 
+
+    if cext!='':
         if cext[0:1]<>'.': cext = '.' + cext
-    
+
     exists = False
     if cid == prev:
         exists = True
     else:
         rows3  = sqlRun("select cid from channels where cid=%s" % cid)
-        if rows3: 
+        if rows3:
             exists = True
-    
+
     if prev!=-1:
-        if cid == prev:  # editing/renaming only 
+        if cid == prev:  # editing/renaming only
             sqlRun("UPDATE channels SET cname='%s', cpath='%s', cext='%s', cenabled=%s, epgscan=%s WHERE cid=%s" % (cname, cpath, cext, aktiv, epggrab, cid))
         else: # also moving
             if exists:
                 sqlRun("UPDATE channels SET cid = -1 WHERE cid = %s" % (prev))
-                sqlRun("UPDATE records  SET cid = -1 WHERE cid = %s" % (prev))            
-                if prev > cid:          
-                    sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))                
-                    sqlRun("UPDATE records  SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))            
-                else:            
+                sqlRun("UPDATE records  SET cid = -1 WHERE cid = %s" % (prev))
+                if prev > cid:
+                    sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))
+                    sqlRun("UPDATE records  SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))
+                else:
                     sqlRun("UPDATE channels SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev, cid))
                     sqlRun("UPDATE records  SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev, cid))
                 sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s, epgscan=%s WHERE cid=-1" % (cname, cid, cpath, cext, aktiv, epggrab))
                 sqlRun("UPDATE records SET cid=%s WHERE cid=-1" % cid)
             else:
-                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s, epgscan=%s WHERE cid=%s" % (cname, cid, cpath, cext, aktiv, epggrab, prev))                
-                sqlRun("UPDATE records SET cid=%s WHERE cid=%s" % (cid, prev))            
+                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s, epgscan=%s WHERE cid=%s" % (cname, cid, cpath, cext, aktiv, epggrab, prev))
+                sqlRun("UPDATE records SET cid=%s WHERE cid=%s" % (cid, prev))
     else:
         if exists:
-            sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s" % cid)            
-            sqlRun("UPDATE records SET cid = cid+1 WHERE cid >= %s" % cid)            
+            sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s" % cid)
+            sqlRun("UPDATE records SET cid = cid+1 WHERE cid >= %s" % cid)
         sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid, epggrab))
     return
-    
+
 @post('/upload')
 def upload_p():
     print "M3U upload parsing started"
@@ -345,11 +347,11 @@ def upload_p():
     upfile = request.files.upfile
     if not upfile:
         print "No file specified, please try again"
-    else:    
+    else:
         header = upfile.file.read(7)
         if header.startswith("#EXTM3U"):
             how = getBool(request.forms.get("switch_list_append"))
-            upfilecontent = upfile.file.read()        
+            upfilecontent = upfile.file.read()
             rowid = 1
             if how==0:
                 sqlRun('DELETE FROM channels')
@@ -359,29 +361,29 @@ def upload_p():
                 rows2 = sqlRun("select max(cid) from channels")
                 if rows2 and not rows2[0][0] is None:
                     rowid = rows2[0][0]+1
-                
+
             lines = upfilecontent.splitlines()
             i = 0
             name = ""
             for line in lines:
                 if not line[0:10] == "#EXTVLCOPT" and line!="":
                     i = i + 1
-                    if i % 2 == 1: 
+                    if i % 2 == 1:
                         name = line.split(",",1)[1]
                     if i % 2 == 0:
                         retl.append([name, line, rowid])
-                        rowid = rowid + 1 
+                        rowid = rowid + 1
                         name = ""
-            sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?, 0)", retl, 1)             
-            
-    redirect("/list") 
+            sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?, 0)", retl, 1)
+
+    redirect("/list")
 
 #------------------------------- Configuration -------------------------------
-    
+
 @post('/config')
-def config_p():    
+def config_p():
     configdata = json.loads(request.forms.get('configdata'))
-    for cfg in configdata: 
+    for cfg in configdata:
         if cfg[0]=="cfg_grab_time":
             if cfg[1]!=config.cfg_grab_time:
                 grabthread.run()
@@ -389,10 +391,10 @@ def config_p():
     return
 
 @route('/config')
-def config_s():    
+def config_s():
     themes = list()
     for theme in os.listdir("css"):
-        if os.path.isdir("css/"+theme) == True:            
+        if os.path.isdir("css/"+theme) == True:
             for css in os.listdir("css/"+theme+"/"):
                 if css.endswith(".css"):
                     themes.append([theme+'/'+css,theme])
@@ -416,8 +418,8 @@ def config_s():
 @route('/getconfig')
 def getconfig():
     rows=sqlRun("SELECT param, '', value FROM config WHERE param<>'cfg_version' AND not param LIKE 'table_%'")
-    return json.dumps({"configdata": rows } )    
-    
+    return json.dumps({"configdata": rows } )
+
 @post('/gettree')
 def gettree():
     deny=['/etc', '/var', '/usr', '/sbin', '/bin', '/recycler']
@@ -434,37 +436,37 @@ def gettree():
         pass
     r.append('</ul>')
     return r
-    
+
 #------------------------------- EPG Grabbing part -------------------------------
 class epggrabthread(Thread):
     stopflag = False
-    running = False 
+    running = False
     epggrabberstate = [0,0]
     timer = None
-    
+
     def getState(self):
         return [self.running, self.epggrabberstate[0], self.epggrabberstate[1], self.stopflag]
-    
+
     def isRunning(self):
         return self.running
-    
+
     def setChannelCount(self):
         self.epggrabberstate[1] = 0
-        if config.cfg_switch_grab_auto == "1": 
+        if config.cfg_switch_grab_auto == "1":
             rows = sqlRun("SELECT count(cname) FROM channels WHERE epgscan = 1 AND cenabled = 1;")
             if rows:
                 self.epggrabberstate[1] += rows[0][0]
-        if config.cfg_switch_xmltv_auto=="1": 
-            self.epggrabberstate[1] += 1     
-    
+        if config.cfg_switch_xmltv_auto=="1":
+            self.epggrabberstate[1] += 1
+
     def __init__(self):
         self.setChannelCount()
         Thread.__init__(self)
-    
+
     def kill(self):
-        if not self.timer == None:             
+        if not self.timer == None:
             self.timer.cancel()
-    
+
     def run(self):
         self.kill()
         if not config.cfg_grab_time == '0' and len(config.cfg_grab_time)>=3:
@@ -478,33 +480,33 @@ class epggrabthread(Thread):
                 self.timer = Timer(deltas, self.doGrab)
                 self.timer.start()
                 if deltas>0:
-                    print "EPG Thread timer waiting till %s (%d seconds)" % (config.cfg_grab_time, deltas)                        
+                    print "EPG Thread timer waiting till %s (%d seconds)" % (config.cfg_grab_time, deltas)
             except:
                 print "Something went wrong with EPG thread. Please check your config settings regarding your start time"
-    
+
     def doGrab(self, override=False):
         self.kill()
-        self.running = True        
+        self.running = True
         if config.cfg_switch_grab_auto=="1"  and not self.stopflag: self.grabStream()
         if config.cfg_switch_xmltv_auto=="1" and not self.stopflag: self.grabXML()
         self.epggrabberstate[0]=0
         self.running = False
         if not override:
-            sleep(61)        
+            sleep(61)
         self.stopflag = False
         self.run()
-        
+
     def grabXML(self):
         try:
             xmltv.getProgList(version)
         except:
             print "XMLTV import could not be completed, please try again later (%s)" % sys.exc_info()[0]
-        self.epggrabberstate[0] += 1    
- 
+        self.epggrabberstate[0] += 1
+
     def grabStream(self):
         rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
         for row in rows:
-            if self.stopflag: 
+            if self.stopflag:
                 break
             self.epggrabberstate[0] += 1
             fulllist = grabber.startgrab(row)
@@ -523,33 +525,33 @@ class epggrabthread(Thread):
                         sqlchlist.append([cid, actname, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S") ] )
                     else:
                         cid = -1
-                    prevname=actname 
+                    prevname=actname
 
                 if cid!=-1:
                     dt1 = l[1]
-                    dt2 = l[1] + l[2]         
+                    dt2 = l[1] + l[2]
                     pos = l[3].find("\n")
                     if pos!=-1:
                         title = l[3][0:pos]
-                        desc = l[3][pos+1:]                        
-                    else:                  
+                        desc = l[3][pos+1:]
+                    else:
                         title = l[3]
                         desc = ""
-                
+
                     sqllist.append([cid, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
 
             if len(sqllist)>0:
                 sqlRun("INSERT OR REPLACE INTO guide_chan VALUES (?, ?, ?)", sqlchlist, 1 )
                 sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
-        
-    
+
+
     def stop(self):
         self.stopflag = True
 
 @route('/getepgstate')
 def getepgstate():
     return json.dumps( {"grabState": grabthread.getState() } )
-        
+
 @post('/grabepg')
 def grabepg():
     mode = int(request.forms.mode)
@@ -559,33 +561,33 @@ def grabepg():
             doGrab.start()
     elif mode == 1:
         grabthread.stop()
-    return 
+    return
 
 #------------------------------- EPG painting part -------------------------------
-        
+
 @post('/removeepg')
-def removeepg():    
+def removeepg():
     sqlRun("DELETE FROM guide")
     sqlRun("DELETE FROM guide_chan")
     print "All EPG data was deleted"
-    return 
+    return
 
 @post('/epg')
-def epg_p():    
+def epg_p():
     day = request.forms.datepicker_epg
     global dayshown
     dayshown = datetime.strptime(day,"%Y-%m-%d")
     return
 
 @route('/epgchart')
-def epg_s():    
+def epg_s():
     grabthread.setChannelCount()
 
     global dayshown
-    
+
     if dayshown < datetime.combine(date.today(), time.min):
-        dayshown = datetime.combine(date.today(), time.min)    
-            
+        dayshown = datetime.combine(date.today(), time.min)
+
     todaysql = datetime.strftime(dayshown, "%Y-%m-%d %H:%M:%S")
 
     if dayshown == datetime.combine(date.today(), time.min): # really today
@@ -596,7 +598,7 @@ def epg_s():
         sthour = 0
         daystart = dayshown
         totalwidth = 86400
-    
+
     hours = int(totalwidth / 3600)
     d_von = daystart
 
@@ -609,8 +611,8 @@ def epg_s():
         x = i * 100.0 / hours * widthq
         w =  1.0 / hours * widthq * 100.0
         rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", -1, "", 0])
-    ret.append(rtemp)    
-    
+    ret.append(rtemp)
+
     rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY channels.cid ORDER BY channels.cid" % (todaysql, todaysql))
     for row in rows:
         cid=row[1]
@@ -618,7 +620,7 @@ def epg_s():
         c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=%s AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id='%s' ORDER BY g_start" % (cid, config.cfg_delta_for_epg, config.cfg_delta_for_epg, todaysql, todaysql, row[0]))
         #c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid FROM guide WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND g_id='%s' ORDER BY g_start" % (todaysql, todaysql, row[0]))
         for event in c_rows:
-            
+
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
             fulltext = "<b>"+event[0]+": "+datetime.strftime(d_von, localtime) + " - " + datetime.strftime(d_bis, localtime) + "</b><BR><BR>"+event[3]
@@ -645,9 +647,9 @@ def epg_s():
     return internationalize(template('epgchart', curr=datetime.strftime(d_von, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom))
 
 @route('/epglist')
-def epglist_s():    
+def epglist_s():
     return internationalize(template('epglist', listmode=config.cfg_switch_epglist_mode))
-    
+
 @route('/epglist_getter')
 def epglist_getter():
     sEcho =  request.query.sEcho
@@ -661,33 +663,33 @@ def epglist_getter():
         if iSortingCols:
             sOrder = "ORDER BY"
             col = int(request.query['iSortCol_0'])
-            sOrder += " %s " % columns[col]  
+            sOrder += " %s " % columns[col]
             sOrder += "ASC" if request.query['sSortDir_0']=="asc" else "DESC"
             if sOrder == "ORDER BY":
                 sOrder = ""
         iSearch = request.query.sSearch
         sWhere = ""
         if iSearch and iSearch!="":
-            sWhere = "AND (guide_chan.g_name LIKE '%" + iSearch + "%' OR guide.g_title LIKE '%" + iSearch + "%' OR guide.g_desc LIKE '%" + iSearch + "%')" 
-            
+            sWhere = "AND (guide_chan.g_name LIKE '%" + iSearch + "%' OR guide.g_title LIKE '%" + iSearch + "%' OR guide.g_desc LIKE '%" + iSearch + "%')"
+
         query = "SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s %s %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere, sOrder, sLimit)
         countquery = "SELECT COUNT(guide.g_start) FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere)
         count = sqlRun(countquery)
         if count:
             totalrows = count[0][0]
-        
+
         rows=sqlRun(query)
     else: # Client-side processing
-        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_epg_max_events))    
+        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_epg_max_events))
 
     for row in rows:
         retlist.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
-            
+
     return json.dumps(
-                      {"aaData": retlist, 
+                      {"aaData": retlist,
                        "sEcho": sEcho,
                        "iTotalRecords": totalrows,
-                       "iTotalDisplayRecords": totalrows 
+                       "iTotalDisplayRecords": totalrows
                        } )
 
 #------------------------------- Record List -------------------------------
@@ -695,15 +697,15 @@ def epglist_getter():
 @route('/getrecordlist')
 def getrecordlist():
     l = []
-#    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")     
-    rows=sqlRun("SELECT recname, cname, rvon, rbis, rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")     
+#    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")
+    rows=sqlRun("SELECT recname, cname, rvon, rbis, rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")
     for row in rows:
         m3u = "<a href=\"live/" + str(row[10]) + ".m3u\">" + row[1] + "</a>"
         l.append([row[0], m3u, row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]])
     return json.dumps({"aaData": l} )
 
 @route('/records')
-def records_s():    
+def records_s():
     return internationalize(template('records', rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid')))
 
 @post('/records')
@@ -714,19 +716,19 @@ def records_p():
         sqlRun("DELETE FROM records WHERE datetime(rbis)<datetime('now', 'localtime') AND NOT rmask>0")
     if what=="-1":
         sqlRun("DELETE FROM records WHERE records.rowid=%s" % (myid))
-    else: 
-        sqlRun("UPDATE records SET renabled=%s WHERE rowid=%s" % (what, myid))            
+    else:
+        sqlRun("UPDATE records SET renabled=%s WHERE rowid=%s" % (what, myid))
     setRecords()
     return
 
 #------------------------------- Record creation -------------------------------
-    
+
 @post('/createepg')
 def createepg():
     sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret, config.cfg_delta_for_epg))
-    setRecords()        
+    setRecords()
     redirect("/records")
-    return 
+    return
 
 @post('/create')
 def create_p():
@@ -736,7 +738,7 @@ def create_p():
     von = request.forms.von
     bis = request.forms.bis
     am = request.forms.am
-    aktiv = getBool(request.forms.aktiv)    
+    aktiv = getBool(request.forms.aktiv)
     recurr = request.forms.recurr
 
     d_von = datetime.strptime(am + " " + von, "%Y-%m-%d %H:%M")
@@ -745,41 +747,41 @@ def create_p():
 #    d_bis = datetime.strptime(am + " " + bis, "%d.%m.%Y %H:%M")
     delta = timedelta(days=1)
     if d_bis < d_von:
-        d_bis = d_bis + delta         
+        d_bis = d_bis + delta
 
-    if prev=="":        
+    if prev=="":
         sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", (recname, sender, d_von, d_bis, aktiv, recurr))
-    else:    
+    else:
         sqlRun("UPDATE records SET recname='%s', cid=%s, rvon='%s', rbis='%s', renabled=%s, rmask=%s WHERE rowid=%s" % (recname, sender, d_von, d_bis, aktiv, recurr,  prev))
-    
+
     setRecords()
-    
-    return 
-   
+
+    return
+
 def getBool(stri):
     r = 0
     if stri == "on" or stri == "1" or stri == "delete" or stri==1:
         r = 1
     return r
 
-    
+
 class record(Thread):
     running = 0
     id = -1
-    stopflag = 0 
+    stopflag = 0
     timer = None
     name = ""
     mask = 0
     ext = ""
     process = None
     myrow = None
-        
+
     def __init__(self, row):
         Thread.__init__(self)
         self.id = row[0]
         self.von = datetime.strptime(row[2],"%Y-%m-%d %H:%M:%S")
-        self.bis = datetime.strptime(row[3],"%Y-%m-%d %H:%M:%S")        
-        self.name = row[5]        
+        self.bis = datetime.strptime(row[3],"%Y-%m-%d %H:%M:%S")
+        self.name = row[5]
         self.url = row[1].strip()
         self.mask = row[6]
         self.myrow = row
@@ -788,24 +790,24 @@ class record(Thread):
         else:
             self.ext = row[7]
         if self.mask > 0:
-            w = self.bis.isoweekday() if self.bis.isoweekday()<7 else 0            
+            w = self.bis.isoweekday() if self.bis.isoweekday()<7 else 0
             if not (self.bis>=datetime.now() and getWeekdays(self.mask)[w]):
                 delta = timedelta(days=1)
                 while not (self.bis>=datetime.now() and getWeekdays(self.mask)[w]):
                     self.von = self.von + delta
                     self.bis = self.bis + delta
-                    w = self.bis.isoweekday() if self.bis.isoweekday()<7 else 0            
+                    w = self.bis.isoweekday() if self.bis.isoweekday()<7 else 0
                 print "Recurrent record '%s' moved to %s" % (self.name, self.von)
-                sqlRun("UPDATE records SET rvon='%s', rbis='%s' WHERE rowid=%d" % (datetime.strftime(self.von,"%Y-%m-%d %H:%M:%S"), datetime.strftime(self.bis,"%Y-%m-%d %H:%M:%S"), self.id ) )    
-    
-    def run(self): 
+                sqlRun("UPDATE records SET rvon='%s', rbis='%s' WHERE rowid=%d" % (datetime.strftime(self.von,"%Y-%m-%d %H:%M:%S"), datetime.strftime(self.bis,"%Y-%m-%d %H:%M:%S"), self.id ) )
+
+    def run(self):
         td = self.von-datetime.now()
         deltas = td.total_seconds()
         self.timer = Timer(deltas, self.doRecord)
         self.timer.start()
         if deltas>0:
             print "Record: Thread timer for '%s' started for %d seconds" % (self.name, deltas)
-        
+
     def doRecord(self):
         self.running = 1
         dateholder = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -820,10 +822,10 @@ class record(Thread):
         streamtype = self.url.lower().split(':', 1)[0]
         ffargs = config.cfg_ffmpeg_params
         ffargs = ffargs.split()
-        if streamtype in fftypes: 
+        if streamtype in fftypes:
             delta = self.bis - datetime.now()
             deltasec = '%d' % delta.total_seconds()
-            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'error', '-t', deltasec] + ffargs + [fn] 
+            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'error', '-t', deltasec] + ffargs + [fn]
             print "FFMPEG (%s) record '%s' called with:" % (streamtype, self.name)
             print attr
             try:
@@ -836,14 +838,14 @@ class record(Thread):
                     print "FFMPEG record '%s' ended" % self.name
             except:
                 print "FFMPEG could not be started"
-        else:        
+        else:
             block_sz = 8192
             print "Record: '%s' started" % (self.name)
             try:
                 u = urllib2.urlopen(self.url)
                 f = open(fn, 'wb')
             except urllib2.URLError:
-                print "Stream could not be parsed (URL=%s), aborting..." % (self.url)  
+                print "Stream could not be parsed (URL=%s), aborting..." % (self.url)
                 pass
             except:
                 print "Output file %s could not be created. Please check your settings." % (fn)
@@ -856,43 +858,43 @@ class record(Thread):
                     f.write(mybuffer)
                 f.close()
                 print "Record: '%s' ended" % (self.name)
-                if self in records: records.remove(self) 
+                if self in records: records.remove(self)
         if self.mask > 0:
             rectimer = Timer(5, setRecords)
             rectimer.start()
-    
+
     def stop(self):
         if self.running==0:
             self.timer.cancel()
         self.stopflag = 1
         if not self.process==None:
-            if self.process.poll()==None:            
+            if self.process.poll()==None:
                 self.process.terminate()
         if self in records: records.remove(self)
         print "Record: Stopflag for '%s' received" % (self.name)
-   
+
 def setRecords():
     rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
-    for row in rows: 
+    for row in rows:
         chk = False
         for t in records:
             if t.id == row[0]:
                 if t.myrow[1]!=row[1] or t.myrow[2]!=row[2] or t.myrow[3]!=row[3] or t.myrow[4]!=row[4] or t.myrow[5]!=row[5]  or t.myrow[6]!=row[6]  or t.myrow[7]!=row[7]:
                     t.stop()
                     chk = False
-                else:    
+                else:
                     chk = True
                 break
         if chk == False:
-            thread = record(row) 
+            thread = record(row)
             thread.start()
             records.append(thread)
-        
-        
+
+
     for i in range(len(records)-1,-1,-1):
         t = records[i]
         chk = False
-        for row in rows: 
+        for row in rows:
             if t.id == row[0]:
                 chk = True
                 break
@@ -906,13 +908,13 @@ print "Initializing config..."
 config.loadConfig()
 credentials = config.getUser()
 print "Checking internationalization..."
-checkLang() 
+checkLang()
 print "Initializing records..."
 setRecords()
 print "Initializing EPG import thread..."
 grabthread = epggrabthread()
 grabthread.run()
-    
+
 print "Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port)
 run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
 
@@ -922,6 +924,6 @@ for t in records:
 
 print "Stopping EPG grab thread..."
 grabthread.kill()
-    
+
 print "tvstreamrecord v.%s: bye-bye" % version
 logStop()

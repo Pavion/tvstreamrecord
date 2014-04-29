@@ -1,5 +1,4 @@
 # coding=UTF-8
-# Python 3 test
 """
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,6 +16,8 @@
 
     @author: Pavion
 """
+from __future__ import print_function
+from __future__ import unicode_literals
 
 from bottle import CherryPyServer
 from bottle import route, run, template, post, request, response
@@ -29,7 +30,10 @@ from sql import sqlRun, sqlCreateAll, purgeDB
 import grabber
 import xmltv
 import json
-import urllib2
+try:
+    import urllib2
+except:
+    import urllib as urllib2
 from threading import Thread, Timer
 import os
 import sys
@@ -149,20 +153,20 @@ def checkLang():
         ret_lng = ( os.path.isfile("lang/tvstreamrecord." + config.cfg_language + ".json") and os.path.isfile("lang/dataTables." + config.cfg_language + ".json") )
         if not ret_lng:
             config.cfg_language = "english"
-            print "Language not found, reverting to default language"
+            print ("Language not found, reverting to default language")
     else:
         ret_lng = True
     if not config.cfg_locale == "default":
         ret_loc = ( os.path.isfile("js/i18n/jquery.ui.datepicker-" + config.cfg_locale + ".js") and os.path.isfile("js/i18n/jquery-ui-timepicker-" + config.cfg_locale + ".js" ) )
         if not ret_loc:
             config.cfg_locale = "default"
-            print "Locale not found, reverting to default locale"
+            print ("Locale not found, reverting to default locale")
     else:
         ret_loc = True
     ret_style = ( os.path.isfile("css/" + config.cfg_theme) )
     if not ret_style:
         config.cfg_theme = "smoothness/jquery-ui-1.10.4.custom.min.css"
-        print "Theme not found, reverting to default theme"
+        print ("Theme not found, reverting to default theme")
     if not (ret_loc and ret_lng and ret_style):
         config.saveConfig()
 
@@ -180,9 +184,9 @@ def internationalize(templ):
                 data = json.load(json_data)
                 for word in data:
                     if data[word]:
-                        templ = templ.replace(u"§"+word+u"§", data[word])
+                        templ = templ.replace("§"+word+"§", data[word])
                     else:
-                        templ = templ.replace(u"§"+word+u"§", word)
+                        templ = templ.replace("§"+word+"§", word)
                 json_data.close()
             except:
                 pass
@@ -209,8 +213,8 @@ def about_s():
 
 logInit()
 
-print "Starting tvstreamrecord v.%s" % version
-print "Logging output initialized"
+print ("Starting tvstreamrecord v.%s" % version)
+print ("Logging output initialized")
 
 @post('/resetlog')
 def log_reset():
@@ -294,7 +298,7 @@ def createchannel():
     elif prev.isdigit():
         prev = int(prev)
     else:
-        print "Wrong number found for the previous ID. Aborting creation/update."
+        print ("Wrong number found for the previous ID. Aborting creation/update.")
         return
 
     if cid=="":
@@ -302,11 +306,12 @@ def createchannel():
     elif cid.isdigit():
         cid = int(cid)
     else:
-        print "Wrong number found for the new ID. Aborting creation/update."
+        print ("Wrong number found for the new ID. Aborting creation/update.")
         return
 
     if cext!='':
-        if cext[0:1]<>'.': cext = '.' + cext
+        if cext[0:1]!='.': 
+            cext = '.' + cext
 
     exists = False
     if cid == prev:
@@ -343,11 +348,11 @@ def createchannel():
 
 @post('/upload')
 def upload_p():
-    print "M3U upload parsing started"
+    print ("M3U upload parsing started")
     retl = []
     upfile = request.files.upfile
     if not upfile:
-        print "No file specified, please try again"
+        print ("No file specified, please try again")
     else:
         header = upfile.file.read(7)
         if header.startswith("#EXTM3U"):
@@ -433,7 +438,7 @@ def gettree():
                 r.append('<li class="directory collapsed"><a href="#" rel="%s/">%s</a></li>' % (ff,f))
             else:
                 pass
-    except Exception,e:
+    except:
         pass
     r.append('</ul>')
     return r
@@ -481,9 +486,9 @@ class epggrabthread(Thread):
                 self.timer = Timer(deltas, self.doGrab)
                 self.timer.start()
                 if deltas>0:
-                    print "EPG Thread timer waiting till %s (%d seconds)" % (config.cfg_grab_time, deltas)
+                    print ("EPG Thread timer waiting till %s (%d seconds)" % (config.cfg_grab_time, deltas))
             except:
-                print "Something went wrong with EPG thread. Please check your config settings regarding your start time"
+                print ("Something went wrong with EPG thread. Please check your config settings regarding your start time")
 
     def doGrab(self, override=False):
         self.kill()
@@ -501,7 +506,7 @@ class epggrabthread(Thread):
         try:
             xmltv.getProgList(version)
         except:
-            print "XMLTV import could not be completed, please try again later (%s)" % sys.exc_info()[0]
+            print ("XMLTV import could not be completed, please try again later (%s)" % sys.exc_info()[0])
         self.epggrabberstate[0] += 1
 
     def grabStream(self):
@@ -570,7 +575,7 @@ def grabepg():
 def removeepg():
     sqlRun("DELETE FROM guide")
     sqlRun("DELETE FROM guide_chan")
-    print "All EPG data was deleted"
+    print ("All EPG data was deleted")
     return
 
 @post('/epg')
@@ -798,7 +803,7 @@ class record(Thread):
                     self.von = self.von + delta
                     self.bis = self.bis + delta
                     w = self.bis.isoweekday() if self.bis.isoweekday()<7 else 0
-                print "Recurrent record '%s' moved to %s" % (self.name, self.von)
+                print ("Recurrent record '%s' moved to %s" % (self.name, self.von))
                 sqlRun("UPDATE records SET rvon='%s', rbis='%s' WHERE rowid=%d" % (datetime.strftime(self.von,"%Y-%m-%d %H:%M:%S"), datetime.strftime(self.bis,"%Y-%m-%d %H:%M:%S"), self.id ) )
 
     def run(self):
@@ -807,7 +812,7 @@ class record(Thread):
         self.timer = Timer(deltas, self.doRecord)
         self.timer.start()
         if deltas>0:
-            print "Record: Thread timer for '%s' started for %d seconds" % (self.name, deltas)
+            print ("Record: Thread timer for '%s' started for %d seconds" % (self.name, deltas))
 
     def doRecord(self):
         self.running = 1
@@ -827,29 +832,29 @@ class record(Thread):
             delta = self.bis - datetime.now()
             deltasec = '%d' % delta.total_seconds()
             attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'error', '-t', deltasec] + ffargs + [fn]
-            print "FFMPEG (%s) record '%s' called with:" % (streamtype, self.name)
-            print attr
+            print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
+            print (attr)
             try:
                 self.process = subprocess.Popen(attr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 out, err = self.process.communicate()
                 self.process.wait()
                 if err:
-                    print "FFMPEG record '%s' ended with an error:\n%s" % (self.name, err)
+                    print ("FFMPEG record '%s' ended with an error:\n%s" % (self.name, err))
                 else:
-                    print "FFMPEG record '%s' ended" % self.name
+                    print ("FFMPEG record '%s' ended" % self.name)
             except:
-                print "FFMPEG could not be started"
+                print ("FFMPEG could not be started")
         else:
             block_sz = 8192
-            print "Record: '%s' started" % (self.name)
+            print ("Record: '%s' started" % (self.name))
             try:
                 u = urllib2.urlopen(self.url)
                 f = open(fn, 'wb')
             except urllib2.URLError:
-                print "Stream could not be parsed (URL=%s), aborting..." % (self.url)
+                print ("Stream could not be parsed (URL=%s), aborting..." % (self.url))
                 pass
             except:
-                print "Output file %s could not be created. Please check your settings." % (fn)
+                print ("Output file %s could not be created. Please check your settings." % (fn))
                 pass
             else:
                 while self.bis > datetime.now() and self.stopflag==0:
@@ -858,7 +863,7 @@ class record(Thread):
                         break
                     f.write(mybuffer)
                 f.close()
-                print "Record: '%s' ended" % (self.name)
+                print ("Record: '%s' ended" % (self.name))
                 if self in records: records.remove(self)
         if self.mask > 0:
             rectimer = Timer(5, setRecords)
@@ -872,7 +877,7 @@ class record(Thread):
             if self.process.poll()==None:
                 self.process.terminate()
         if self in records: records.remove(self)
-        print "Record: Stopflag for '%s' received" % (self.name)
+        print ("Record: Stopflag for '%s' received" % (self.name))
 
 def setRecords():
     rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
@@ -902,29 +907,29 @@ def setRecords():
         if chk == False:
             t.stop()
 
-print "Initializing database..."
+print ("Initializing database... ")
 sqlCreateAll(version)
 purgeDB()
-print "Initializing config..."
+print ("Initializing config...")
 config.loadConfig()
 credentials = config.getUser()
-print "Checking internationalization..."
+print ("Checking internationalization...")
 checkLang()
-print "Initializing records..."
+print ("Initializing records...")
 setRecords()
-print "Initializing EPG import thread..."
+print ("Initializing EPG import thread...")
 grabthread = epggrabthread()
 grabthread.run()
 
-print "Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port)
+print ("Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port))
 run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
 
-print "Server aborted. Stopping all records before exiting..."
+print ("Server aborted. Stopping all records before exiting...")
 for t in records:
     t.stop()
 
-print "Stopping EPG grab thread..."
+print ("Stopping EPG grab thread...")
 grabthread.kill()
 
-print "tvstreamrecord v.%s: bye-bye" % version
 logStop()
+print ("tvstreamrecord v.%s: bye-bye" % version)

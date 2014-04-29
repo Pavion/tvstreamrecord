@@ -14,6 +14,8 @@
 
     @author: Pavion
 """
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import sqlite3
 
@@ -37,7 +39,7 @@ def sqlRun(sql, t=-1, many=0):
         conn.commit()
         conn.close()
     except:
-        print "exception: %s" % sql
+        print ("exception:", sql)
         pass
     return fa
 
@@ -71,7 +73,7 @@ def sqlCreateAll(version):
             sql += "INSERT INTO config VALUES ('cfg_version', 'Program version', '%s');" % version
         else: # Versioning
             oldver = rows[0][0]
-            if oldver<>version:
+            if oldver!=version:
                 if oldver < '0.4.4a':
                     sql += "ALTER TABLE channels ADD COLUMN cext TEXT DEFAULT '';"
                 if oldver < '0.5.0':
@@ -99,10 +101,10 @@ def sqlCreateAll(version):
                                 break
 
                 if oldver > version:
-                    print "Critical error: Version mismatch!!!"
+                    print ("Critical error: Version mismatch!!!")
 
                 sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version
-                print "New version %s was implemented" % version
+                print ("New version", version, "was implemented")
 
     sqlRun(sql, -1, 1)
     return

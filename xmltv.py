@@ -15,21 +15,28 @@
 
     @author: Pavion
 """
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import xml.etree.ElementTree as et
 from datetime import datetime, timedelta
-import httplib
-import urllib2
+try:
+    import httplib
+    import urllib2 as urllib32
+except:
+    import http.client as httplib
+    import urllib.request as urllib32
 import zlib
 from sql import sqlRun
 import config
+from sys import version_info
 
 version = ''
 
 def getProgList(ver=''):
     global version
     version = ver    
-    print "tvstreamrecord v.%s / XMLTV import started" % version
+    print ("tvstreamrecord v.%s / XMLTV import started" % version)
     stri = getFile(config.cfg_xmltvinitpath, 1)
     channellist = []
     if stri:    
@@ -43,7 +50,7 @@ def getProgList(ver=''):
             elif type[:4] == "TVxb":
                 pass
             else: 
-                print "Unknown XMLTV generator '%s', please contact me if it fails" % type
+                print ("Unknown XMLTV generator '%s', please contact me if it fails" % type)
                 url = dict_el.find('base-url').text
                         
             rows=sqlRun("SELECT cname from channels WHERE cname = '%s' and cenabled=1 GROUP BY cname" % name)
@@ -74,7 +81,7 @@ def getProgList(ver=''):
                     sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))                       
         if type[:4] == "TVxb" and len(channellist)>0:   # same file
             getProg(stri, channellist)        
-    print "XMLTV import completed"
+    print ("XMLTV import completed")
        
 def getProg(stri, channellist=[]):    
     sqllist = []
@@ -112,33 +119,50 @@ def getFile(file_in, override=0):
         lastmod = rows[0][2]
         etag = rows[0][3]
     try:
-        httplib.HTTPConnection.debuglevel = 1                            
-        request = urllib2.Request(file_in)
+        httplib.HTTPConnection.debuglevel = 0                            
+        request = urllib32.Request(file_in)
         request.add_header('User-Agent', 'tvstreamrecord/' + version)
         if override==0:
             request.add_header('If-Modified-Since', lastmod)
             request.add_header('If-None-Match', etag)                
-        opener = urllib2.build_opener()
+        opener = urllib32.build_opener()
         response = opener.open(request)
-        feeddata = response.read()        
+        feeddata = response.read()
+        try:
+            lastmod = response.info().getheader('Last-Modified')
+            etag = response.info().getheader('ETag')
+        except:
+            lastmod = response.getheader('Last-Modified')
+            etag = response.getheader('ETag')        
         if rows:
-            sqlRun("UPDATE caching SET crTime=datetime('now', 'localtime'), Last_Modified=?, ETag=? WHERE url='%s'" % file_in, (response.info().getheader('Last-Modified'), response.info().getheader('ETag')))
+            sqlRun("UPDATE caching SET crTime=datetime('now', 'localtime'), Last_Modified=?, ETag=? WHERE url='%s'" % file_in, (lastmod, etag))
         else:
-            sqlRun("INSERT INTO caching VALUES (datetime('now', 'localtime'), ?, ?, ?)", (file_in, response.info().getheader('Last-Modified'), response.info().getheader('ETag')))        
+            sqlRun("INSERT INTO caching VALUES (datetime('now', 'localtime'), ?, ?, ?)", (file_in, lastmod, etag))        
         d = zlib.decompressobj(16+zlib.MAX_WBITS)
         out = d.decompress(feeddata)
-        print "XMLTV: reading URL %s" % file_in
+        print ("XMLTV: reading URL %s" % file_in)
         
-        if not "</tv>" in out[-1000:]:
-            print "Possibly corrupted XML file, attempting to repair..."
-            pos = out.rfind("</programme>") 
+        if not b"</tv>" in out[-1000:]:
+            print ("Possibly corrupted XML file, attempting to repair...")
+            pos = out.rfind(b"</programme>") 
             if pos != -1:
-                out = out[:pos+12]  + "</tv>"
+                out = out[:pos+12]  + b"</tv>"
             else: 
-                pos = out.rfind("</channel>")
+                pos = out.rfind(b"</channel>")
                 if pos != -1:
-                    out = out[:pos+10]  + "</tv>" 
-    except:
-        print "XMLTV: no new data, try again later"
+                    out = out[:pos+10]  + b"</tv>" 
+    except Exception as ex:
+        print ("XMLTV: no new data, try again later")
         pass
+
+    if type(out) is bytes and not type(out) is str:
+        out = out.decode("UTF-8")
+
     return out
+
+def main(argv=None):
+    getProgList('debug')
+    return
+    
+if __name__ == "__main__":
+    exit(main())

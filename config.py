@@ -14,6 +14,8 @@
 
     @author: pavion
 """
+from __future__ import print_function
+from __future__ import unicode_literals
 
 configuration = [
 [
@@ -167,7 +169,7 @@ def banIP(ip):
     if rows:
         sqlRun("UPDATE blacklist SET trycount=%s, lasttry='%s' WHERE ip='%s'" % (rows[0][0]+1, now, ip)  )
         if rows[0][0]+1==3:
-            print "IP %s has been blacklisted for for three unsuccessful login attempts" % ip
+            print ("IP %s has been blacklisted for for three unsuccessful login attempts" % ip)
 
     else:
         sqlRun("INSERT INTO blacklist VALUES ('%s', %s, '%s')" % (ip, 1, now) )
@@ -233,7 +235,7 @@ def writeWebman(port):
         else:
             lfile.write(lline)
     lfile.close()
-    print "Port changes saved, new port: %s, please restart the software" % str(port)
+    print ("Port changes saved, new port: %s, please restart the software" % str(port))
     return    
         
 

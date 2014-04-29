@@ -15,11 +15,13 @@
 
     @author: Pavion
 """
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import sys
 from datetime import datetime
 
-log = open("log.txt", "a", 0)
+log = open("log.txt", "a", 1)
 stdout_old = sys.stdout
 stderr_old = sys.stderr
 

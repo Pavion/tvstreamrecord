@@ -19,9 +19,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import sys
+import codecs
 from datetime import datetime
 
-log = open("log.txt", "a", 1)
+log = codecs.open("log.txt", encoding='utf-8', mode='a', buffering=1)
 stdout_old = sys.stdout
 stderr_old = sys.stderr
 
@@ -35,42 +36,43 @@ class Logger(object):
         else:
             self.terminal = sys.stderr
 
-    def write(self, message):       
-        self.terminal.write(message)        
+    def write(self, message):
+        self.terminal.write(message)
         mylines = message.replace('\n', '')
         mylines = mylines.replace('\r', '')
         mylines = mylines.strip()
-        try:
-            try:
-                mylines = mylines.encode("UTF-8", errors='replace')
-            except:
-                pass    
-            if mylines!="": 
-                self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + self.typ + " " + mylines + "\n")
-        except:
-            pass
-    
-    
-def logInit():        
+        #try:
+            #mylines = mylines.encode("UTF-8", errors='replace')
+            #try:
+            #    mylines = mylines.encode("UTF-8", errors='replace')
+        #except Exception as ex:
+        #    print (ex)
+        #    pass
+        if mylines!=u"":
+            self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + self.typ + " " + mylines + "\n")
+        #except:
+        #    pass
+
+
+def logInit():
     sys.stdout = Logger(log, "OUT")
     sys.stderr = Logger(log, "ERR")
-    
+
 def logRenew():
     global log
-    sys.stdout = stdout_old 
-    sys.stderr = stderr_old 
+    sys.stdout = stdout_old
+    sys.stderr = stderr_old
     log.close()
     log = open("log.txt", "w", 0)
     logInit()
-    
-def logPause():
-    sys.stdout = stdout_old 
-    sys.stderr = stderr_old 
 
-def logResume():    
+def logPause():
+    sys.stdout = stdout_old
+    sys.stderr = stderr_old
+
+def logResume():
     logInit()
-       
+
 def logStop():
     global log
     log.close()
-    

@@ -180,17 +180,15 @@ def internationalize(templ):
         templ = header + templ + footer
         if not config.cfg_language == "english":
             try:
-                json_data=open('lang/tvstreamrecord.' + config.cfg_language + '.json')
-                data = json.load(json_data)
+                json_data=open('lang/tvstreamrecord.' + config.cfg_language + '.json', "rb")
+                data = json.loads(json_data.read().decode('utf-8'))
+                json_data.close()
                 for word in data:
                     if data[word]:
                         templ = templ.replace("§"+word+"§", data[word])
-                    else:
-                        templ = templ.replace("§"+word+"§", word)
-                json_data.close()
             except:
                 pass
-        templ = templ.replace(u"§","")
+        templ = templ.replace("§","")
         return templ
 
 #------------------------------- Main menu -------------------------------
@@ -213,7 +211,7 @@ def about_s():
 
 logInit()
 
-print ("Starting tvstreamrecord v.%s" % version)
+print ("Starting tvstreamrecord v.%s with Python %s" % (version, sys.version_info.major))
 print ("Logging output initialized")
 
 @post('/resetlog')
@@ -783,6 +781,10 @@ class record(Thread):
         self.von = datetime.strptime(row[2],"%Y-%m-%d %H:%M:%S")
         self.bis = datetime.strptime(row[3],"%Y-%m-%d %H:%M:%S")
         self.name = row[5]
+        try:
+            self.name = self.name.decode("UTF-8")
+        except:
+            pass
         self.url = row[1].strip()
         self.mask = row[6]
         self.myrow = row

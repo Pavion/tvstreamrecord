@@ -405,6 +405,10 @@ def getFullList(f):
     fulllist = list()
 
     lists = read_stream(f)
+    if not lists:
+        print ("No EPG information found")
+        return fulllist
+
     guides = lists[0]
     channellist = lists[1]
 

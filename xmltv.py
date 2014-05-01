@@ -128,12 +128,10 @@ def getFile(file_in, override=0):
         opener = urllib32.build_opener()
         response = opener.open(request)
         feeddata = response.read()
-        try:
-            lastmod = response.info().getheader('Last-Modified')
-            etag = response.info().getheader('ETag')
-        except:
-            lastmod = response.getheader('Last-Modified')
-            etag = response.getheader('ETag')        
+        if version_info.major >= 3:
+            response = response.info()
+        lastmod = response.getheader('Last-Modified')
+        etag = response.getheader('ETag')
         if rows:
             sqlRun("UPDATE caching SET crTime=datetime('now', 'localtime'), Last_Modified=?, ETag=? WHERE url='%s'" % file_in, (lastmod, etag))
         else:

@@ -239,12 +239,8 @@ def log_get():
 
 @route('/channellist')
 def chanlist():
-    l = []
     rows=sqlRun('SELECT channels.cid, cname, cpath, cext, epgscan, cenabled FROM channels')
-    for row in rows:
-        m3u = "<a href=\"live/" + str(row[0]) + ".m3u\">" + row[1] + "</a>"
-        l.append([row[0], m3u, row[2], row[3], row[4], row[5]])
-    return json.dumps({"aaData": l } )
+    return json.dumps({"aaData": rows } )
 
 @route('/list')
 def list_s():
@@ -616,7 +612,7 @@ def epg_s():
         t = time(i+sthour)
         x = i * 100.0 / hours * widthq
         w =  1.0 / hours * widthq * 100.0
-        rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", -1, "", 0])
+        rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", "", -1, "", 0])
     ret.append(rtemp)
 
     rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY channels.cid ORDER BY channels.cid" % (todaysql, todaysql))
@@ -624,31 +620,30 @@ def epg_s():
         cid=row[1]
         rtemp = list()
         c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=%s AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id='%s' ORDER BY g_start" % (cid, config.cfg_delta_for_epg, config.cfg_delta_for_epg, todaysql, todaysql, row[0]))
-        #c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid FROM guide WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND g_id='%s' ORDER BY g_start" % (todaysql, todaysql, row[0]))
         for event in c_rows:
 
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
-            fulltext = "<b>"+event[0]+": "+datetime.strftime(d_von, localtime) + " - " + datetime.strftime(d_bis, localtime) + "</b><BR><BR>"+event[3]
-#            fulltext = fulltext.replace(chr(138), "").replace(chr(0xE4),"").replace(chr(0xF6),"").replace(chr(0xFC),"")
-            title = fulltext
-            if len(title)>300:
-                for char in range (300, 280, -1):
-                    try:
-                        title = title[:char]+"..."
-                        title.decode("UTF-8")
-                        break
-                    except:
-                        pass
+            #fulltext = "<b>"+event[0]+": "+datetime.strftime(d_von, localtime) + " - " + datetime.strftime(d_bis, localtime) + "</b><BR><BR>"+event[3]
+            #title = fulltext
+            #if len(title)>300:
+            #    for char in range (300, 280, -1):
+            #        try:
+            #            title = title[:char]+"..."
+            #            title.decode("UTF-8")
+            #            break
+            #        except:
+            #            pass
 
             if d_von < daystart:
                 d_von = daystart
             if d_bis.date() > daystart.date():
                 d_bis=datetime.combine(d_bis.date(),time.min)
-            x = d_von - daystart#datetime.combine(d_von.date(),time.min)
+            x = d_von - daystart
             w = d_bis - d_von
             if x.total_seconds()>=0 and w.total_seconds()>0:
-                rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], title, fulltext, event[4], row[2], event[5]])
+                #rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], title, fulltext, event[4], row[2], event[5]])
+                rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], d_von, d_bis, event[3], event[4], row[2], event[5]])
         ret.append(rtemp)
     return internationalize(template('epgchart', curr=datetime.strftime(d_von, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom))
 
@@ -925,8 +920,8 @@ print ("Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg
 run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
 
 print ("Server aborted. Stopping all records before exiting...")
-for t in records:
-    t.stop()
+while len(records)>0:
+    records[0].stop()
 
 print ("Stopping EPG grab thread...")
 grabthread.kill()

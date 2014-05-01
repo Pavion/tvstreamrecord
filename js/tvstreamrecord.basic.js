@@ -792,6 +792,7 @@ $(function() {
                 paintTable();
             },
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                $('td:eq(1)', nRow).html('<a href=\"live/'+aData[0]+'.m3u\">'+aData[1]+'</a>');    
                 var data4 = "";
                 if (aData[4] == 1) data4 = "plus"; else data4="minus";
                 var chk = "";
@@ -875,7 +876,7 @@ $(function() {
         $( "#searchepg" ).change(function() {
             var tofind = $(this).val().toLowerCase().trim();
             $( "[id=event]" ).each(function(i) {
-                var text = $(this).attr('fulltext').toLowerCase();
+                var text = $(this).text.toLowerCase() + " " + $(this).attr('fulltext').toLowerCase();
                 if(text.indexOf(tofind)!=-1 && tofind.length>0) {
                     $(this).addClass("ui-selected");
                 } else {
@@ -894,7 +895,10 @@ $(function() {
         $("[id=event]").live("click", function(event) {
             $("[id=event]").siblings().removeClass("ui-selected");
             $(this).addClass("ui-selected");
-            var ft = $(this).attr("fulltext");
+            
+            var ft = "<b>" + $(this).text() + ": " + localDateTime($(this).attr("at")) + " - " 
+                   + localDateTime($(this).attr("till")) + "</b><BR><BR>" + $(this).attr("fulltext");
+                   
             if (ft)  {
                 $("#ret").val($(this).attr("rid"));
                 $("#dialog_content").html ( ft );

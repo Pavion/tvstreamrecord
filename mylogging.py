@@ -22,7 +22,7 @@ import sys
 import codecs
 from datetime import datetime
 
-log = codecs.open("log.txt", encoding='utf-8', mode='a', buffering=1)
+log = None
 stdout_old = sys.stdout
 stderr_old = sys.stderr
 
@@ -41,38 +41,37 @@ class Logger(object):
         mylines = message.replace('\n', '')
         mylines = mylines.replace('\r', '')
         mylines = mylines.strip()
-        #try:
+#        try:
             #mylines = mylines.encode("UTF-8", errors='replace')
             #try:
             #    mylines = mylines.encode("UTF-8", errors='replace')
-        #except Exception as ex:
-        #    print (ex)
         #    pass
         if mylines!=u"":
             self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + self.typ + " " + mylines + "\n")
-        #except:
-        #    pass
+#        except Exception as ex:
+#            pass
+           
+    def flush(self):
+        pass
 
 
-def logInit():
+def logInit(filemode):
+    global log
+    log = codecs.open("log.txt", encoding='utf-8', mode=filemode, buffering=0)
     sys.stdout = Logger(log, "OUT")
     sys.stderr = Logger(log, "ERR")
 
 def logRenew():
-    global log
-    sys.stdout = stdout_old
-    sys.stderr = stderr_old
-    log.close()
-    log = open("log.txt", "w", 0)
-    logInit()
+    logStop()
+    logInit('w')
 
-def logPause():
-    sys.stdout = stdout_old
-    sys.stderr = stderr_old
+#def logPause():
 
-def logResume():
-    logInit()
+#def logResume():
+#    logInit()
 
 def logStop():
     global log
+    sys.stdout = stdout_old
+    sys.stderr = stderr_old
     log.close()

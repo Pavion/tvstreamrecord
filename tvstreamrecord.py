@@ -45,7 +45,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.6.4'
+version = '0.6.4a'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -209,7 +209,7 @@ def about_s():
 
 #------------------------------- Logging -------------------------------
 
-logInit()
+logInit('a')
 
 print ("Starting tvstreamrecord v.%s with Python %s" % (version, sys.version_info.major))
 print ("Logging output initialized")
@@ -928,5 +928,5 @@ while len(records)>0:
 print ("Stopping EPG grab thread...")
 grabthread.kill()
 
-logStop()
 print ("tvstreamrecord v.%s: bye-bye" % version)
+logStop()

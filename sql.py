@@ -24,6 +24,7 @@ def sqlRun(sql, t=-1, many=0):
     try:
         conn = sqlite3.connect('settings.db')
         c = conn.cursor()
+        c.execute('PRAGMA journal_mode = OFF;')
         conn.text_factory = str
         if t != -1:
             if many == 1:
@@ -38,8 +39,8 @@ def sqlRun(sql, t=-1, many=0):
         fa=rows.fetchall()
         conn.commit()
         conn.close()
-    except:
-        print ("exception:", sql)
+    except Exception as ex:
+        print ("exception: %s" % sql)
         pass
     return fa
 
@@ -104,7 +105,7 @@ def sqlCreateAll(version):
                     print ("Critical error: Version mismatch!!!")
 
                 sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version
-                print ("New version", version, "was implemented")
+                print ("New version %s was implemented" % version)
 
     sqlRun(sql, -1, 1)
     return

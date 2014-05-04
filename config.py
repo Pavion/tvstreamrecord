@@ -22,6 +22,7 @@ configuration = [
 'cfg_xmltvinitpath',
 'Initial path for an XMLTV-Import',
 'http://xmltv.spaetfruehstuecken.org/xmltv/datalist.xml.gz'
+#'http://www.xmltvepg.nl/rytecxmltvskyde.gz'
 ],
 
 [

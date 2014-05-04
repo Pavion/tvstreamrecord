@@ -21,7 +21,7 @@
 try:
     import urllib2 as urllib32
 except:
-    import urllib as urllib32
+    import urllib.request as urllib32
 from datetime import datetime, timedelta
 import config
 import time
@@ -195,7 +195,7 @@ def read_stream(f_in):
 
                 tmp = mybuffer[i+4: i+size]
                 # Save first payload to avoid duplicity
-                if myfirstpayload[ch] == "":
+                if myfirstpayload[ch] == b"":
                     myfirstpayload[ch] = tmp
                 elif tmp == myfirstpayload[ch]:
                     # Payload match encountered
@@ -208,7 +208,7 @@ def read_stream(f_in):
                     plist = getList(payload[ch], ch)
                     maxlist[ch] = joinarrays(maxlist[ch], plist)
                     myfirstpayload[ch] = tmp
-                    payload[ch] = ""
+                    payload[ch] = b""
                     analyse[ch] = False
 
                 payload[ch] = payload[ch] + tmp
@@ -367,17 +367,17 @@ def getChannelList(pl):
 
                 i = pos+6
 
-                if table[i-1]=='V' or table[i-1]=='H':
+                if table[i-1:i+2]==b'V' or table[i-1:i+2]==b'H':
                     i = i + 2
                 clen = ord(table[i:i+1])
-                provider = table[i+1: i+clen+1].replace(chr(0x86), "").replace(chr(0x87), "").replace(chr(0x05), "")
+                provider = table[i+1: i+clen+1].replace(b'\x86', b"").replace(b'\x87', b"").replace(b'\x05', b"")
                 i = i + clen + 1
                 clen = ord(table[i:i+1])
 
                 channame = table[i+1: i+clen+1]
-                channame = channame.replace(chr(0x86), "").replace(chr(0x87), "").replace(chr(0x05), "")
+                channame = channame.replace(b'\x86', b"").replace(b'\x87', b"").replace(b'\x05', b"")
 
-                if channame!=".":
+                if channame!=b".":
                     channellist.append([cid, provider, channame])
 
                 pos = pos + 5 + dlen
@@ -393,7 +393,7 @@ def savePayloads(payloads):
         f.close()
 
 def loadPayloads():
-    payloads = ["",""]
+    payloads = [b"",b""]
     for i in range(0, 2):
         f = open("out-%s.hex" % i, "rb")
         payloads[i] = f.read()
@@ -479,26 +479,20 @@ def main(argv=None):
     if len(argv)>1:
         try:
             if argv[1].find("://")!=-1: # URL
-                print ("EPG grabbing started on %s for %s seconds" % (argv[0], config.cfg_grab_max_duration))
+                print ("EPG grabbing started on %s for %s seconds" % (argv[1], config.cfg_grab_max_duration))
                 inp = urllib32.urlopen(argv[1])
             else:
                 inp = open(argv[1], "rb")
         except:
             print ("Supplied file/stream could not be found, aborting...")
             return fulllist
-    else:  # default
+    else:
         inp = open("o:/20140429165800 - Tagesschau1700.mpg", "rb")
-        #inp = open("d:/temp/test-rtl2.ts", "rb")
         print ("Opening local file")
 
     fulllist = getFullList(inp)
-
-    #out = open("d:/temp/out.txt", "w")
-    #for f in fulllist:
-    #    out.write(repr(f[0]) + '\t' + datetime.strftime((f[1]),  "%d.%m.%Y %H:%M:%S")  + '\t' + str(f[2].total_seconds()) + '\t' + repr(f[3]) + '\n')
-    #out.close()
-
-    return #fulllist
+    
+    return 
     
 if __name__ == "__main__":
     sys.exit(main())

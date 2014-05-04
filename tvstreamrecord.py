@@ -18,6 +18,7 @@
 """
 from __future__ import print_function
 from __future__ import unicode_literals
+from __future__ import division
 
 from bottle import CherryPyServer
 from bottle import route, run, template, post, request, response
@@ -31,14 +32,20 @@ import grabber
 import xmltv
 import json
 try:
-    import urllib2
+    import urllib2 as urllib32
 except:
-    import urllib as urllib2
+    import urllib.request as urllib32
 from threading import Thread, Timer
 import os
 import sys
 from mylogging import logInit, logRenew, logStop
 import hashlib
+
+def total(timedelta):
+    try: 
+        return timedelta.total_seconds()
+    except: 
+        return (timedelta.microseconds + (timedelta.seconds + timedelta.days * 24 * 3600) * 10**6) / 10**6
 
 records = []
 localdatetime = "%d.%m.%Y %H:%M:%S"
@@ -211,7 +218,7 @@ def about_s():
 
 logInit('a')
 
-print ("Starting tvstreamrecord v.%s with Python %s" % (version, sys.version_info.major))
+print ("Starting tvstreamrecord v.%s with Python %s" % (version, sys.version_info[0]))
 print ("Logging output initialized")
 
 @post('/resetlog')
@@ -425,7 +432,7 @@ def gettree():
     deny=['/etc', '/var', '/usr', '/sbin', '/bin', '/recycler']
     r=['<ul class="jqueryFileTree" style="display: none;">']
     try:
-        d=urllib2.unquote(request.POST.get('dir','\\'))
+        d=urllib32.unquote(request.POST.get('dir','\\'))
         for f in os.listdir(d):
             ff=os.path.join(d,f)
             if os.path.isdir(ff) and not ff.lower() in deny and f[0] != '@':
@@ -476,7 +483,7 @@ class epggrabthread(Thread):
                 if mydatetime < datetime.now():
                     mydatetime = mydatetime + timedelta(days=1)
                 td = mydatetime-datetime.now()
-                deltas = td.total_seconds()
+                deltas = total(td)
                 self.timer = Timer(deltas, self.doGrab)
                 self.timer.start()
                 if deltas>0:
@@ -593,7 +600,7 @@ def epg_s():
     if dayshown == datetime.combine(date.today(), time.min): # really today
         sthour = datetime.now().time().hour
         daystart = datetime.combine(date.today(), time(sthour,0,0))
-        totalwidth = 86400 - (daystart - dayshown).total_seconds()
+        totalwidth = 86400 - total(daystart - dayshown)
     else:
         sthour = 0
         daystart = dayshown
@@ -637,11 +644,10 @@ def epg_s():
                 d_von = daystart
             if d_bis.date() > daystart.date():
                 d_bis=datetime.combine(d_bis.date(),time.min)
-            x = d_von - daystart
-            w = d_bis - d_von
-            if x.total_seconds()>=0 and w.total_seconds()>0:
-                #rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], title, fulltext, event[4], row[2], event[5]])
-                rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], d_von, d_bis, event[3], event[4], row[2], event[5]])
+            x = total(d_von - daystart)
+            w = total(d_bis - d_von)
+            if x >= 0 and w > 0:
+                rtemp.append ([cid, x/totalwidth*100.0*widthq, w/totalwidth*100.0*widthq, event[0], d_von, d_bis, event[3], event[4], row[2], event[5]])
         ret.append(rtemp)
     return internationalize(template('epgchart', curr=datetime.strftime(d_von, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom))
 
@@ -805,7 +811,7 @@ class record(Thread):
 
     def run(self):
         td = self.von-datetime.now()
-        deltas = td.total_seconds()
+        deltas = total(td)
         self.timer = Timer(deltas, self.doRecord)
         self.timer.start()
         if deltas>0:
@@ -826,8 +832,8 @@ class record(Thread):
         ffargs = config.cfg_ffmpeg_params
         ffargs = ffargs.split()
         if streamtype in fftypes:
-            delta = self.bis - datetime.now()
-            deltasec = '%d' % delta.total_seconds()
+            delta = total(self.bis - datetime.now())
+            deltasec = '%d' % delta
             attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'error', '-t', deltasec] + ffargs + [fn]
             print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
             print (attr)
@@ -845,9 +851,9 @@ class record(Thread):
             block_sz = 8192
             print ("Record: '%s' started" % (self.name))
             try:
-                u = urllib2.urlopen(self.url)
+                u = urllib32.urlopen(self.url)
                 f = open(fn, 'wb')
-            except urllib2.URLError:
+            except urllib32.URLError:
                 print ("Stream could not be parsed (URL=%s), aborting..." % (self.url))
                 pass
             except:

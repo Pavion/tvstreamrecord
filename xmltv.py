@@ -128,7 +128,7 @@ def getFile(file_in, override=0):
         opener = urllib32.build_opener()
         response = opener.open(request)
         feeddata = response.read()
-        if version_info.major >= 3:
+        if version_info[0] < 3:
             response = response.info()
         lastmod = response.getheader('Last-Modified')
         etag = response.getheader('ETag')

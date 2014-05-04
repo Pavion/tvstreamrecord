@@ -68,7 +68,7 @@ def sqlCreateAll(version):
         sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version
         sql += "INSERT OR REPLACE INTO config VALUES ('credentials', '', '');"
     else:
-        rows = sqlRun("select value from config where param='cfg_version'")
+        rows = sqlRun("select value from config where param='cfg_version';")
         if not rows: # Version < 0.4.4
             sql += 'ALTER TABLE records ADD COLUMN rmask INTEGER DEFAULT 0;'
             sql += "INSERT INTO config VALUES ('cfg_version', 'Program version', '%s');" % version
@@ -106,8 +106,8 @@ def sqlCreateAll(version):
 
                 sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version
                 print ("New version %s was implemented" % version)
-
-    sqlRun(sql, -1, 1)
+    if sql:
+        sqlRun(sql, -1, 1)
     return
 
 def purgeDB():

@@ -18,6 +18,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+
 import xml.etree.ElementTree as et
 from datetime import datetime, timedelta
 try:
@@ -42,7 +43,7 @@ def getProgList(ver=''):
     if stri:    
         tree = et.fromstring(stri)
         type = tree.attrib.get("generator-info-name")
-        for dict_el in tree.iterfind('channel'):
+        for dict_el in tree.findall('channel'):
             g_id = dict_el.attrib.get("id")
             name = dict_el.find('display-name').text
             if type == "nonametv":
@@ -64,7 +65,7 @@ def getProgList(ver=''):
                     if timerows:
                         lastdate = datetime.strptime(timerows[0][0], "%Y-%m-%d %H:%M:%S")
                     dtmax = datetime.min
-                    for tim in dict_el.iter("datafor"):
+                    for tim in dict_el.findall("datafor"):
                         dttext = tim.text
                         dtepg  = datetime.strptime(dttext, "%Y-%m-%d")
                         dt = datetime.strptime(tim.attrib.get("lastmodified")[0:14],"%Y%m%d%H%M%S")
@@ -89,7 +90,7 @@ def getProg(stri, channellist=[]):
     #stri = f.read()
     if stri: 
         tree = et.fromstring(stri)
-        for dict_el in tree.iterfind('programme'):
+        for dict_el in tree.findall('programme'):
             dt1 = datetime.strptime(dict_el.attrib.get("start")[0:14],"%Y%m%d%H%M%S")        
             dt2 = datetime.strptime(dict_el.attrib.get("stop")[0:14],"%Y%m%d%H%M%S")        
             p_id = dict_el.attrib.get("channel")
@@ -103,8 +104,13 @@ def getProg(stri, channellist=[]):
                     if not "http://" in sub_title: # fix for corrupted XML data
                         if title != "": title = title + " - "
                         title = title + sub_title
-                if dict_el.find('episode-num[@system="onscreen"]') is not None:
-                    desc = dict_el.find('episode-num[@system="onscreen"]').text + ". "
+#                if dict_el.find('episode-num[@system="onscreen"]') is not None:
+#                    desc = dict_el.find('episode-num[@system="onscreen"]').text + ". "
+                if dict_el.find('episode-num') is not None:
+                    for en in dict_el:
+                        if en.attrib.get('system') == 'onscreen':
+                            desc = en.text + ". "
+                            break
                 if dict_el.find('desc') is not None:
                     desc = desc + dict_el.find('desc').text
                 sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])

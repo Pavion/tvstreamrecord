@@ -876,11 +876,13 @@ $(function() {
         $( "#searchepg" ).change(function() {
             var tofind = $(this).val().toLowerCase().trim();
             $( "[id=event]" ).each(function(i) {
-                var text = $(this).text.toLowerCase() + " " + $(this).attr('fulltext').toLowerCase();
-                if(text.indexOf(tofind)!=-1 && tofind.length>0) {
-                    $(this).addClass("ui-selected");
-                } else {
-                    $(this).removeClass("ui-selected");
+                if ($(this).attr("cnt")!=="0") {
+                    var text = $(this).text.toLowerCase() + " " + $(this).attr('fulltext').toLowerCase();
+                    if(text.indexOf(tofind)!=-1 && tofind.length>0) {
+                        $(this).addClass("ui-selected");
+                    } else {
+                        $(this).removeClass("ui-selected");
+                    }
                 }
             });
         });
@@ -894,16 +896,18 @@ $(function() {
 
         $("[id=event]").live("click", function(event) {
             $("[id=event]").siblings().removeClass("ui-selected");
-            $(this).addClass("ui-selected");
-            
-            var ft = "<b>" + $(this).text() + ": " + localDateTime($(this).attr("at")) + " - " 
-                   + localDateTime($(this).attr("till")) + "</b><BR><BR>" + $(this).attr("fulltext");
-                   
-            if (ft)  {
-                $("#ret").val($(this).attr("rid"));
-                $("#dialog_content").html ( ft );
-                $( "#dialog_record_from_epg" ).dialog( "open" );
-                $(this).removeClass("ui-selected");
+            if ($(this).attr("cnt")!=="0") {
+                $(this).addClass("ui-selected");
+
+                var ft = "<b>" + $(this).text() + ": " + localDateTime($(this).attr("at")) + " - " 
+                       + localDateTime($(this).attr("till")) + "</b><BR><BR>" + $(this).attr("fulltext");
+
+                if (ft)  {
+                    $("#ret").val($(this).attr("rid"));
+                    $("#dialog_content").html ( ft );
+                    $( "#dialog_record_from_epg" ).dialog( "open" );
+                    $(this).removeClass("ui-selected");
+                }
             }
         });
 

@@ -14,9 +14,10 @@
     along with this program; if not, see <http://www.gnu.org/licenses/>.
 
     @author: Pavion
+
 """
-#from __future__ import print_function
-#from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import unicode_literals
 
 try:
     import urllib2 as urllib32
@@ -29,23 +30,17 @@ import sys
 from sql import sqlRun
 
 def unistr(strin):
+    #if type(strin) is bytes and not type(strin) is str:
+    strout = u''#unicode('', "UTF-8")
     try:
-        strout = unicode('', "UTF-8")
-        for s in strin:
-#        if ord(s)<30 and not ord(s)==ord('\n'):
-#            break
-            strout = strout + unichr(ord(s))
-#    if len(strin) > len(strout) + 20:
-#        print ("++++++++++++++++++++++++++++++++++++++")
-#        print ("I: " + strin)
-#        print ("O: " + strout)
-#        print ("--------------------------------------")
-    except: 
-        strout = ''
-        for s in strin:
-            strout = strout + chr(s)#.decode(encoding='UTF-8')
-        #strout = strin.decode(encoding='UTF-8')
-        
+        strout = strin.decode('cp1252')
+    except Exception as ex: 
+        pos = 0
+        for pos in range(0, len(strin)-1):
+            try:
+                strout = strout + strin[pos:pos+1].decode('cp1252')
+            except Exception as ex: 
+                strout = strout + u'_'
     return strout
 
 # converts string into time, i.e. 0x20 0x15 0x15 = 20:15:15 - what a funny way to encode time!
@@ -166,12 +161,10 @@ def read_stream(f_in):
         mybuffer = f_in.read(block_sz)
         blocksread = blocksread + block_sz
         if not mybuffer or blocksread>maxblocksread or datetime.now() -starttime>maxtimespend:
-            print ("Read finished at %s/%s MB" % (blocksread/1024/1024, maxblocksread/1024/1024))
+            print ("Read finished at %d/%d MB" % (blocksread/1024/1024, maxblocksread/1024/1024))
             for ch in range(0,2):
                 plist = getList(payloadSort(payload[ch], False), ch)
                 maxlist[ch] = joinarrays(maxlist[ch], plist)
-                #if len(plist)>len(maxlist[ch]):
-                #    maxlist[ch] = plist
             break
         for i in range(0, len(mybuffer), size):
             pid1 = ord(mybuffer[i+1:i+2])
@@ -257,7 +250,6 @@ def getGuides(pl):
         if pos0!=-1: #end of string
             guidetext = guidetext + b"////" + pl[pos0+1:]
 
-
         # Separating the tables into a list
         guidelist = guidetext.split(b"////")
 
@@ -289,17 +281,17 @@ def getGuides(pl):
                             if dlen>0:
                                 pos2 = pos + 17
                                 # Steuerbyte for several descriptions (?)
-                                stb = guide[pos2+1]
-                                if stb==5: # several descriptions / lines available
-                                    desc = b""
-                                    desccnt = 0
+                                stb = guide[pos2+1:pos2+2]
+                                desc = list()
+                                if stb==b'\x05': # several descriptions / lines available
 
                                     while pos2<pos+12+dlen-1 and pos2<=len(guide):
-                                        if guide[pos2]==chr(0x4E):
+#                                        print (pos2, guide[pos2:pos2+1])
+                                        if guide[pos2:pos2+1]==b'\x4E':
                                             pos2 = pos2 + 7
-                                        elif guide[pos2]==chr(0x50) or guide[pos2]==chr(0x54):
+                                        elif guide[pos2:pos2+1]==b'\x50' or guide[pos2:pos2+1]==b'\x54':
                                             break
-                                        elif ord(guide[pos2:pos2+1])==0 and ord(guide[pos2+1:pos2+2])==0x54: # seems to be a delimiter between title and description
+                                        elif guide[pos2:pos2+1]==b'\x00' and guide[pos2+1:pos2+2]==b'\x54': # seems to be a delimiter between title and description
                                             pos2 = pos2 + 12
 
                                         dlen2 = ord(guide[pos2:pos2+1])
@@ -307,20 +299,25 @@ def getGuides(pl):
                                         if dlen2<=0 or pos2+dlen2+1>=pos+12+dlen-1: #dunno
                                             break
 
-                                        if desccnt == 1:# or desccnt == 2:
-                                            desc = desc + b"\n" + guide[pos2+2:pos2+1+dlen2]
-                                        else:
-                                            desc = desc + guide[pos2+2:pos2+1+dlen2]
+                                        desc.append(guide[pos2+2:pos2+1+dlen2])
 
-                                        desccnt = desccnt + 1
+                                        #desccnt = desccnt + 1
                                         pos2 = pos2+dlen2+1
                                 else: # only one description available
                                     dlen2 = ord(guide[pos2:pos2+1])
-                                    desc = guide[pos2+1:pos2+1+dlen2]
+                                    desc.append(guide[pos2+1:pos2+1+dlen2])
 
-                                guides.append([sid, start, duration, unistr(desc)])
-
-
+                                sumdesc = b''
+                                cntdesc = 0
+                                for cntdesc in range(0, len(desc)):
+                                    # remove invalid entries
+                                    if not (b'\x1B' in desc[cntdesc] or b'\x03' in desc[cntdesc] or b'\x04' in desc[cntdesc] or b'\x05' in desc[cntdesc] or b'\x06' in desc[cntdesc]):
+                                        sumdesc = sumdesc + desc[cntdesc]
+                                        if len(desc[cntdesc]) < 246 and cntdesc < len(desc) - 1:
+                                            sumdesc = sumdesc + b'\n'
+                                # remove empty
+                                if len(sumdesc)>1:
+                                    guides.append([sid, start, duration, unistr(sumdesc.replace(b'\x8a', b'\n'))])
 
                             pos = pos + dlen + 12
                     lenpos = lenpos + slen + 4
@@ -367,8 +364,9 @@ def getChannelList(pl):
 
                 i = pos+6
 
-                if table[i-1:i+2]==b'V' or table[i-1:i+2]==b'H':
+                if table[i-1:i]==b'V' or table[i-1:i]==b'H':
                     i = i + 2
+                  
                 clen = ord(table[i:i+1])
                 provider = table[i+1: i+clen+1].replace(b'\x86', b"").replace(b'\x87', b"").replace(b'\x05', b"")
                 i = i + clen + 1
@@ -377,11 +375,11 @@ def getChannelList(pl):
                 channame = table[i+1: i+clen+1]
                 channame = channame.replace(b'\x86', b"").replace(b'\x87', b"").replace(b'\x05', b"")
 
-                if channame!=b".":
-                    channellist.append([cid, provider, channame])
+                if channame!=b"." and not b'\xff' in channame and not b'\xf3' in channame:
+                    channellist.append([cid, provider, unistr(channame)])
 
                 pos = pos + 5 + dlen
-    except:
+    except Exception as ex:
         pass
 
     return channellist
@@ -414,7 +412,7 @@ def getFullList(f):
 
 #    print ("guides %s" % (len(guides)))
 #    for g in guides:
-#        print (g[0], g[1], g[2]#, g[3].decode("UTF-8"))
+#        print (g[0], g[1], g[2], g[3].encode("UTF-8"))
 
 #    print ("channellist %s" % (len(channellist)))
 #    for g in channellist:
@@ -487,7 +485,7 @@ def main(argv=None):
             print ("Supplied file/stream could not be found, aborting...")
             return fulllist
     else:
-        inp = open("o:/20140429165800 - Tagesschau1700.mpg", "rb")
+        inp = open("O:/20140511124301 - test.mpg", "rb")
         print ("Opening local file")
 
     fulllist = getFullList(inp)

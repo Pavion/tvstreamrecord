@@ -526,7 +526,7 @@ class epggrabthread(Thread):
             for l in fulllist:
                 actname = l[0]
                 if actname!=prevname:
-                    rows2 = sqlRun("SELECT cid FROM channels WHERE cenabled = 1 AND cname='%s' OR lower(cname)='%s'" % (actname, actname.lower()) )
+                    rows2 = sqlRun("SELECT cid FROM channels WHERE cenabled = 1 AND lower(cname)='%s'" % actname.lower())
                     if rows2:
                         cid = rows2[0][0]
                         sqlchlist.append([cid, actname, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S") ] )

@@ -877,7 +877,7 @@ $(function() {
             var tofind = $(this).val().toLowerCase().trim();
             $( "[id=event]" ).each(function(i) {
                 if ($(this).attr("cnt")!=="0") {
-                    var text = $(this).text.toLowerCase() + " " + $(this).attr('fulltext').toLowerCase();
+                    var text = $(this).text().toLowerCase() + " " + $(this).attr('fulltext').toLowerCase();
                     if(text.indexOf(tofind)!=-1 && tofind.length>0) {
                         $(this).addClass("ui-selected");
                     } else {
@@ -901,6 +901,7 @@ $(function() {
 
                 var ft = "<b>" + $(this).text() + ": " + localDateTime($(this).attr("at")) + " - " 
                        + localDateTime($(this).attr("till")) + "</b><BR><BR>" + $(this).attr("fulltext");
+                ft = ft.replace(/\n/g, '<BR>');
 
                 if (ft)  {
                     $("#ret").val($(this).attr("rid"));

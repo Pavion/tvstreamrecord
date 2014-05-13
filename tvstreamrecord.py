@@ -115,7 +115,7 @@ def postLogin():
     else:
         config.banIP(request.remote_addr)
     expire = None if not request.forms.store_pw else 315360000
-    response.set_cookie(name="tvstreamrecord_user", value=hash, max_age=expire)
+    response.set_cookie(name=b"tvstreamrecord_user", value=hash, max_age=expire)
     redirect("/")
 
 @post('/setpass')
@@ -125,7 +125,7 @@ def setPass():
     pass_new_1 = hashlib.sha224(request.forms.pass_new_1).hexdigest() if request.forms.pass_new_1 else ""
     pass_new_2 = hashlib.sha224(request.forms.pass_new_2).hexdigest() if request.forms.pass_new_2 else ""
     if pass_old == credentials and pass_new_1 == pass_new_2:
-        response.delete_cookie("tvstreamrecord_user")
+        response.delete_cookie(b"tvstreamrecord_user")
         credentials = config.setUser(pass_new_1)
         ret = 0
     elif pass_old != credentials:
@@ -138,7 +138,7 @@ def checkLogin():
     localhost = ['192','10.']
     global credentials
     if credentials:
-        if credentials != request.get_cookie("tvstreamrecord_user") and not request.remote_addr[:3] in localhost and request.remote_addr != '127.0.0.1':
+        if credentials != request.get_cookie(b"tvstreamrecord_user") and not request.remote_addr[:3] in localhost and request.remote_addr != '127.0.0.1':
             if config.checkIP(request.remote_addr) == True:
                 return template('login')
             else:

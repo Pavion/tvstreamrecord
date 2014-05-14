@@ -37,7 +37,10 @@ class Logger(object):
             self.terminal = sys.stderr
 
     def write(self, message):
-        self.terminal.write(message)
+        try:
+            self.terminal.write(message)
+        except:
+            pass
         mylines = message.replace('\n', '')
         mylines = mylines.replace('\r', '')
         mylines = mylines.strip()

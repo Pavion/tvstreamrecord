@@ -821,6 +821,10 @@ class record(Thread):
         self.running = 1
         dateholder = datetime.now().strftime("%Y%m%d%H%M%S")
         titleholder = "".join([x if x.isalnum() else "_" for x in self.name])
+        try:
+            titleholder = titleholder.encode('ascii', 'replace')
+        except:
+            pass
         fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + self.ext
         num = 1
         while os.path.isfile(fn) and num<127:

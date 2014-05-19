@@ -200,10 +200,9 @@ def internationalize(templ):
 
 def fileexists(file):
     try:
-        file = file.encode('utf-8')
+        return os.path.isfile(file) 
     except Exception as ex:
-        print (ex)        
-    return os.path.isfile(file) 
+        return os.path.isfile(file.encode('utf-8').decode(sys.getfilesystemencoding()))
 
 #------------------------------- Main menu -------------------------------
 
@@ -684,15 +683,15 @@ def epglist_getter():
         if iSearch and iSearch!="":
             sWhere = "AND (guide_chan.g_name LIKE '%" + iSearch + "%' OR guide.g_title LIKE '%" + iSearch + "%' OR guide.g_desc LIKE '%" + iSearch + "%')"
 
-        query = "SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s %s %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere, sOrder, sLimit)
-        countquery = "SELECT COUNT(guide.g_start) FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere)
+        query = "SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s %s %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere, sOrder, sLimit)
+        countquery = "SELECT COUNT(guide.g_start) FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere)
         count = sqlRun(countquery)
         if count:
             totalrows = count[0][0]
 
         rows=sqlRun(query)
     else: # Client-side processing
-        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_epg_max_events))
+        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_epg_max_events))
 
     for row in rows:
         retlist.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
@@ -794,14 +793,6 @@ class record(Thread):
         self.von = datetime.strptime(row[2],"%Y-%m-%d %H:%M:%S")
         self.bis = datetime.strptime(row[3],"%Y-%m-%d %H:%M:%S")
         self.name = row[5]
-#        print ("<< c: %s; t: %s; l: %s" % (type(row[5]), type(self.name), len(self.name)))
-#        try:
-#            print ("a %s" % self.name)
-#            self.name = self.name.decode("UTF-8")
-#        except:
-#            print ("b")
-#            pass
-#        print (">> c: %s; t: %s; l: %s" % (type(row[5]), type(self.name), len(self.name)))
         self.url = row[1].strip()
         self.mask = row[6]
         self.myrow = row
@@ -832,10 +823,6 @@ class record(Thread):
         self.running = 1
         dateholder = datetime.now().strftime("%Y%m%d%H%M%S")
         titleholder = "".join([x if x.isalnum() else "_" for x in self.name])
-        #try:
-        #    titleholder = titleholder.encode('ascii', 'replace')
-        #except:
-        #    pass
         fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + self.ext
         num = 1
         while fileexists(fn) and num<127:
@@ -866,12 +853,11 @@ class record(Thread):
             block_sz = 8192
             print ("Record: '%s' started" % (self.name))
             try:
-                fn = fn.encode('utf-8')
-            except Exception as ex:
-                print (ex)        
-            try:
                 u = urllib32.urlopen(self.url)
-                f = open(fn, 'wb')
+                try:
+                    f = open(fn, 'wb')
+                except:    
+                    f = open(fn.encode('utf-8').decode(sys.getfilesystemencoding()), 'wb')
             except urllib32.URLError:
                 print ("Stream could not be parsed (URL=%s), aborting..." % (self.url))
                 pass

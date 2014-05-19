@@ -26,7 +26,8 @@ def sqlRun(sql, t=-1, many=0):
         conn = sqlite3.connect('settings.db')
         c = conn.cursor()
         c.execute('PRAGMA journal_mode = OFF;')
-        #conn.text_factory = str
+        conn.text_factory = sqlite3.OptimizedUnicode
+        #print (conn.text_factory)
         if t != -1:
             if many == 1:
                 rows = c.executemany(sql, t)
@@ -41,7 +42,8 @@ def sqlRun(sql, t=-1, many=0):
         conn.commit()
         conn.close()
     except Exception as ex:
-        print ("exception: %s" % sql)
+        print ("SQL Exception: %s" % sql)
+#        print (ex)
         pass
     return fa
 

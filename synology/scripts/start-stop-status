@@ -37,7 +37,7 @@ case $1 in
 		cd ${SYNOPKG_PKGDEST}
         findpython
         echo `date +"%Y-%m-%d %H:%M:%S"` "OUT Using Python (${TVSTREAMRECORD_PYTHON})..." >> ${SYNOPKG_PKGDEST}/log.txt
-        nohup ${TVSTREAMRECORD_PYTHON} tvstreamrecord.py >/dev/null 2>&1 &
+        nohup /usr/bin/env LANG="en_US.utf8" ${TVSTREAMRECORD_PYTHON} tvstreamrecord.py >/dev/null 2>&1 &
 		ln -s "${SYNOPKG_PKGDEST}/webman" /usr/syno/synoman/webman/3rdparty/tvstreamrecord
         exit 0
 	;;

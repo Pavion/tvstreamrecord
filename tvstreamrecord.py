@@ -157,20 +157,20 @@ def getWeekdays(mask):
 
 def checkLang():
     if not config.cfg_language == "english":
-        ret_lng = ( os.path.isfile("lang/tvstreamrecord." + config.cfg_language + ".json") and os.path.isfile("lang/dataTables." + config.cfg_language + ".json") )
+        ret_lng = ( fileexists("lang/tvstreamrecord." + config.cfg_language + ".json") and fileexists("lang/dataTables." + config.cfg_language + ".json") )
         if not ret_lng:
             config.cfg_language = "english"
             print ("Language not found, reverting to default language")
     else:
         ret_lng = True
     if not config.cfg_locale == "default":
-        ret_loc = ( os.path.isfile("js/i18n/jquery.ui.datepicker-" + config.cfg_locale + ".js") and os.path.isfile("js/i18n/jquery-ui-timepicker-" + config.cfg_locale + ".js" ) )
+        ret_loc = ( fileexists("js/i18n/jquery.ui.datepicker-" + config.cfg_locale + ".js") and fileexists("js/i18n/jquery-ui-timepicker-" + config.cfg_locale + ".js" ) )
         if not ret_loc:
             config.cfg_locale = "default"
             print ("Locale not found, reverting to default locale")
     else:
         ret_loc = True
-    ret_style = ( os.path.isfile("css/" + config.cfg_theme) )
+    ret_style = ( fileexists("css/" + config.cfg_theme) )
     if not ret_style:
         config.cfg_theme = "smoothness/jquery-ui-1.10.4.custom.min.css"
         print ("Theme not found, reverting to default theme")
@@ -192,11 +192,18 @@ def internationalize(templ):
                 json_data.close()
                 for word in data:
                     if data[word]:
-                        templ = templ.replace("§"+word+"§", data[word])
+                        templ = templ.replace(u"§"+word+u"§", data[word])
             except:
                 pass
-        templ = templ.replace("§","")
+        templ = templ.replace(u"§","")
         return templ
+
+def fileexists(file):
+    try:
+        file = file.encode('utf-8')
+    except Exception as ex:
+        print (ex)        
+    return os.path.isfile(file) 
 
 #------------------------------- Main menu -------------------------------
 
@@ -208,7 +215,7 @@ def root_s():
 @route('/about')
 def about_s():
     changelog=""
-    if os.path.isfile("CHANGELOG"):
+    if fileexists("CHANGELOG"):
         f = open("CHANGELOG", "r")
         changelog = f.read()
         f.close()
@@ -411,14 +418,14 @@ def config_s():
     for langfile in os.listdir("lang"):
         if langfile.startswith("tvstreamrecord.") and langfile.endswith(".json"):
             lang = langfile[15:-5]
-            if os.path.isfile("lang/dataTables." + lang + ".json"):# and os.path.isfile("js/i18n/jquery.ui.datepicker-" + lang[1] + ".js") and os.path.isfile("js/i18n/jquery-ui-timepicker-" + lang[1] + ".js"):
+            if fileexists("lang/dataTables." + lang + ".json"):# and fileexists("js/i18n/jquery.ui.datepicker-" + lang[1] + ".js") and fileexists("js/i18n/jquery-ui-timepicker-" + lang[1] + ".js"):
                 languages.append(lang)
     locales = list()
     locales.append("default")
     for locfile in os.listdir("js/i18n"):
         if locfile.startswith("jquery.ui.datepicker-") and locfile.endswith(".js"):
             locale = locfile[21:-3]
-            if os.path.isfile("js/i18n/jquery-ui-timepicker-" + locale + ".js"):
+            if fileexists("js/i18n/jquery-ui-timepicker-" + locale + ".js"):
                 locales.append(locale)
     return internationalize(template('config', themes=themes, languages=languages, locales=locales))
 
@@ -787,10 +794,14 @@ class record(Thread):
         self.von = datetime.strptime(row[2],"%Y-%m-%d %H:%M:%S")
         self.bis = datetime.strptime(row[3],"%Y-%m-%d %H:%M:%S")
         self.name = row[5]
-        try:
-            self.name = self.name.decode("UTF-8")
-        except:
-            pass
+#        print ("<< c: %s; t: %s; l: %s" % (type(row[5]), type(self.name), len(self.name)))
+#        try:
+#            print ("a %s" % self.name)
+#            self.name = self.name.decode("UTF-8")
+#        except:
+#            print ("b")
+#            pass
+#        print (">> c: %s; t: %s; l: %s" % (type(row[5]), type(self.name), len(self.name)))
         self.url = row[1].strip()
         self.mask = row[6]
         self.myrow = row
@@ -821,13 +832,13 @@ class record(Thread):
         self.running = 1
         dateholder = datetime.now().strftime("%Y%m%d%H%M%S")
         titleholder = "".join([x if x.isalnum() else "_" for x in self.name])
-        try:
-            titleholder = titleholder.encode('ascii', 'replace')
-        except:
-            pass
+        #try:
+        #    titleholder = titleholder.encode('ascii', 'replace')
+        #except:
+        #    pass
         fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + self.ext
         num = 1
-        while os.path.isfile(fn) and num<127:
+        while fileexists(fn) and num<127:
             fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + ("_%s" % num) + self.ext
             num += 1
         fftypes = config.cfg_ffmpeg_types
@@ -855,12 +866,16 @@ class record(Thread):
             block_sz = 8192
             print ("Record: '%s' started" % (self.name))
             try:
+                fn = fn.encode('utf-8')
+            except Exception as ex:
+                print (ex)        
+            try:
                 u = urllib32.urlopen(self.url)
                 f = open(fn, 'wb')
             except urllib32.URLError:
                 print ("Stream could not be parsed (URL=%s), aborting..." % (self.url))
                 pass
-            except:
+            except Exception as ex:
                 print ("Output file %s could not be created. Please check your settings." % (fn))
                 pass
             else:

@@ -1,3 +1,4 @@
+# coding=UTF-8
 """
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +26,7 @@ def sqlRun(sql, t=-1, many=0):
         conn = sqlite3.connect('settings.db')
         c = conn.cursor()
         c.execute('PRAGMA journal_mode = OFF;')
-        conn.text_factory = str
+        #conn.text_factory = str
         if t != -1:
             if many == 1:
                 rows = c.executemany(sql, t)

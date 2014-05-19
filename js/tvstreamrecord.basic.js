@@ -205,7 +205,7 @@ function initIcons() {
 //                    $("#dialog_content").html (data[i][7]);
                     var dat_v = data[i][3].split(" ")[1].substr(0,5); 
                     var dat_b = data[i][4].split(" ")[1].substr(0,5); 
-                    $( "#dialog_content" ).html ("<b>" + data[i][1] + ": "+dat_v + " - " + dat_b + "</b><BR><BR>" + data[i][2]);
+                    $( "#dialog_content" ).html ("<b>" + data[i][1] + ": "+dat_v + " - " + dat_b + "</b><BR><BR>" + data[i][2].replace(/\n/g, '<BR>'));
                     $( "#dialog_record_from_epg" ).dialog( "open" );
                     break;
                 }

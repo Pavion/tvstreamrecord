@@ -40,6 +40,7 @@ import os
 import sys
 from mylogging import logInit, logRenew, logStop
 import hashlib
+import codecs
 
 def total(timedelta):
     try: 
@@ -52,7 +53,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.6.4a'
+version = '0.6.4b'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -64,12 +65,11 @@ def server_static9(filename):
     return static_file("/live.m3u", root='', mimetype='video')
 
 def write_m3u(name, path):
-    f = open("live.m3u", "w")
+    f = codecs.open("live.m3u", "w", "utf-8")
     f.write("#EXTM3U\n")
     f.write("#EXTINF:0,"+name+"\n")
     f.write(path+"\n")
     f.close()
-
 
 @route('/channels.m3u')
 def server_static8():
@@ -276,7 +276,7 @@ def list_p():
 def clgen_p():
     rows = sqlRun("select cid, cname, cpath from channels where cenabled=1 ORDER BY cid")
     if rows:
-        f = open("channels.m3u", "w")
+        f = codecs.open("channels.m3u", "w", "utf-8")
         f.write("#EXTM3U\n")
         for row in rows:
             f.write("#EXTINF:0,"+row[1]+"\n")
@@ -512,8 +512,8 @@ class epggrabthread(Thread):
     def grabXML(self):
         try:
             xmltv.getProgList(version)
-        except:
-            print ("XMLTV import could not be completed, please try again later (%s)" % sys.exc_info()[0])
+        except Exception as ex:
+            print ("XMLTV import could not be completed, please try again later (%s)" % ex)
         self.epggrabberstate[0] += 1
 
     def grabStream(self):
@@ -836,7 +836,7 @@ class record(Thread):
         if streamtype in fftypes:
             delta = total(self.bis - datetime.now())
             deltasec = '%d' % delta
-            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'error', '-t', deltasec] + ffargs + [fn]
+            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'fatal', '-t', deltasec] + ffargs + [fn]
             print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
             print (attr)
             try:

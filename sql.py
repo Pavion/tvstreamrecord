@@ -23,7 +23,7 @@ import sqlite3
 def sqlRun(sql, t=-1, many=0):
     fa = []
     try:
-        conn = sqlite3.connect('settings.db')
+        conn = sqlite3.connect('settings.db', timeout=20)
         c = conn.cursor()
         c.execute('PRAGMA journal_mode = OFF;')
         conn.text_factory = sqlite3.OptimizedUnicode
@@ -42,8 +42,7 @@ def sqlRun(sql, t=-1, many=0):
         conn.commit()
         conn.close()
     except Exception as ex:
-        print ("SQL Exception: %s" % sql)
-#        print (ex)
+        print ("SQL Exception '%s' with '%s'" % (ex,sql))
         pass
     return fa
 

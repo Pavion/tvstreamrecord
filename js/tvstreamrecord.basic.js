@@ -830,11 +830,13 @@ $(function() {
                 $(this).css("margin-top", cnt==0?10:(80+(cnt-1)*100) + 'px');
                 $(this).css("margin-left", x+'%');
                 $(this).css("width", w+'%');
+//                if (cnt==0) $(this).css("position", 'fixed');
             } else {
                 $(this).css("left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');
                 $(this).css("top", x+'%');
                 $(this).css("width", cnt==0?'50px':'240px');
                 $(this).css("height", w + "%");
+//                if (cnt==0) $(this).css("position", 'fixed');
             }
         });
 

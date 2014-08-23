@@ -361,10 +361,13 @@ def upload_p():
     if not upfile:
         print ("No file specified, please try again")
     else:
-        header = upfile.file.read(7)
-        if header.startswith("#EXTM3U"):
+        content = upfile.file.read()
+        try:
+            content = content.decode("UTF-8")
+        except:
+            pass
+        if content[:7] == "#EXTM3U":
             how = getBool(request.forms.get("switch_list_append"))
-            upfilecontent = upfile.file.read()
             rowid = 1
             if how==0:
                 sqlRun('DELETE FROM channels')
@@ -375,11 +378,11 @@ def upload_p():
                 if rows2 and not rows2[0][0] is None:
                     rowid = rows2[0][0]+1
 
-            lines = upfilecontent.splitlines()
+            lines = content.splitlines()
             i = 0
             name = ""
             for line in lines:
-                if not line[0:10] == "#EXTVLCOPT" and line!="":
+                if line[0:10] != "#EXTVLCOPT" and line!="" and line[:7] != "#EXTM3U":
                     i = i + 1
                     if i % 2 == 1:
                         name = line.split(",",1)[1]

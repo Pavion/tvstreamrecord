@@ -52,6 +52,10 @@ div#changelog {
     white-space: pre;
 }
 
+[id^=event] {
+    cursor: pointer;
+}
+
 [id^=icons-], [id^=iconsEPG-], [id^=iconsRec-] , [id^=iconsERec-]  {
     position: relative;
     cursor: pointer;

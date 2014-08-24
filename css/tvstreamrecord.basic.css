@@ -69,7 +69,11 @@ div#changelog {
     cursor: default; 
     clear: none;
 }  
-    
+
+[id^=event] {
+    cursor: pointer;
+}
+
 [id^=icons-] span.ui-icon  {
     float: left;
     margin: -2px -2px;

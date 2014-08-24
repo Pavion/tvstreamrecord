@@ -944,3 +944,4 @@ grabthread.kill()
 
 print ("tvstreamrecord v.%s: bye-bye" % version)
 logStop()
+#test commit

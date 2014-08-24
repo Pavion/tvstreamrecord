@@ -16,14 +16,14 @@
 <div id="epg_cname" cnt="{{cnt}}">
         %else:
 <div id="epg_cname" cnt="{{cnt}}">
-    <div><b><a href="live/{{rows[0][0]}}.m3u">{{rows[0][7]}}</a></b>
+    <div><b><a href="live/{{rows[0][0]}}.m3u">{{rows[0][8]}}</a></b>
         <label title="Disable channel" id="iconsDisable-{{rows[0][0]}}" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-close"></span></label>
     </div>
         %end
 </div>
 <div id="channelgroup">
         %for row in rows:
-    <div class="ui-state-default" id="event" cnt="{{cnt}}" x="{{row[1]}}" width="{{row[2]}}" cid="{{row[0]}}" rid="{{row[6]}}" fulltext="{{row[5]}}" recording="{{row[8]}}" title="{{row[4]}}">{{row[3]}}</div>
+    <div class="ui-state-default" id="event" cnt="{{cnt}}" cid="{{row[0]}}" x="{{row[1]}}" width="{{row[2]}}" at="{{row[4]}}" till="{{row[5]}}" fulltext="{{row[6]}}" rid="{{row[7]}}" recording="{{row[9]}}">{{row[3]}}</div>
         %end
 </div>
         %cnt=cnt+1

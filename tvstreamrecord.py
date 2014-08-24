@@ -16,6 +16,9 @@
 
     @author: Pavion
 """
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
 
 from bottle import CherryPyServer
 from bottle import route, run, template, post, request, response
@@ -28,19 +31,29 @@ from sql import sqlRun, sqlCreateAll, purgeDB
 import grabber
 import xmltv
 import json
-import urllib2
+try:
+    import urllib2 as urllib32
+except:
+    import urllib.request as urllib32
 from threading import Thread, Timer
 import os
 import sys
 from mylogging import logInit, logRenew, logStop
 import hashlib
+import codecs
+
+def total(timedelta):
+    try: 
+        return timedelta.total_seconds()
+    except: 
+        return (timedelta.microseconds + (timedelta.seconds + timedelta.days * 24 * 3600) * 10**6) / 10**6
 
 records = []
 localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.6.4'
+version = '0.6.4b'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -52,12 +65,11 @@ def server_static9(filename):
     return static_file("/live.m3u", root='', mimetype='video')
 
 def write_m3u(name, path):
-    f = open("live.m3u", "w")
+    f = codecs.open("live.m3u", "w", "utf-8")
     f.write("#EXTM3U\n")
     f.write("#EXTINF:0,"+name+"\n")
     f.write(path+"\n")
     f.close()
-
 
 @route('/channels.m3u')
 def server_static8():
@@ -103,7 +115,7 @@ def postLogin():
     else:
         config.banIP(request.remote_addr)
     expire = None if not request.forms.store_pw else 315360000
-    response.set_cookie(name="tvstreamrecord_user", value=hash, max_age=expire)
+    response.set_cookie(name=b"tvstreamrecord_user", value=hash, max_age=expire)
     redirect("/")
 
 @post('/setpass')
@@ -113,7 +125,7 @@ def setPass():
     pass_new_1 = hashlib.sha224(request.forms.pass_new_1).hexdigest() if request.forms.pass_new_1 else ""
     pass_new_2 = hashlib.sha224(request.forms.pass_new_2).hexdigest() if request.forms.pass_new_2 else ""
     if pass_old == credentials and pass_new_1 == pass_new_2:
-        response.delete_cookie("tvstreamrecord_user")
+        response.delete_cookie(b"tvstreamrecord_user")
         credentials = config.setUser(pass_new_1)
         ret = 0
     elif pass_old != credentials:
@@ -126,7 +138,7 @@ def checkLogin():
     localhost = ['192','10.']
     global credentials
     if credentials:
-        if credentials != request.get_cookie("tvstreamrecord_user") and not request.remote_addr[:3] in localhost and request.remote_addr != '127.0.0.1':
+        if credentials != request.get_cookie(b"tvstreamrecord_user") and not request.remote_addr[:3] in localhost and request.remote_addr != '127.0.0.1':
             if config.checkIP(request.remote_addr) == True:
                 return template('login')
             else:
@@ -145,23 +157,23 @@ def getWeekdays(mask):
 
 def checkLang():
     if not config.cfg_language == "english":
-        ret_lng = ( os.path.isfile("lang/tvstreamrecord." + config.cfg_language + ".json") and os.path.isfile("lang/dataTables." + config.cfg_language + ".json") )
+        ret_lng = ( fileexists("lang/tvstreamrecord." + config.cfg_language + ".json") and fileexists("lang/dataTables." + config.cfg_language + ".json") )
         if not ret_lng:
             config.cfg_language = "english"
-            print "Language not found, reverting to default language"
+            print ("Language not found, reverting to default language")
     else:
         ret_lng = True
     if not config.cfg_locale == "default":
-        ret_loc = ( os.path.isfile("js/i18n/jquery.ui.datepicker-" + config.cfg_locale + ".js") and os.path.isfile("js/i18n/jquery-ui-timepicker-" + config.cfg_locale + ".js" ) )
+        ret_loc = ( fileexists("js/i18n/jquery.ui.datepicker-" + config.cfg_locale + ".js") and fileexists("js/i18n/jquery-ui-timepicker-" + config.cfg_locale + ".js" ) )
         if not ret_loc:
             config.cfg_locale = "default"
-            print "Locale not found, reverting to default locale"
+            print ("Locale not found, reverting to default locale")
     else:
         ret_loc = True
-    ret_style = ( os.path.isfile("css/" + config.cfg_theme) )
+    ret_style = ( fileexists("css/" + config.cfg_theme) )
     if not ret_style:
         config.cfg_theme = "smoothness/jquery-ui-1.10.4.custom.min.css"
-        print "Theme not found, reverting to default theme"
+        print ("Theme not found, reverting to default theme")
     if not (ret_loc and ret_lng and ret_style):
         config.saveConfig()
 
@@ -175,18 +187,22 @@ def internationalize(templ):
         templ = header + templ + footer
         if not config.cfg_language == "english":
             try:
-                json_data=open('lang/tvstreamrecord.' + config.cfg_language + '.json')
-                data = json.load(json_data)
+                json_data=open('lang/tvstreamrecord.' + config.cfg_language + '.json', "rb")
+                data = json.loads(json_data.read().decode('utf-8'))
+                json_data.close()
                 for word in data:
                     if data[word]:
                         templ = templ.replace(u"§"+word+u"§", data[word])
-                    else:
-                        templ = templ.replace(u"§"+word+u"§", word)
-                json_data.close()
             except:
                 pass
         templ = templ.replace(u"§","")
         return templ
+
+def fileexists(file):
+    try:
+        return os.path.isfile(file) 
+    except Exception as ex:
+        return os.path.isfile(file.encode('utf-8').decode(sys.getfilesystemencoding()))
 
 #------------------------------- Main menu -------------------------------
 
@@ -198,7 +214,7 @@ def root_s():
 @route('/about')
 def about_s():
     changelog=""
-    if os.path.isfile("CHANGELOG"):
+    if fileexists("CHANGELOG"):
         f = open("CHANGELOG", "r")
         changelog = f.read()
         f.close()
@@ -206,10 +222,10 @@ def about_s():
 
 #------------------------------- Logging -------------------------------
 
-logInit()
+logInit('a')
 
-print "Starting tvstreamrecord v.%s" % version
-print "Logging output initialized"
+print ("Starting tvstreamrecord v.%s with Python %s" % (version, sys.version_info[0]))
+print ("Logging output initialized")
 
 @post('/resetlog')
 def log_reset():
@@ -234,12 +250,8 @@ def log_get():
 
 @route('/channellist')
 def chanlist():
-    l = []
     rows=sqlRun('SELECT channels.cid, cname, cpath, cext, epgscan, cenabled FROM channels')
-    for row in rows:
-        m3u = "<a href=\"live/" + str(row[0]) + ".m3u\">" + row[1] + "</a>"
-        l.append([row[0], m3u, row[2], row[3], row[4], row[5]])
-    return json.dumps({"aaData": l } )
+    return json.dumps({"aaData": rows } )
 
 @route('/list')
 def list_s():
@@ -264,7 +276,7 @@ def list_p():
 def clgen_p():
     rows = sqlRun("select cid, cname, cpath from channels where cenabled=1 ORDER BY cid")
     if rows:
-        f = open("channels.m3u", "w")
+        f = codecs.open("channels.m3u", "w", "utf-8")
         f.write("#EXTM3U\n")
         for row in rows:
             f.write("#EXTINF:0,"+row[1]+"\n")
@@ -293,7 +305,7 @@ def createchannel():
     elif prev.isdigit():
         prev = int(prev)
     else:
-        print "Wrong number found for the previous ID. Aborting creation/update."
+        print ("Wrong number found for the previous ID. Aborting creation/update.")
         return
 
     if cid=="":
@@ -301,11 +313,12 @@ def createchannel():
     elif cid.isdigit():
         cid = int(cid)
     else:
-        print "Wrong number found for the new ID. Aborting creation/update."
+        print ("Wrong number found for the new ID. Aborting creation/update.")
         return
 
     if cext!='':
-        if cext[0:1]<>'.': cext = '.' + cext
+        if cext[0:1]!='.': 
+            cext = '.' + cext
 
     exists = False
     if cid == prev:
@@ -342,16 +355,19 @@ def createchannel():
 
 @post('/upload')
 def upload_p():
-    print "M3U upload parsing started"
+    print ("M3U upload parsing started")
     retl = []
     upfile = request.files.upfile
     if not upfile:
-        print "No file specified, please try again"
+        print ("No file specified, please try again")
     else:
-        header = upfile.file.read(7)
-        if header.startswith("#EXTM3U"):
+        content = upfile.file.read()
+        try:
+            content = content.decode("UTF-8")
+        except:
+            pass
+        if content[:7] == "#EXTM3U":
             how = getBool(request.forms.get("switch_list_append"))
-            upfilecontent = upfile.file.read()
             rowid = 1
             if how==0:
                 sqlRun('DELETE FROM channels')
@@ -362,11 +378,11 @@ def upload_p():
                 if rows2 and not rows2[0][0] is None:
                     rowid = rows2[0][0]+1
 
-            lines = upfilecontent.splitlines()
+            lines = content.splitlines()
             i = 0
             name = ""
             for line in lines:
-                if not line[0:10] == "#EXTVLCOPT" and line!="":
+                if line[0:10] != "#EXTVLCOPT" and line!="" and line[:7] != "#EXTM3U":
                     i = i + 1
                     if i % 2 == 1:
                         name = line.split(",",1)[1]
@@ -404,14 +420,14 @@ def config_s():
     for langfile in os.listdir("lang"):
         if langfile.startswith("tvstreamrecord.") and langfile.endswith(".json"):
             lang = langfile[15:-5]
-            if os.path.isfile("lang/dataTables." + lang + ".json"):# and os.path.isfile("js/i18n/jquery.ui.datepicker-" + lang[1] + ".js") and os.path.isfile("js/i18n/jquery-ui-timepicker-" + lang[1] + ".js"):
+            if fileexists("lang/dataTables." + lang + ".json"):# and fileexists("js/i18n/jquery.ui.datepicker-" + lang[1] + ".js") and fileexists("js/i18n/jquery-ui-timepicker-" + lang[1] + ".js"):
                 languages.append(lang)
     locales = list()
     locales.append("default")
     for locfile in os.listdir("js/i18n"):
         if locfile.startswith("jquery.ui.datepicker-") and locfile.endswith(".js"):
             locale = locfile[21:-3]
-            if os.path.isfile("js/i18n/jquery-ui-timepicker-" + locale + ".js"):
+            if fileexists("js/i18n/jquery-ui-timepicker-" + locale + ".js"):
                 locales.append(locale)
     return internationalize(template('config', themes=themes, languages=languages, locales=locales))
 
@@ -425,14 +441,14 @@ def gettree():
     deny=['/etc', '/var', '/usr', '/sbin', '/bin', '/recycler']
     r=['<ul class="jqueryFileTree" style="display: none;">']
     try:
-        d=urllib2.unquote(request.POST.get('dir','\\'))
+        d=urllib32.unquote(request.POST.get('dir','\\'))
         for f in os.listdir(d):
             ff=os.path.join(d,f)
             if os.path.isdir(ff) and not ff.lower() in deny and f[0] != '@':
                 r.append('<li class="directory collapsed"><a href="#" rel="%s/">%s</a></li>' % (ff,f))
             else:
                 pass
-    except Exception,e:
+    except:
         pass
     r.append('</ul>')
     return r
@@ -476,13 +492,13 @@ class epggrabthread(Thread):
                 if mydatetime < datetime.now():
                     mydatetime = mydatetime + timedelta(days=1)
                 td = mydatetime-datetime.now()
-                deltas = td.total_seconds()
+                deltas = total(td)
                 self.timer = Timer(deltas, self.doGrab)
                 self.timer.start()
                 if deltas>0:
-                    print "EPG Thread timer waiting till %s (%d seconds)" % (config.cfg_grab_time, deltas)
+                    print ("EPG Thread timer waiting till %s (%d seconds)" % (config.cfg_grab_time, deltas))
             except:
-                print "Something went wrong with EPG thread. Please check your config settings regarding your start time"
+                print ("Something went wrong with EPG thread. Please check your config settings regarding your start time")
 
     def doGrab(self, override=False):
         self.kill()
@@ -499,8 +515,8 @@ class epggrabthread(Thread):
     def grabXML(self):
         try:
             xmltv.getProgList(version)
-        except:
-            print "XMLTV import could not be completed, please try again later (%s)" % sys.exc_info()[0]
+        except Exception as ex:
+            print ("XMLTV import could not be completed, please try again later (%s)" % ex)
         self.epggrabberstate[0] += 1
 
     def grabStream(self):
@@ -519,7 +535,7 @@ class epggrabthread(Thread):
             for l in fulllist:
                 actname = l[0]
                 if actname!=prevname:
-                    rows2 = sqlRun("SELECT cid FROM channels WHERE cenabled = 1 AND cname='%s' OR lower(cname)='%s'" % (actname, actname.lower()) )
+                    rows2 = sqlRun("SELECT cid FROM channels WHERE cenabled = 1 AND lower(cname)='%s'" % actname.lower())
                     if rows2:
                         cid = rows2[0][0]
                         sqlchlist.append([cid, actname, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S") ] )
@@ -569,7 +585,7 @@ def grabepg():
 def removeepg():
     sqlRun("DELETE FROM guide")
     sqlRun("DELETE FROM guide_chan")
-    print "All EPG data was deleted"
+    print ("All EPG data was deleted")
     return
 
 @post('/epg')
@@ -593,7 +609,7 @@ def epg_s():
     if dayshown == datetime.combine(date.today(), time.min): # really today
         sthour = datetime.now().time().hour
         daystart = datetime.combine(date.today(), time(sthour,0,0))
-        totalwidth = 86400 - (daystart - dayshown).total_seconds()
+        totalwidth = 86400 - total(daystart - dayshown)
     else:
         sthour = 0
         daystart = dayshown
@@ -610,7 +626,7 @@ def epg_s():
         t = time(i+sthour)
         x = i * 100.0 / hours * widthq
         w =  1.0 / hours * widthq * 100.0
-        rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", -1, "", 0])
+        rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", "", -1, "", 0])
     ret.append(rtemp)
 
     rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY channels.cid ORDER BY channels.cid" % (todaysql, todaysql))
@@ -618,31 +634,29 @@ def epg_s():
         cid=row[1]
         rtemp = list()
         c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=%s AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id='%s' ORDER BY g_start" % (cid, config.cfg_delta_for_epg, config.cfg_delta_for_epg, todaysql, todaysql, row[0]))
-        #c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid FROM guide WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND g_id='%s' ORDER BY g_start" % (todaysql, todaysql, row[0]))
         for event in c_rows:
 
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
-            fulltext = "<b>"+event[0]+": "+datetime.strftime(d_von, localtime) + " - " + datetime.strftime(d_bis, localtime) + "</b><BR><BR>"+event[3]
-#            fulltext = fulltext.replace(chr(138), "").replace(chr(0xE4),"").replace(chr(0xF6),"").replace(chr(0xFC),"")
-            title = fulltext
-            if len(title)>300:
-                for char in range (300, 280, -1):
-                    try:
-                        title = title[:char]+"..."
-                        title.decode("UTF-8")
-                        break
-                    except:
-                        pass
+            #fulltext = "<b>"+event[0]+": "+datetime.strftime(d_von, localtime) + " - " + datetime.strftime(d_bis, localtime) + "</b><BR><BR>"+event[3]
+            #title = fulltext
+            #if len(title)>300:
+            #    for char in range (300, 280, -1):
+            #        try:
+            #            title = title[:char]+"..."
+            #            title.decode("UTF-8")
+            #            break
+            #        except:
+            #            pass
 
             if d_von < daystart:
                 d_von = daystart
             if d_bis.date() > daystart.date():
                 d_bis=datetime.combine(d_bis.date(),time.min)
-            x = d_von - daystart#datetime.combine(d_von.date(),time.min)
-            w = d_bis - d_von
-            if x.total_seconds()>=0 and w.total_seconds()>0:
-                rtemp.append ([cid, x.total_seconds()/totalwidth*100.0*widthq, w.total_seconds()/totalwidth*100.0*widthq, event[0], title, fulltext, event[4], row[2], event[5]])
+            x = total(d_von - daystart)
+            w = total(d_bis - d_von)
+            if x >= 0 and w > 0:
+                rtemp.append ([cid, x/totalwidth*100.0*widthq, w/totalwidth*100.0*widthq, event[0], d_von, d_bis, event[3], event[4], row[2], event[5]])
         ret.append(rtemp)
     return internationalize(template('epgchart', curr=datetime.strftime(d_von, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom))
 
@@ -672,15 +686,15 @@ def epglist_getter():
         if iSearch and iSearch!="":
             sWhere = "AND (guide_chan.g_name LIKE '%" + iSearch + "%' OR guide.g_title LIKE '%" + iSearch + "%' OR guide.g_desc LIKE '%" + iSearch + "%')"
 
-        query = "SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s %s %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere, sOrder, sLimit)
-        countquery = "SELECT COUNT(guide.g_start) FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere)
+        query = "SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s %s %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere, sOrder, sLimit)
+        countquery = "SELECT COUNT(guide.g_start) FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere)
         count = sqlRun(countquery)
         if count:
             totalrows = count[0][0]
 
         rows=sqlRun(query)
     else: # Client-side processing
-        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM ((guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id) INNER JOIN channels ON channels.cname=guide_chan.g_name) LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_epg_max_events))
+        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_epg_max_events))
 
     for row in rows:
         retlist.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
@@ -797,16 +811,16 @@ class record(Thread):
                     self.von = self.von + delta
                     self.bis = self.bis + delta
                     w = self.bis.isoweekday() if self.bis.isoweekday()<7 else 0
-                print "Recurrent record '%s' moved to %s" % (self.name, self.von)
+                print ("Recurrent record '%s' moved to %s" % (self.name, self.von))
                 sqlRun("UPDATE records SET rvon='%s', rbis='%s' WHERE rowid=%d" % (datetime.strftime(self.von,"%Y-%m-%d %H:%M:%S"), datetime.strftime(self.bis,"%Y-%m-%d %H:%M:%S"), self.id ) )
 
     def run(self):
         td = self.von-datetime.now()
-        deltas = td.total_seconds()
+        deltas = total(td)
         self.timer = Timer(deltas, self.doRecord)
         self.timer.start()
         if deltas>0:
-            print "Record: Thread timer for '%s' started for %d seconds" % (self.name, deltas)
+            print ("Record: Thread timer for '%s' started for %d seconds" % (self.name, deltas))
 
     def doRecord(self):
         self.running = 1
@@ -814,7 +828,7 @@ class record(Thread):
         titleholder = "".join([x if x.isalnum() else "_" for x in self.name])
         fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + self.ext
         num = 1
-        while os.path.isfile(fn) and num<127:
+        while fileexists(fn) and num<127:
             fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + ("_%s" % num) + self.ext
             num += 1
         fftypes = config.cfg_ffmpeg_types
@@ -823,32 +837,35 @@ class record(Thread):
         ffargs = config.cfg_ffmpeg_params
         ffargs = ffargs.split()
         if streamtype in fftypes:
-            delta = self.bis - datetime.now()
-            deltasec = '%d' % delta.total_seconds()
-            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'error', '-t', deltasec] + ffargs + [fn]
-            print "FFMPEG (%s) record '%s' called with:" % (streamtype, self.name)
-            print attr
+            delta = total(self.bis - datetime.now())
+            deltasec = '%d' % delta
+            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'fatal', '-t', deltasec] + ffargs + [fn]
+            print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
+            print (attr)
             try:
                 self.process = subprocess.Popen(attr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 out, err = self.process.communicate()
                 self.process.wait()
                 if err:
-                    print "FFMPEG record '%s' ended with an error:\n%s" % (self.name, err)
+                    print ("FFMPEG record '%s' ended with an error:\n%s" % (self.name, err))
                 else:
-                    print "FFMPEG record '%s' ended" % self.name
+                    print ("FFMPEG record '%s' ended" % self.name)
             except:
-                print "FFMPEG could not be started"
+                print ("FFMPEG could not be started")
         else:
             block_sz = 8192
-            print "Record: '%s' started" % (self.name)
+            print ("Record: '%s' started" % (self.name))
             try:
-                u = urllib2.urlopen(self.url)
-                f = open(fn, 'wb')
-            except urllib2.URLError:
-                print "Stream could not be parsed (URL=%s), aborting..." % (self.url)
+                u = urllib32.urlopen(self.url)
+                try:
+                    f = open(fn, 'wb')
+                except:    
+                    f = open(fn.encode('utf-8').decode(sys.getfilesystemencoding()), 'wb')
+            except urllib32.URLError:
+                print ("Stream could not be parsed (URL=%s), aborting..." % (self.url))
                 pass
-            except:
-                print "Output file %s could not be created. Please check your settings." % (fn)
+            except Exception as ex:
+                print ("Output file %s could not be created. Please check your settings." % (fn))
                 pass
             else:
                 while self.bis > datetime.now() and self.stopflag==0:
@@ -857,7 +874,7 @@ class record(Thread):
                         break
                     f.write(mybuffer)
                 f.close()
-                print "Record: '%s' ended" % (self.name)
+                print ("Record: '%s' ended" % (self.name))
                 if self in records: records.remove(self)
         if self.mask > 0:
             rectimer = Timer(5, setRecords)
@@ -871,7 +888,7 @@ class record(Thread):
             if self.process.poll()==None:
                 self.process.terminate()
         if self in records: records.remove(self)
-        print "Record: Stopflag for '%s' received" % (self.name)
+        print ("Record: Stopflag for '%s' received" % (self.name))
 
 def setRecords():
     rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
@@ -901,29 +918,29 @@ def setRecords():
         if chk == False:
             t.stop()
 
-print "Initializing database..."
+print ("Initializing database... ")
 sqlCreateAll(version)
 purgeDB()
-print "Initializing config..."
+print ("Initializing config...")
 config.loadConfig()
 credentials = config.getUser()
-print "Checking internationalization..."
+print ("Checking internationalization...")
 checkLang()
-print "Initializing records..."
+print ("Initializing records...")
 setRecords()
-print "Initializing EPG import thread..."
+print ("Initializing EPG import thread...")
 grabthread = epggrabthread()
 grabthread.run()
 
-print "Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port)
+print ("Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port))
 run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
 
-print "Server aborted. Stopping all records before exiting..."
-for t in records:
-    t.stop()
+print ("Server aborted. Stopping all records before exiting...")
+while len(records)>0:
+    records[0].stop()
 
-print "Stopping EPG grab thread..."
+print ("Stopping EPG grab thread...")
 grabthread.kill()
 
-print "tvstreamrecord v.%s: bye-bye" % version
+print ("tvstreamrecord v.%s: bye-bye" % version)
 logStop()

@@ -205,7 +205,7 @@ function initIcons() {
 //                    $("#dialog_content").html (data[i][7]);
                     var dat_v = data[i][3].split(" ")[1].substr(0,5); 
                     var dat_b = data[i][4].split(" ")[1].substr(0,5); 
-                    $( "#dialog_content" ).html ("<b>" + data[i][1] + ": "+dat_v + " - " + dat_b + "</b><BR><BR>" + data[i][2]);
+                    $( "#dialog_content" ).html ("<b>" + data[i][1] + ": "+dat_v + " - " + dat_b + "</b><BR><BR>" + data[i][2].replace(/\n/g, '<BR>'));
                     $( "#dialog_record_from_epg" ).dialog( "open" );
                     break;
                 }
@@ -792,6 +792,7 @@ $(function() {
                 paintTable();
             },
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                $('td:eq(1)', nRow).html('<a href=\"live/'+aData[0]+'.m3u\">'+aData[1]+'</a>');    
                 var data4 = "";
                 if (aData[4] == 1) data4 = "plus"; else data4="minus";
                 var chk = "";
@@ -829,11 +830,13 @@ $(function() {
                 $(this).css("margin-top", cnt==0?10:(80+(cnt-1)*100) + 'px');
                 $(this).css("margin-left", x+'%');
                 $(this).css("width", w+'%');
+//                if (cnt==0) $(this).css("position", 'fixed');
             } else {
                 $(this).css("left", cnt==0?0:((cnt-1) * 250 + 60) + 'px');
                 $(this).css("top", x+'%');
                 $(this).css("width", cnt==0?'50px':'240px');
                 $(this).css("height", w + "%");
+//                if (cnt==0) $(this).css("position", 'fixed');
             }
         });
 
@@ -875,11 +878,13 @@ $(function() {
         $( "#searchepg" ).change(function() {
             var tofind = $(this).val().toLowerCase().trim();
             $( "[id=event]" ).each(function(i) {
-                var text = $(this).attr('fulltext').toLowerCase();
-                if(text.indexOf(tofind)!=-1 && tofind.length>0) {
-                    $(this).addClass("ui-selected");
-                } else {
-                    $(this).removeClass("ui-selected");
+                if ($(this).attr("cnt")!=="0") {
+                    var text = $(this).text().toLowerCase() + " " + $(this).attr('fulltext').toLowerCase();
+                    if(text.indexOf(tofind)!=-1 && tofind.length>0) {
+                        $(this).addClass("ui-selected");
+                    } else {
+                        $(this).removeClass("ui-selected");
+                    }
                 }
             });
         });
@@ -893,13 +898,19 @@ $(function() {
 
         $("[id=event]").live("click", function(event) {
             $("[id=event]").siblings().removeClass("ui-selected");
-            $(this).addClass("ui-selected");
-            var ft = $(this).attr("fulltext");
-            if (ft)  {
-                $("#ret").val($(this).attr("rid"));
-                $("#dialog_content").html ( ft );
-                $( "#dialog_record_from_epg" ).dialog( "open" );
-                $(this).removeClass("ui-selected");
+            if ($(this).attr("cnt")!=="0") {
+                $(this).addClass("ui-selected");
+
+                var ft = "<b>" + $(this).text() + ": " + localDateTime($(this).attr("at")) + " - " 
+                       + localDateTime($(this).attr("till")) + "</b><BR><BR>" + $(this).attr("fulltext");
+                ft = ft.replace(/\n/g, '<BR>');
+
+                if (ft)  {
+                    $("#ret").val($(this).attr("rid"));
+                    $("#dialog_content").html ( ft );
+                    $( "#dialog_record_from_epg" ).dialog( "open" );
+                    $(this).removeClass("ui-selected");
+                }
             }
         });
 

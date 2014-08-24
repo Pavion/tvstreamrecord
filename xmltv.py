@@ -15,95 +15,142 @@
 
     @author: Pavion
 """
+from __future__ import print_function
+from __future__ import unicode_literals
 
-import xml.etree.ElementTree as et
+
 from datetime import datetime, timedelta
-import httplib
-import urllib2
+try:
+    import httplib
+    import urllib2 as urllib32
+except:
+    import http.client as httplib
+    import urllib.request as urllib32
 import zlib
-from sql import sqlRun
-import config
+try:
+    from sql import sqlRun
+    import config
+except:
+    def sqlRun(v1="", v2="", v3=""):
+        return None
 
-version = ''
+def getAttr(stri, attr):
+    ret = ""
+    p1 = stri.find(attr) + len(attr) + 2
+    p2 = stri.find(b'"', p1)
+    if p1 >= len(attr) + 2 and p2>p1:
+        ret = stri[p1:p2]
+    return ret
+
+def getFirst(stri, attr):
+    ret = ""
+    p1 = stri.find('<'+attr) 
+    if p1 != -1:
+        p1 = p1 + len(attr) + 1
+        p2 = stri.find('>', p1) + 1 
+        p3 = stri.find('</'+attr, p2) 
+        ret = stri[p2:p3].strip()
+    return ret
+
+def getList(stri, attr):
+#    treelist = list()
+    p1 = stri.find('<'+attr) 
+    while p1!=-1:
+        p1 = p1 + len(attr) + 1 
+        p2 = stri.find('>', p1) + 1     
+        p3 = stri.find('</'+attr, p2) 
+        att = stri[p1:p2-1].strip()
+        txt = stri[p2:p3].strip()
+        yield((att, txt))
+        p1 = stri.find('<'+attr, p3)   
 
 def getProgList(ver=''):
-    global version
-    version = ver    
-    print "tvstreamrecord v.%s / XMLTV import started" % version
-    stri = getFile(config.cfg_xmltvinitpath, 1)
-    channellist = []
-    if stri:    
-        tree = et.fromstring(stri)
-        type = tree.attrib.get("generator-info-name")
-        for dict_el in tree.iterfind('channel'):
-            g_id = dict_el.attrib.get("id")
-            name = dict_el.find('display-name').text
-            if type == "nonametv":
-                url = dict_el.find('base-url').text
-            elif type[:4] == "TVxb":
-                pass
-            else: 
-                print "Unknown XMLTV generator '%s', please contact me if it fails" % type
-                url = dict_el.find('base-url').text
-                        
-            rows=sqlRun("SELECT cname from channels WHERE cname = '%s' and cenabled=1 GROUP BY cname" % name)
-            if rows:
-                timerows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (g_id))
-                dtmax = datetime.now()
-                if type[:4] == "TVxb":   # same file
-                    channellist.append(g_id)
-                else:               # separate files
-                    lastdate = datetime.now()-timedelta(days=30)
-                    if timerows:
-                        lastdate = datetime.strptime(timerows[0][0], "%Y-%m-%d %H:%M:%S")
-                    dtmax = datetime.min
-                    for tim in dict_el.iter("datafor"):
-                        dttext = tim.text
-                        dtepg  = datetime.strptime(dttext, "%Y-%m-%d")
-                        dt = datetime.strptime(tim.attrib.get("lastmodified")[0:14],"%Y%m%d%H%M%S")
-                        if dt>lastdate and dtepg>=datetime.now()-timedelta(days=1):
-                            source = url+g_id+"_"+dttext+".xml.gz"
-                            stri = getFile(source)
-                            getProg(stri)    
-                        if dt>dtmax:
-                            dtmax = dt
+    print ("tvstreamrecord v.%s / XMLTV import started" % ver)
+    stri = getFile(config.cfg_xmltvinitpath, 1, ver)
+    
+    channellist = []        
+    typ = getAttr(stri[:200], "generator-info-name")
+    
+    for attr,innertxt in getList(stri, "channel"):
+        g_id = getAttr(attr, "id")
+        name = getFirst(innertxt, 'display-name')
+        if typ == "nonametv":
+            url = getFirst(innertxt, 'base-url')
+        elif typ[:4] == "TVxb":
+            pass
+        else: 
+            print ("Unknown XMLTV generator '%s', please contact me if it fails" % typ)
+            url = getFirst(innertxt, 'base-url')
+                
+        rows=sqlRun("SELECT cname from channels WHERE cname = '%s' and cenabled=1 GROUP BY cname" % name)
+        if rows:
+            timerows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (g_id))
+            dtmax = datetime.now()
+            if typ[:4] == "TVxb":   # same file
+                channellist.append(g_id)
+            else:               # separate files
+                lastdate = datetime.now()-timedelta(days=30)
+                if timerows:
+                    lastdate = datetime.strptime(timerows[0][0], "%Y-%m-%d %H:%M:%S")
+                dtmax = datetime.min
+                
+                for t_attr, dttext in getList(innertxt, "datafor"):
+                    dtepg  = datetime.strptime(dttext, "%Y-%m-%d")
+                    dt = datetime.strptime(getAttr(t_attr, "lastmodified")[0:14],"%Y%m%d%H%M%S")
+                    if dt>lastdate and dtepg>=datetime.now()-timedelta(days=1):
+                        source = url+g_id+"_"+dttext+".xml.gz"
+                        getProg(getFile(source,0,ver))
+                    if dt>dtmax:
+                        dtmax = dt
+            if not timerows:
+                sqlRun("INSERT OR IGNORE INTO guide_chan VALUES (?, ?, ?)", (g_id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
+            else:
+                sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))                       
 
-                if not timerows:
-                    sqlRun("INSERT OR IGNORE INTO guide_chan VALUES (?, ?, ?)", (g_id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
-                else:
-                    sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))                       
-        if type[:4] == "TVxb" and len(channellist)>0:   # same file
-            getProg(stri, channellist)        
-    print "XMLTV import completed"
-       
-def getProg(stri, channellist=[]):    
+    if typ[:4] == "TVxb" and len(channellist)>0:   # same file
+        getProg(stri, channellist)
+      
+    del (stri)        
+    print ("XMLTV import completed")
+    return
+  
+
+def getProg(strp, channellist=[]):    
     sqllist = []
-    #f = open("test.xml", "r")
-    #stri = f.read()
-    if stri: 
-        tree = et.fromstring(stri)
-        for dict_el in tree.iterfind('programme'):
-            dt1 = datetime.strptime(dict_el.attrib.get("start")[0:14],"%Y%m%d%H%M%S")        
-            dt2 = datetime.strptime(dict_el.attrib.get("stop")[0:14],"%Y%m%d%H%M%S")        
-            p_id = dict_el.attrib.get("channel")
-            if len(channellist)==0 or p_id in channellist:
-                title = ""
-                desc = ""
-                if dict_el.find('title') is not None:
-                    title = dict_el.find('title').text
-                if dict_el.find('sub-title') is not None:
-                    sub_title = dict_el.find('sub-title').text
-                    if not "http://" in sub_title: # fix for corrupted XML data
-                        if title != "": title = title + " - "
-                        title = title + sub_title
-                if dict_el.find('episode-num[@system="onscreen"]') is not None:
-                    desc = dict_el.find('episode-num[@system="onscreen"]').text + ". "
-                if dict_el.find('desc') is not None:
-                    desc = desc + dict_el.find('desc').text
-                sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
-        sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
+    
+    for attr,innertxt in getList(strp, 'programme'):    
+        dt1 = datetime.strptime(getAttr(attr, "start")[0:14],"%Y%m%d%H%M%S")        
+        dt2 = datetime.strptime(getAttr(attr, "stop")[0:14],"%Y%m%d%H%M%S")        
+        p_id = getAttr(attr, "channel")
+        if len(channellist)==0 or p_id in channellist:
+            desc = ""
+            title = getFirst(innertxt, 'title')
+            sub_title = getFirst(innertxt, 'sub-title')
+            if not "http://" in sub_title: # fix for corrupted XML data
+                if title != "": title = title + " - "
+                title = title + sub_title
+            eplist = getFirst(innertxt, 'episode-num')
+            for epatt, epin in getList(eplist, 'system'):
+                if getAttr(epatt, 'system') == 'onscreen':
+                    desc = epin + ". "
+                    break
+            tmpdesc = getFirst(innertxt, 'desc')
+            desc = desc + tmpdesc 
+            sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
+    sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
+
+    return    
         
-def getFile(file_in, override=0):
+def getTestFile():
+    with open('e.xml', 'r') as content_file:
+        stri = content_file.read()
+    try:
+        stri = stri.decode("UTF-8")
+    except:
+        pass
+    return stri
+
+def getFile(file_in, override=0, ver=""):
     rows=sqlRun("SELECT * FROM caching WHERE url='%s'" % file_in)    
     lastmod = ""
     etag = "" 
@@ -112,33 +159,49 @@ def getFile(file_in, override=0):
         lastmod = rows[0][2]
         etag = rows[0][3]
     try:
-        httplib.HTTPConnection.debuglevel = 1                            
-        request = urllib2.Request(file_in)
-        request.add_header('User-Agent', 'tvstreamrecord/' + version)
+        httplib.HTTPConnection.debuglevel = 0                            
+        request = urllib32.Request(file_in)
+        request.add_header('User-Agent', 'tvstreamrecord/' + ver)
         if override==0:
             request.add_header('If-Modified-Since', lastmod)
             request.add_header('If-None-Match', etag)                
-        opener = urllib2.build_opener()
-        response = opener.open(request)
-        feeddata = response.read()        
-        if rows:
-            sqlRun("UPDATE caching SET crTime=datetime('now', 'localtime'), Last_Modified=?, ETag=? WHERE url='%s'" % file_in, (response.info().getheader('Last-Modified'), response.info().getheader('ETag')))
-        else:
-            sqlRun("INSERT INTO caching VALUES (datetime('now', 'localtime'), ?, ?, ?)", (file_in, response.info().getheader('Last-Modified'), response.info().getheader('ETag')))        
+        opener = urllib32.build_opener()
+        hresponse = opener.open(request)
+        feeddata = hresponse.read()
+        hr = hresponse.info()        
+        lastmod = hr.get('Last-Modified')
+        etag = hr.get('ETag')
+        if rows and lastmod and etag:
+            sqlRun("UPDATE caching SET crTime=datetime('now', 'localtime'), Last_Modified=?, ETag=? WHERE url='%s'" % file_in, (lastmod, etag))
+        elif lastmod and etag:
+            sqlRun("INSERT INTO caching VALUES (datetime('now', 'localtime'), ?, ?, ?)", (file_in, lastmod, etag))        
         d = zlib.decompressobj(16+zlib.MAX_WBITS)
         out = d.decompress(feeddata)
-        print "XMLTV: reading URL %s" % file_in
-        
-        if not "</tv>" in out[-1000:]:
-            print "Possibly corrupted XML file, attempting to repair..."
-            pos = out.rfind("</programme>") 
+        print ("XMLTV: reading URL %s with %s bytes" % (file_in, len(out)))
+        if not b"</tv>" in out[-1000:]:
+            print ("Possibly corrupted XML file, attempting to repair...")
+            pos = out.rfind(b"</programme>") 
             if pos != -1:
-                out = out[:pos+12]  + "</tv>"
+                out = out[:pos+12]  + b"</tv>"
             else: 
-                pos = out.rfind("</channel>")
+                pos = out.rfind(b"</channel>")
                 if pos != -1:
-                    out = out[:pos+10]  + "</tv>" 
-    except:
-        print "XMLTV: no new data, try again later"
+                    out = out[:pos+10]  + b"</tv>" 
+    except Exception as ex:
+        #print (ex)
+        print ("XMLTV: no new data, try again later (%s)" % file_in)
         pass
+
+    try:
+        out = out.decode("UTF-8")
+    except:
+        pass
+    
     return out
+
+def main(argv=None):
+    getProgList('debug')
+    return
+    
+if __name__ == "__main__":
+    exit(main())

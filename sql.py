@@ -1,3 +1,4 @@
+# coding=UTF-8
 """
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,15 +15,19 @@
 
     @author: Pavion
 """
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import sqlite3
 
 def sqlRun(sql, t=-1, many=0):
     fa = []
     try:
-        conn = sqlite3.connect('settings.db')
+        conn = sqlite3.connect('settings.db', timeout=20)
         c = conn.cursor()
-        conn.text_factory = str
+        c.execute('PRAGMA journal_mode = OFF;')
+        conn.text_factory = sqlite3.OptimizedUnicode
+        #print (conn.text_factory)
         if t != -1:
             if many == 1:
                 rows = c.executemany(sql, t)
@@ -36,8 +41,8 @@ def sqlRun(sql, t=-1, many=0):
         fa=rows.fetchall()
         conn.commit()
         conn.close()
-    except:
-        print "exception: %s" % sql
+    except Exception as ex:
+        print ("SQL Exception '%s' with '%s'" % (ex,sql))
         pass
     return fa
 
@@ -65,13 +70,13 @@ def sqlCreateAll(version):
         sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version
         sql += "INSERT OR REPLACE INTO config VALUES ('credentials', '', '');"
     else:
-        rows = sqlRun("select value from config where param='cfg_version'")
+        rows = sqlRun("select value from config where param='cfg_version';")
         if not rows: # Version < 0.4.4
             sql += 'ALTER TABLE records ADD COLUMN rmask INTEGER DEFAULT 0;'
             sql += "INSERT INTO config VALUES ('cfg_version', 'Program version', '%s');" % version
         else: # Versioning
             oldver = rows[0][0]
-            if oldver<>version:
+            if oldver!=version:
                 if oldver < '0.4.4a':
                     sql += "ALTER TABLE channels ADD COLUMN cext TEXT DEFAULT '';"
                 if oldver < '0.5.0':
@@ -99,12 +104,12 @@ def sqlCreateAll(version):
                                 break
 
                 if oldver > version:
-                    print "Critical error: Version mismatch!!!"
+                    print ("Critical error: Version mismatch!!!")
 
                 sql += "INSERT OR REPLACE INTO config VALUES ('cfg_version', 'Program version', '%s');" % version
-                print "New version %s was implemented" % version
-
-    sqlRun(sql, -1, 1)
+                print ("New version %s was implemented" % version)
+    if sql:
+        sqlRun(sql, -1, 1)
     return
 
 def purgeDB():

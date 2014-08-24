@@ -5,12 +5,15 @@
 findpython() {
     TVSTREAMRECORD_PYTHON='python'
     type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
-        TVSTREAMRECORD_PYTHON='/volume1/@appstore/python/bin/python'
+        TVSTREAMRECORD_PYTHON='python3'
         type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
-            TVSTREAMRECORD_PYTHON='/usr/local/python26/bin/python'
+            TVSTREAMRECORD_PYTHON='/volume1/@appstore/python/bin/python'
             type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
-                echo `date +"%Y-%m-%d %H:%M:%S"` "ERR Python 2.x could not be found. Please install Python package from Utilities tab of the Package Center" >> ${SYNOPKG_PKGDEST}/log.txt
-                exit 1
+                TVSTREAMRECORD_PYTHON='/usr/local/python26/bin/python'
+                type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
+                    echo `date +"%Y-%m-%d %H:%M:%S"` "ERR Python could not be found. Please install Python package from Utilities tab of the Package Center" >> ${SYNOPKG_PKGDEST}/log.txt
+                    exit 1
+                }
             }
         }
     }
@@ -19,7 +22,7 @@ findpython() {
 
 
 stop() {
-	PID=`ps -w | grep 'python [t]vstreamrecord.py' | cut -c 1-5`
+	PID=`ps -w | grep '[t]vstreamrecord.py' | cut -c 1-5`
     kill ${PID}
 	sleep 3
 	kill -2 ${PID}	
@@ -32,9 +35,9 @@ stop() {
 case $1 in
 	start)
 		cd ${SYNOPKG_PKGDEST}
-        findpython        
-        echo `date +"%Y-%m-%d %H:%M:%S"` "OUT Using Python 2.x (${TVSTREAMRECORD_PYTHON})..." >> ${SYNOPKG_PKGDEST}/log.txt
-        nohup ${TVSTREAMRECORD_PYTHON} tvstreamrecord.py >/dev/null 2>&1 &
+        findpython
+        echo `date +"%Y-%m-%d %H:%M:%S"` "OUT Using Python (${TVSTREAMRECORD_PYTHON})..." >> ${SYNOPKG_PKGDEST}/log.txt
+        nohup /usr/bin/env LANG="en_US.utf8" ${TVSTREAMRECORD_PYTHON} tvstreamrecord.py >/dev/null 2>&1 &
 		ln -s "${SYNOPKG_PKGDEST}/webman" /usr/syno/synoman/webman/3rdparty/tvstreamrecord
         exit 0
 	;;

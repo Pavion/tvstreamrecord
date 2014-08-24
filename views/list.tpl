@@ -1,4 +1,4 @@
-%include create
+%include ('create.tpl')
 <div id="users-contain" class="ui-widget">
     <h1>Channels:
         <button id="button_create_channel">§Create new§</button>

@@ -62,7 +62,7 @@
     "till": "bis",
     "Record name": "Sendungstitel",
     "Channel": "Sender",
-    "Recurrent": "Wiederholen",
+    "Recurrent": "Wiederholung",
     "Controls": "Aktionen",
     "Create new record": "Neue Aufnahme erstellen",
     "Purge old records": "Alte Aufnahmen bereinigen",
@@ -138,5 +138,10 @@
     "New": "Neues",
     "Repeat": "Wiederholen",
  
-    "Browse": "Durchsuchen"
+    "Browse": "Durchsuchen",
+    
+    "Next": "Weiter",
+    "Duration": "Dauer",
+    "Skip": "Überspringen"
+
 }

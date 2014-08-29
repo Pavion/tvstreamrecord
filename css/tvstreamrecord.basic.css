@@ -70,10 +70,6 @@ div#changelog {
     clear: none;
 }  
 
-[id^=event] {
-    cursor: pointer;
-}
-
 [id^=icons-] span.ui-icon  {
     float: left;
     margin: -2px -2px;
@@ -212,3 +208,15 @@ div#users-contain table td, div#users-contain table th { border: 1px solid #eee;
 
 #cfg_recordpath { width: 70%; float: left; }
 #button_pathchooser { width: 20%; float: right; margin-right: 20px; }
+
+#mobipic {
+    padding: 0;
+    margin-top: 0.2em;  
+    margin-left: 0.1em;
+    margin-right: 0.3em;
+    
+    /*padding-left: 0.1em;
+    padding-right: 0.1em;
+    padding-top: 0.1em;
+    padding-bottom: 0.22em;*/
+}

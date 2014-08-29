@@ -53,7 +53,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.6.4b'
+version = '0.6.4c'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -155,6 +155,7 @@ def getWeekdays(mask):
 
 #------------------------------- Internalization -------------------------
 
+#actlocal = ['mm/dd/yy', ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"], 0]
 def checkLang():
     if not config.cfg_language == "english":
         ret_lng = ( fileexists("lang/tvstreamrecord." + config.cfg_language + ".json") and fileexists("lang/dataTables." + config.cfg_language + ".json") )
@@ -177,14 +178,15 @@ def checkLang():
     if not (ret_loc and ret_lng and ret_style):
         config.saveConfig()
 
-def internationalize(templ):
+def internationalize(templ,noheader=False):
     login = checkLogin()
     if login != "":
         return login
     else:
-        header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale )
-        footer = template('footer')
-        templ = header + templ + footer
+        if not noheader:
+            header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale )
+            footer = template('footer')
+            templ = header + templ + footer
         if not config.cfg_language == "english":
             try:
                 json_data=open('lang/tvstreamrecord.' + config.cfg_language + '.json', "rb")
@@ -208,14 +210,22 @@ def fileexists(file):
 
 @route('/')
 @route('/login')
-def root_s():
-    redirect("/records")
+def root_s():    
+    agent = request.headers.get('User-Agent')
+    if ("Android" in agent and "Mobile" in agent) or "berry" in agent or "Symbian" in agent or "Nokia" in agent or "iPhone" in agent:
+        count = sqlRun("select count(cid) from channels where cenabled=1")[0][0]        
+        if count > 0:
+            redirect("/mobile")
+        else:
+            redirect("/records")
+    else:
+        redirect("/records")
 
 @route('/about')
 def about_s():
     changelog=""
     if fileexists("CHANGELOG"):
-        f = open("CHANGELOG", "r")
+        f = codecs.open("CHANGELOG", "r", "utf-8")
         changelog = f.read()
         f.close()
     return internationalize(template('about', changelog=changelog))
@@ -239,7 +249,7 @@ def log_s():
 @route('/logget')
 def log_get():
     l = list()
-    lfile = open("log.txt", "r")
+    lfile = codecs.open("log.txt", "r", "utf-8")
     for lline in lfile:
         if len(lline)>24:
             l.append([ lline[0:19], lline[20:23], lline[24:] ])
@@ -701,10 +711,81 @@ def epglist_getter():
 
     return json.dumps(
                       {"aaData": retlist,
-                       "sEcho": sEcho,
-                       "iTotalRecords": totalrows,
+                       "sEcho": sEcho, 
+                      "iTotalRecords": totalrows,
                        "iTotalDisplayRecords": totalrows
                        } )
+
+
+# ------------------- Mobile version ----------------
+
+def getLocale():
+    if config.cfg_locale == "default":
+        return None
+    else:
+        try:
+            f = codecs.open("js/i18n/jquery.ui.datepicker-" + config.cfg_locale + ".js", "r", "utf-8")
+            loc = f.read()
+            f.close()
+            p1 = loc.find("{") 
+            p1 = loc.find("{", p1+1)
+            p2 = loc.find("}", p1+1)
+            full = loc[p1+2:p2]
+            f = codecs.open("js/i18n/jquery-ui-timepicker-" + config.cfg_locale + ".js", "r", "utf-8")
+            loc = f.read()
+            f.close()
+            p1 = loc.find("{") 
+            p1 = loc.find("{", p1+1)
+            p2 = loc.find("}", p1+1)
+            full = full + "," + loc[p1+1:p2]        
+            #full = full.replace('\t', '').replace(',\n', ',"').replace(': ', '": ').replace('\n', '').replace("\"'",'"').replace("'",'"')
+            full = full.replace('\t', '').replace(',\n', ',"').replace(': ', '": ').replace('\n', '').replace("\"'",'"').replace("'",'"')
+            return '{"' + full + '}'
+        except:
+            print ("Error at parsing locales to JSON string")
+            return None
+
+@route('/mobile')
+def records_s():
+    return internationalize(template('mobile',locale=getLocale()),True)
+
+@route('/getchannelgroups')
+def getchannelgroups():
+    l = []   
+    sql = "case WHEN  substr(upper(cname), 1, 1)  >= 'A' AND  substr(upper(cname), 1, 1) <= 'Z' THEN  substr(upper(cname), 1, 1) ELSE '0' END"
+    sql = "select " + sql + ", count(cname) from channels where cenabled=1 group by " + sql
+    rows=sqlRun(sql)
+    for row in rows:
+        l.append([row[0], row[1]])
+    return json.dumps({"aaData": l} )
+
+@post('/getchannelgroup')
+def getchannelgroup():
+    l = []   
+    id = request.forms.get("id")
+    sql = "select cid, cname from channels where cenabled=1 "
+    if id=='-':
+        sql = sql + "LIMIT 10"
+    elif id=='0':
+        sql = sql + "AND substr(upper(cname), 1, 1)  >= '0' AND  substr(upper(cname), 1, 1) <= '9'"
+    else:
+        sql = sql + "AND substr(upper(cname), 1, 1)  = '" + id + "'"
+    rows=sqlRun(sql)
+    for row in rows:
+        l.append([row[0], row[1]])
+    return json.dumps({"aaData": l} )    
+
+@post('/getepgday')
+def getepgday():
+    cname = request.forms.get("cname").decode("utf-8")
+    rdate = request.forms.get("rdate")
+    print (cname)
+    sql = "SELECT substr(g_title,1,50), g_start, substr(g_desc, 1, 100), round((julianday(g_stop)-julianday(g_start))*24*60) FROM guide, guide_chan WHERE guide.g_id = guide_chan.g_id AND guide_chan.g_name='{0}' AND (date(g_start)=date('{1}') OR date(g_stop)=date('{1}')) AND datetime(guide.g_stop)>datetime('now', 'localtime') ORDER BY g_start".format(cname, rdate)
+    rows=sqlRun(sql)
+    if rows: 
+        return json.dumps({"aaData": rows} )    
+    else:
+        return None
 
 #------------------------------- Record List -------------------------------
 
@@ -944,4 +1025,3 @@ grabthread.kill()
 
 print ("tvstreamrecord v.%s: bye-bye" % version)
 logStop()
-#test commit

@@ -5,16 +5,16 @@
     <link rel="shortcut icon" href="images/favicon.ico?v=2" type="image/x-icon" /> 
     <meta charset="utf-8" />
 	<title>tvstreamrecord {{version}}</title>
-	<link rel="stylesheet" href="css/{{style}}" />
-	<link rel="stylesheet" href="css/jquery-ui-timepicker-addon.min.css" />
-	<link rel="stylesheet" href="css/jquery.dataTables_themeroller.css" />
-	<link rel="stylesheet" href="css/jqueryFileTree.css" />
-	<link rel="stylesheet" href="css/slickswitch.css" />
-        <link rel="stylesheet" href="css/tvstreamrecord.basic.css" type="text/css" />
+	<link rel="stylesheet" type="text/css" href="css/{{style}}" />
+	<link rel="stylesheet" type="text/css" href="css/jquery-ui-timepicker-addon.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/jquery.dataTables_themeroller.css" />
+	<link rel="stylesheet" type="text/css" href="css/jqueryFileTree.css" />
+	<link rel="stylesheet" type="text/css" href="css/slickswitch.css" />
+    <link rel="stylesheet" type="text/css" href="css/tvstreamrecord.basic.css" type="text/css" />
 
-        <script type="text/javascript" src="js/jquery-1.8.3.js"></script>
+    <script type="text/javascript" src="js/jquery-1.8.3.js"></script>
 	<script type="text/javascript" src="js/jquery-ui-1.9.2.custom.js"></script>
-        <script type="text/javascript" src="js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui-timepicker-addon.min.js"></script>
 	<script type="text/javascript" src="js/jquery.slickswitch.js"></script>
 	<script type="text/javascript" src="js/jquery.dataTables.min.js"></script>	
 %if not locale == 'default':
@@ -33,6 +33,7 @@
 </div>
 <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
   <ul id="mainmenu" class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+    <a id="mobipic" title="tvstreamrecord Mobile" class="ui-tabs-anchor" href="/mobile"><img src="images/iphone-control-panel-px-png.png">
     <li id="menu-0" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/records">§Records§</a></li>
     <li id="menu-1" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/list">§Channels§</a></li>
     <li id="menu-2" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epgchart">§EPG Chart§</a></li>

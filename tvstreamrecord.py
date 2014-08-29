@@ -777,7 +777,11 @@ def getchannelgroup():
 
 @post('/getepgday')
 def getepgday():
-    cname = request.forms.get("cname").decode("utf-8")
+    cname = request.forms.get("cname")
+    try:
+        cname = cname.decode("utf-8")
+    except:
+        pass
     rdate = request.forms.get("rdate")
     print (cname)
     sql = "SELECT substr(g_title,1,50), g_start, substr(g_desc, 1, 100), round((julianday(g_stop)-julianday(g_start))*24*60) FROM guide, guide_chan WHERE guide.g_id = guide_chan.g_id AND guide_chan.g_name='{0}' AND (date(g_start)=date('{1}') OR date(g_stop)=date('{1}')) AND datetime(guide.g_stop)>datetime('now', 'localtime') ORDER BY g_start".format(cname, rdate)

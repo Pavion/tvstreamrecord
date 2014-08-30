@@ -37,7 +37,7 @@ except:
 def getAttr(stri, attr):
     ret = ""
     p1 = stri.find(attr) + len(attr) + 2
-    p2 = stri.find(b'"', p1)
+    p2 = stri.find('"', p1)
     if p1 >= len(attr) + 2 and p2>p1:
         ret = stri[p1:p2]
     return ret

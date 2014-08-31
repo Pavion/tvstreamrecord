@@ -1,3 +1,11 @@
+2014-09-01 1.0.0 Mobile version for record management 
+                 Auto redirect for iOS and Android Mobile
+                 Full Python 2.6.6/2.7/3 support
+                 Better unicode support
+                 Enhanced performance and memory usage for XMLTV                 
+                 Refactoring and cleaning up
+                 Bug fixes
+
 2014-04-26 0.6.4 Password protection on remote connections added
                  Browsing for target folder selection added
                  Record name mask added

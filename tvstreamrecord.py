@@ -53,7 +53,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '0.6.4c'
+version = '1.0.0'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -783,7 +783,6 @@ def getepgday():
     except:
         pass
     rdate = request.forms.get("rdate")
-    print (cname)
     sql = "SELECT substr(g_title,1,50), g_start, substr(g_desc, 1, 100), round((julianday(g_stop)-julianday(g_start))*24*60) FROM guide, guide_chan WHERE guide.g_id = guide_chan.g_id AND guide_chan.g_name='{0}' AND (date(g_start)=date('{1}') OR date(g_stop)=date('{1}')) AND datetime(guide.g_stop)>datetime('now', 'localtime') ORDER BY g_start".format(cname, rdate)
     rows=sqlRun(sql)
     if rows: 
@@ -948,10 +947,10 @@ class record(Thread):
                     f = open(fn.encode('utf-8').decode(sys.getfilesystemencoding()), 'wb')
             except urllib32.URLError:
                 print ("Stream could not be parsed (URL=%s), aborting..." % (self.url))
-                pass
+            except ValueError as ex:
+                print ("Unknown URL type (%s), record could not be started. Please check your channel settings" % (self.url))
             except Exception as ex:
-                print ("Output file %s could not be created. Please check your settings." % (fn))
-                pass
+                print ("Output file %s could not be created. Please check your settings. (Err: %s)" % (fn, ex))
             else:
                 while self.bis > datetime.now() and self.stopflag==0:
                     mybuffer = u.read(block_sz)

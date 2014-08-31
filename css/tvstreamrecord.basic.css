@@ -154,7 +154,7 @@ label#append {float: left; margin-top: 3px;}
     margin-top: 3px; 
 }
 
-th.ccontrols { width: 120px; }
+th.ccontrols { width: 8.5em; min-width: 8.5em; }
 th.cid { width: 40px; }
 th.cname { width: 150px; }
 th.cext { width: 50px; }

@@ -188,15 +188,10 @@ $(function() {
                             "am":am,
                             "aktiv":akt,
                             "recurr":mask
-                        }, function() {}, "json");
-
-            $("body").pagecontainer("change", "#");
-            getTableData();
-            console.log(recname);
-            console.log(sender);
-            console.log(am);
-            console.log(von);
-            console.log(bis);
+                        }, function() {
+                            $("body").pagecontainer("change", "#");
+                            getTableData();                            
+                        }, "json");
         }
     });
 

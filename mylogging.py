@@ -74,7 +74,7 @@ def logRenew():
 #    logInit()
 
 def logStop():
-    global log
+    global log, stdout_old, stderr_old
     sys.stdout = stdout_old
     sys.stderr = stderr_old
     log.close()

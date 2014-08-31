@@ -358,7 +358,7 @@ $(function() {
             }
         }]
     });
-
+    
 // Record create dialogs and forms
     var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker_create" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" ).add("#cname").add("#ccid").add("#cpath");
 
@@ -587,6 +587,7 @@ $(function() {
             "sAjaxSource": "/getrecordlist",
             "bStateSave": true,
             "fnStateSave": function (oSettings, oData) {
+                oData.oSearch.sSearch=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
             },
             "fnStateLoad": function (oSettings) {
@@ -781,10 +782,11 @@ $(function() {
             "sAjaxSource": "/channellist",
             "bStateSave": true,
             "fnStateSave": function (oSettings, oData) {
+                oData.oSearch.sSearch=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
             },
             "fnStateLoad": function (oSettings) {
-                return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
+                return JSON.parse(localStorage.getItem('DataTables_'+window.location.pathname));
             },
             "fnDrawCallback": function( oSettings ) {
                 initSwitch();
@@ -951,6 +953,7 @@ $(function() {
             "bServerSide": serverSide,
             "bStateSave": true,
             "fnStateSave": function (oSettings, oData) {
+                oData.oSearch.sSearch=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
             },
             "fnStateLoad": function (oSettings) {
@@ -1160,6 +1163,7 @@ $(function() {
             "sAjaxSource": "/logget",
             "bStateSave": true,
             "fnStateSave": function (oSettings, oData) {
+                oData.oSearch.sSearch=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
             },
             "fnStateLoad": function (oSettings) {

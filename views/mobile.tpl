@@ -39,12 +39,12 @@
             <table data-role="table" data-mode="reflow" class="rtable-breakpoint" id="rectable" recurr="§none§">
              <thead>
                <tr>
-                 <th>§Record name§</th>
-                 <th>§Channel§</th>
-                 <th>§at§</th>
-                 <th>§till§</th>
-                 <th>§Recurrent§</th>
-                 <th id="tcntrl">§Controls§</th>
+                 <th>§Record name§:</th>
+                 <th>§Channel§:</th>
+                 <th>§at§:</th>
+                 <th>§till§:</th>
+                 <th>§Recurrent§:</th>
+                 <th id="tcntrl">§Controls§:</th>
                </tr>
              </thead>
              <tbody id="recbody">

@@ -42,7 +42,10 @@ def sqlRun(sql, t=-1, many=0):
         conn.commit()
         conn.close()
     except Exception as ex:
-        print ("SQL Exception '%s' with '%s'" % (ex,sql))
+        if sql=="select * from config":
+            print ("New database created. Thank you for using this package.")
+        else:
+            print ("SQL Exception '%s' with '%s'" % (ex,sql))
         pass
     return fa
 

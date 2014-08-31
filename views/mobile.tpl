@@ -12,7 +12,7 @@
     <script type="text/javascript" src="js/jquery.mousewheel.min.js"></script>
     <script type="text/javascript" src="js/jqm-datebox.core.min.js"></script>
     <script type="text/javascript" src="js/jqm-datebox.mode.flipbox.min.js"></script>
-    <script type="text/javascript" src="js/jqm-datebox.mode.durationflipbox.min.js"></script>
+<!--    <script type="text/javascript" src="js/jqm-datebox.mode.durationflipbox.min.js"></script>-->
 	<script type="text/javascript" src="js/tvstreamrecord.mobile.js"></script>
 
 	<link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.3.min.css" />
@@ -86,9 +86,10 @@
     <!-- Time selection -->
     <div data-role="page" id="time" class="tsr-mobile jqm-home">    	    
         <h6>§Start time§</h6>
-        <div><div><input type="text" autocomplete="off" data-role="datebox" data-options='{"mode":"timeflipbox","useInline":true,"hideInput":true,"useSetButton":false,"useHeader":true}' id="timebox"  class="tmp_timebox"></div></div>
-        <h6>§Duration§</h6>
-        <div><div><input type="text" autocomplete="off" data-role="datebox" data-options='{"mode":"durationflipbox","useInline":true,"hideInput":true,"overrideDurationOrder":["h","i"],"useSetButton":false}' id="durabox" class="tmp_durabox"></div></div>
+        <div><div><input type="text" autocomplete="off" data-role="datebox" data-options='{"mode":"timeflipbox","useInline":true,"hideInput":true,"useSetButton":false,"useHeader":true}' id="timebox_v"  class="tmp_timebox"></div></div>
+        <h6>§End time§</h6>
+<!--        <div><div><input type="text" autocomplete="off" data-role="datebox" data-options='{"mode":"durationflipbox","useInline":true,"hideInput":true,"overrideDurationOrder":["h","i"],"useSetButton":false}' id="durabox" class="tmp_durabox"></div></div>-->
+        <div><div><input type="text" autocomplete="off" data-role="datebox" data-options='{"mode":"timeflipbox","useInline":true,"hideInput":true,"useSetButton":false,"useHeader":true}' id="timebox_b"  class="tmp_timebox"></div></div>
         <a href="#" data-role="button" id="btn_time_ok">§Next§</a> 
         <a href="#" data-role="button" id="btn_cancel">§Cancel§</a> 
 	</div>

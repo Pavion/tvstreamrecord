@@ -783,7 +783,7 @@ def getepgday():
     except:
         pass
     rdate = request.forms.get("rdate")
-    sql = "SELECT substr(g_title,1,50), g_start, substr(g_desc, 1, 100), round((julianday(g_stop)-julianday(g_start))*24*60) FROM guide, guide_chan WHERE guide.g_id = guide_chan.g_id AND guide_chan.g_name='{0}' AND (date(g_start)=date('{1}') OR date(g_stop)=date('{1}')) AND datetime(guide.g_stop)>datetime('now', 'localtime') ORDER BY g_start".format(cname, rdate)
+    sql = "SELECT substr(g_title,1,50), g_start, substr(g_desc, 1, 100), g_stop FROM guide, guide_chan WHERE guide.g_id = guide_chan.g_id AND guide_chan.g_name='{0}' AND (date(g_start)=date('{1}') OR date(g_stop)=date('{1}')) AND datetime(guide.g_stop)>datetime('now', 'localtime') ORDER BY g_start".format(cname, rdate)
     rows=sqlRun(sql)
     if rows: 
         return json.dumps({"aaData": rows} )    

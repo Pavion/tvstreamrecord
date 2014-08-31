@@ -104,31 +104,36 @@ $(function() {
                 var data = data.aaData;
                 $("body").pagecontainer("change", "#epg");
                 $("#epglist").empty();
-                $("#epglist").append($('<li start="" dur=""><a href="#"><h2>' + $("#epglist").attr('skip') + ' EPG</h2></a></li>'));
+                $("#epglist").append($('<li start="" stop=""><a href="#"><h2>' + $("#epglist").attr('skip') + ' EPG</h2></a></li>'));
 
                 for (var i = 0; i < data.length; i++) {
                     if (data[i][0].length===50) data[i][0] += "...";
                     if (data[i][2].length===100) data[i][2] += "...";
-                    $("#epglist").append($('<li start="' + data[i][1].substr(11,5) + '" dur="' + data[i][3] + '"><a href="#"><h2>' + data[i][0] + '</h2><p>' + data[i][2] + '</p><p class="ui-li-aside"><strong>' + data[i][1].substr(11,5) + '</strong></p></a></li>'));
+                    $("#epglist").append($('<li start="' + data[i][1].substr(11,5) + '" stop="' + data[i][3].substr(11,5) + '"><a href="#"><h2>' + data[i][0] + '</h2><p>' + data[i][2] + '</p><p class="ui-li-aside"><strong>' + data[i][1].substr(11,5) + '</strong></p></a></li>'));
                 }
                 $("#epglist").listview().children().click(function() {
                     $("body").pagecontainer("change", "#time");
                     if ($(this).attr("start")=="") {
-                        $("#durabox").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
+                        $("#timebox_v").datebox("setTheDate",new Date((new Date()).getTime()));
+                        $("#timebox_b").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
+//                        $("#durabox").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
                     } else {
                         // Use EPG delta? Dunno...
-                        $("#timebox").datebox("setTheDate",new Date(1970,0,1,parseInt($(this).attr("start").substr(0,2)),parseInt($(this).attr("start").substr(3,2)),0,0) );
-                        $("#durabox").datebox("setTheDate",new Date((new Date()).getTime() + parseInt($(this).attr("dur"))*60*1000 ));
+                        $("#timebox_v").datebox("setTheDate",new Date(1970,0,1,parseInt($(this).attr("start").substr(0,2)),parseInt($(this).attr("start").substr(3,2)),0,0) );
+                        //$("#durabox").datebox("setTheDate",new Date((new Date()).getTime() + parseInt($(this).attr("dur"))*60*1000 ));
+                        $("#timebox_b").datebox("setTheDate",new Date(1970,0,1,parseInt($(this).attr("stop").substr(0,2)),parseInt($(this).attr("stop").substr(3,2)),0,0) );
+//                        $("#durabox_b").datebox("setTheDate",new Date((new Date()).getTime() + parseInt($(this).attr("dur"))*60*1000 ));
                         title = $(this).children('a').children('h2').text();
                         console.log(title);
                     }
                 });
                 $("#epglist").listview( "refresh" );
 
-
             } else {
                 $("body").pagecontainer("change", "#time");
-                $("#durabox").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
+                $("#timebox_v").datebox("setTheDate",new Date((new Date()).getTime()));
+                $("#timebox_b").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
+//                $("#durabox").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
             }
 
         },"json");
@@ -137,13 +142,15 @@ $(function() {
     // Time confirmation button
     $("#btn_time_ok").click(function(event) {
         event.preventDefault();
-        var rtime =  $("#timebox").datebox('getTheDate');
+        var time_v =  $("#timebox_v").datebox('getTheDate');
+        var time_b =  $("#timebox_b").datebox('getTheDate');
         //am = rday.getFullYear() + "-" + (rday.getMonth()+1) + "-" + rday.getDate();
-        var dtime = new Date(rday.getFullYear(), rday.getMonth(), rday.getDate(), rtime.getHours(), rtime.getMinutes(), 0, 0);
-        von = rtime.getHours() + ":" + rtime.getMinutes()
-        var dur = $("#durabox").datebox('getLastDur');
-        var dtime = new Date( dtime.getTime() + dur * 1000);
-        bis = dtime.getHours() + ":" + dtime.getMinutes()
+//        var dtime = new Date(rday.getFullYear(), rday.getMonth(), rday.getDate(), time_v.getHours(), time_v.getMinutes(), 0, 0);
+        von = time_v.getHours() + ":" + time_v.getMinutes()
+        bis = time_b.getHours() + ":" + time_b.getMinutes()
+//        var dur = $("#durabox").datebox('getLastDur');
+//        var dtime = new Date( dtime.getTime() + dur * 1000);
+//        bis = dtime.getHours() + ":" + dtime.getMinutes()
 
         $("body").pagecontainer("change", "#rname");
         if (title === "") {

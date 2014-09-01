@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>tvstreamrecord Mobile</title>
     <link rel="shortcut icon" href="images/favicon.ico?v=3" type="image/x-icon" /> 
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 	
     <script src="js/jquery-1.8.3.js"></script>
 	<script src="js/jquery.mobile-1.4.3.js"></script>

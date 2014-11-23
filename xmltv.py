@@ -76,7 +76,7 @@ def getProgList(ver=''):
         name = getFirst(innertxt, 'display-name')
         if typ == "nonametv":
             url = getFirst(innertxt, 'base-url')
-        elif typ[:4] == "TVxb":
+        elif typ[:4] == "TVxb" or typ[:5] == "TVH_W":
             pass
         else: 
             print ("Unknown XMLTV generator '%s', please contact me if it fails" % typ)
@@ -86,7 +86,7 @@ def getProgList(ver=''):
         if rows:
             timerows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (g_id))
             dtmax = datetime.now()
-            if typ[:4] == "TVxb":   # same file
+            if typ[:4] == "TVxb" or typ[:5] == "TVH_W":   # same file
                 channellist.append(g_id)
             else:               # separate files
                 lastdate = datetime.now()-timedelta(days=30)
@@ -107,7 +107,7 @@ def getProgList(ver=''):
             else:
                 sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))                       
 
-    if typ[:4] == "TVxb" and len(channellist)>0:   # same file
+    if (typ[:4] == "TVxb" or typ[:5] == "TVH_W") and len(channellist)>0:   # same file
         getProg(stri, channellist)
       
     del (stri)        
@@ -126,7 +126,7 @@ def getProg(strp, channellist=[]):
             desc = ""
             title = getFirst(innertxt, 'title')
             sub_title = getFirst(innertxt, 'sub-title')
-            if not "http://" in sub_title: # fix for corrupted XML data
+            if not "http://" in sub_title and len(sub_title)>0: # fix for corrupted XML data
                 if title != "": title = title + " - "
                 title = title + sub_title
             eplist = getFirst(innertxt, 'episode-num')

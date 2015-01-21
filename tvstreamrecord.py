@@ -24,6 +24,7 @@ from bottle import CherryPyServer
 from bottle import route, run, template, post, request, response
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
+from timezone import tDiff
 from time import sleep
 import subprocess
 import config
@@ -53,7 +54,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '1.0.1'
+version = '1.0.2'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -74,6 +75,9 @@ def write_m3u(name, path):
 @route('/channels.m3u')
 def server_static8():
     return static_file("/channels.m3u", root='')
+@route('/settings.db')
+def server_static8():
+    return static_file("/settings.db", root='', download="settings.db")
 # Languages
 @route('/lang/<filename>')
 def server_static10(filename):
@@ -501,7 +505,7 @@ class epggrabthread(Thread):
                 mydatetime = datetime.combine(datetime.now().date(), mytime)
                 if mydatetime < datetime.now():
                     mydatetime = mydatetime + timedelta(days=1)
-                td = mydatetime-datetime.now()
+                td = tDiff(mydatetime,datetime.now())
                 deltas = total(td)
                 self.timer = Timer(deltas, self.doGrab)
                 self.timer.start()
@@ -899,7 +903,7 @@ class record(Thread):
                 sqlRun("UPDATE records SET rvon='%s', rbis='%s' WHERE rowid=%d" % (datetime.strftime(self.von,"%Y-%m-%d %H:%M:%S"), datetime.strftime(self.bis,"%Y-%m-%d %H:%M:%S"), self.id ) )
 
     def run(self):
-        td = self.von-datetime.now()
+        td = tDiff(self.von,datetime.now())
         deltas = total(td)
         self.timer = Timer(deltas, self.doRecord)
         self.timer.start()
@@ -921,7 +925,7 @@ class record(Thread):
         ffargs = config.cfg_ffmpeg_params
         ffargs = ffargs.split()
         if streamtype in fftypes:
-            delta = total(self.bis - datetime.now())
+            delta = total(tDiff(self.bis, datetime.now()))
             deltasec = '%d' % delta
             attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'fatal', '-t', deltasec] + ffargs + [fn]
             print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
@@ -959,7 +963,7 @@ class record(Thread):
                     f.write(mybuffer)
                 f.close()
                 print ("Record: '%s' ended" % (self.name))
-                if self in records: records.remove(self)
+        if self in records: records.remove(self)
         if self.mask > 0:
             rectimer = Timer(5, setRecords)
             rectimer.start()

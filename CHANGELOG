@@ -1,3 +1,6 @@
+2014-01-21 1.0.2 Fix for daylight saving time (#9)
+                 Recurrent fix & retry on failed ffmpeg records (#10)
+                 
 2014-11-23 1.0.1 XMLTV generator 'TVH_W' supported
 
 2014-09-01 1.0.0 Mobile version for record management 

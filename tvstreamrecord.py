@@ -964,9 +964,12 @@ class record(Thread):
                 f.close()
                 print ("Record: '%s' ended" % (self.name))
         if self in records: records.remove(self)
-        if self.mask > 0:
-            rectimer = Timer(5, setRecords)
-            rectimer.start()
+        # 2015-01-21 Fail & recurrency check       
+        if datetime.now() < self.bis - timedelta(seconds=10) and self.stopflag==0:
+            print ("Something went wrong with '%s', retry in 10 seconds" % (self.name))
+
+        rectimer = Timer(10, setRecords)
+        rectimer.start()
 
     def stop(self):
         if self.running==0:

@@ -54,7 +54,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '1.0.2'
+version = '1.0.3'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -925,15 +925,18 @@ class record(Thread):
         ffargs = config.cfg_ffmpeg_params
         ffargs = ffargs.split()
         if streamtype in fftypes:
-            delta = total(tDiff(self.bis, datetime.now()))
+            delta = total(tDiff(self.bis, datetime.now())) 
             deltasec = '%d' % delta
             attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'fatal', '-t', deltasec] + ffargs + [fn]
             print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
             print (attr)
             try:
                 self.process = subprocess.Popen(attr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                cleaner = Timer(delta+30, self.cleanProcess) # if ffmpeg won't exit, try to terminate its process in 30 seconds
+                cleaner.start()
                 out, err = self.process.communicate()
-                self.process.wait()
+                self.process.wait() # oops... not needed? harmless!
+                cleaner.cancel()
                 if err:
                     print ("FFMPEG record '%s' ended with an error:\n%s" % (self.name, err))
                 else:
@@ -980,6 +983,13 @@ class record(Thread):
                 self.process.terminate()
         if self in records: records.remove(self)
         print ("Record: Stopflag for '%s' received" % (self.name))
+
+    def cleanProcess(self):
+        try:
+            self.process.terminate()
+        except:
+            pass
+        print ("FFMPEG Record '%s' had to be interrupted." % self.name)
 
 def setRecords():
     rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")

@@ -1,3 +1,5 @@
+2014-02-04 1.0.3 Fix for FFMPEG not responding
+                 
 2014-01-21 1.0.2 Fix for daylight saving time (#9)
                  Recurrent fix & retry on failed ffmpeg records (#10)
                  

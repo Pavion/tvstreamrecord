@@ -986,10 +986,18 @@ class record(Thread):
 
     def cleanProcess(self):
         try:
-            self.process.terminate()
+            if not self.process==None:
+                self.process.terminate()                
+            sleep(3)
+            if not self.process==None:
+                self.process.kill()
+                print ("FFMPEG Record '%s' had to be killed. R.I.P." % self.name)
+            else:
+                print ("FFMPEG Record '%s' had to be terminated." % self.name)
         except:
-            pass
-        print ("FFMPEG Record '%s' had to be interrupted." % self.name)
+            print ("FFMPEG Record '%s' termination error, process might be running" % self.name)
+        if not self.process==None:
+            print ("FFMPEG Record '%s': termination failed" % self.name)
 
 def setRecords():
     rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")

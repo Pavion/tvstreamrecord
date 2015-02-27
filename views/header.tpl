@@ -23,6 +23,7 @@
 %end
 	<script type="text/javascript" src="js/jqueryFileTree.js"></script>
 	<script type="text/javascript" src="js/tvstreamrecord.basic.js"></script>
+	<script type="text/javascript" src="js/preloader.js"></script>
 </head><BODY>
 <div id="datepicker_local" style="display: none;"></div>
 <div id="timepicker_local" style="display: none;"></div>
@@ -31,6 +32,7 @@
 <div id="logo">
 	<a href="http://pavion.github.io/tvstreamrecord/"><img src="images/tvstreamrecordlogo.png"></a> 
 </div>
+    <div id="loaderImage"></div>
 <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
   <ul id="mainmenu" class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
     <a id="mobipic" title="tvstreamrecord Mobile" class="ui-tabs-anchor" href="/mobile"><img src="images/iphone-control-panel-px-png.png">

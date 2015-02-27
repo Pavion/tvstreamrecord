@@ -220,3 +220,10 @@ div#users-contain table td, div#users-contain table th { border: 1px solid #eee;
     padding-top: 0.1em;
     padding-bottom: 0.22em;*/
 }
+
+#loaderImage {
+    margin-left: 50%;
+    margin-top: 20%;
+    position: absolute;
+    z-index: 999;
+}

@@ -248,6 +248,10 @@ function initSwitch() {
 }
 
 function post(dest1, data1, rel) {
+    if(rel==1) {
+        $("html").fadeTo("fast", 0.4);
+        new imageLoader(cImageSrc, 'startAnimation()');
+    }
     $.ajax({
         type: "POST",
         url: dest1,
@@ -310,7 +314,7 @@ function getEpgState() {
     );
 }
 
-$(function() {
+$(function() {           
     $(document).tooltip();
 
 // Localization    

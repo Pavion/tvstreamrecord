@@ -64,6 +64,14 @@ def getList(stri, attr):
         yield((att, txt))
         p1 = stri.find('<'+attr, p3)   
 
+def checkType(typ):
+    if typ == "nonametv": # separate files
+        return 1
+    elif typ[:4] == "TVxb" or typ[:5] == "TVH_W" or typ=="SS": # same file
+        return 2
+    else: 
+        return 0
+
 def getProgList(ver=''):
     print ("tvstreamrecord v.%s / XMLTV import started" % ver)
     stri = getFile(config.cfg_xmltvinitpath, 1, ver)
@@ -74,9 +82,9 @@ def getProgList(ver=''):
     for attr,innertxt in getList(stri, "channel"):
         g_id = getAttr(attr, "id")
         name = getFirst(innertxt, 'display-name')
-        if typ == "nonametv":
+        if checkType(typ) == 1:
             url = getFirst(innertxt, 'base-url')
-        elif typ[:4] == "TVxb" or typ[:5] == "TVH_W":
+        elif checkType(typ) == 2:
             pass
         else: 
             print ("Unknown XMLTV generator '%s', please contact me if it fails" % typ)
@@ -86,9 +94,9 @@ def getProgList(ver=''):
         if rows:
             timerows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (g_id))
             dtmax = datetime.now()
-            if typ[:4] == "TVxb" or typ[:5] == "TVH_W":   # same file
+            if checkType(typ) == 2:
                 channellist.append(g_id)
-            else:               # separate files
+            else:
                 lastdate = datetime.now()-timedelta(days=30)
                 if timerows:
                     lastdate = datetime.strptime(timerows[0][0], "%Y-%m-%d %H:%M:%S")
@@ -107,7 +115,7 @@ def getProgList(ver=''):
             else:
                 sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))                       
 
-    if (typ[:4] == "TVxb" or typ[:5] == "TVH_W") and len(channellist)>0:   # same file
+    if (checkType(typ)==2) and len(channellist)>0:
         getProg(stri, channellist)
       
     del (stri)        
@@ -174,9 +182,12 @@ def getFile(file_in, override=0, ver=""):
         if rows and lastmod and etag:
             sqlRun("UPDATE caching SET crTime=datetime('now', 'localtime'), Last_Modified=?, ETag=? WHERE url='%s'" % file_in, (lastmod, etag))
         elif lastmod and etag:
-            sqlRun("INSERT INTO caching VALUES (datetime('now', 'localtime'), ?, ?, ?)", (file_in, lastmod, etag))        
-        d = zlib.decompressobj(16+zlib.MAX_WBITS)
-        out = d.decompress(feeddata)
+            sqlRun("INSERT INTO caching VALUES (datetime('now', 'localtime'), ?, ?, ?)", (file_in, lastmod, etag))
+        if file_in[-3] == ".gz":
+            d = zlib.decompressobj(16+zlib.MAX_WBITS)
+            out = d.decompress(feeddata)
+        else:
+            out = feeddata
         print ("XMLTV: reading URL %s with %s bytes" % (file_in, len(out)))
         if not b"</tv>" in out[-1000:]:
             print ("Possibly corrupted XML file, attempting to repair...")
@@ -188,7 +199,6 @@ def getFile(file_in, override=0, ver=""):
                 if pos != -1:
                     out = out[:pos+10]  + b"</tv>" 
     except Exception as ex:
-        #print (ex)
         print ("XMLTV: no new data, try again later (%s)" % file_in)
         pass
 

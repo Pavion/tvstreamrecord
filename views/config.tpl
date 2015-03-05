@@ -66,6 +66,7 @@
 <tr><td>§Lenghten an EPG-record (delta before and after), [minutes]§</td><td><input id="cfg_delta_for_epg" /></td></tr>
 <tr><td>§Enable XMLTV import§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_xmltv_auto" /></td></tr>
 <tr><td>§Initial path for an XMLTV import§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_xmltvinitpath" value="" autocomplete="off" /></td></tr>
+<tr><td>§Time shift for XMLTV data (in hours)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_xmltvtimeshift" value="" autocomplete="off" /></td></tr>
 <tr><td>§Enable stream scan/grab§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_grab_auto" /></td></tr>
 <tr><td>§Maximal EPG scan duration per channel, [seconds] (default: '60')§</td><td><input id="cfg_grab_max_duration" /></td></tr>
 <tr><td>§Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)§</td><td><input type="text" maxlength="5" id="cfg_grab_time" class="text ui-widget-content ui-corner-all" alert="§Invalid grab time, please check your settings§"/></td></tr>

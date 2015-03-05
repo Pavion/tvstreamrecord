@@ -37,6 +37,7 @@
     "Lenghten an EPG-record (delta before and after), [minutes]": "Продлевать EPG записи на (до и после) [мин.])",
     "Enable XMLTV import": "Включить XMLTV-импорт",
     "Initial path for an XMLTV import": "Адрес для XMLTV-импорта",
+    "Time shift for XMLTV data (in hours)": "Сдвиг пво времени данных XMLTV (в часах)",
     "Enable stream scan/grab": "Включить импорт из потокового видео",
     "Maximal EPG scan duration per channel, [seconds] (default: '60')": "Максимальная длительность импортирования одного канала [сек.] (по умолчанию '60')",
     "Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)": "Время для ежедневного импорта из выбранных источников (формат hh:mm, 24 часа, по умолчанию '0' для ручного импорта)",

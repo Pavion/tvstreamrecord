@@ -989,10 +989,14 @@ $(function() {
             toggledOn: function() {
                 $("#cfg_xmltvinitpath").removeAttr("disabled");
                 $("#cfg_xmltvinitpath").removeClass("ui-state-disabled");
+                $("#cfg_xmltvtimeshift").removeAttr("disabled");
+                $("#cfg_xmltvtimeshift").removeClass("ui-state-disabled");            
             },
             toggledOff: function() {
                 $("#cfg_xmltvinitpath").prop("disabled", "true");
                 $("#cfg_xmltvinitpath").addClass("ui-state-disabled");
+                $("#cfg_xmltvtimeshift").prop("disabled", "true");
+                $("#cfg_xmltvtimeshift").addClass("ui-state-disabled");
             }
         });
     	$("#cfg_switch_grab_auto").slickswitch({

@@ -123,12 +123,18 @@ def getProgList(ver=''):
     return
   
 
-def getProg(strp, channellist=[]):    
+def getProg(strp, channellist=[]):
+    deltaxmltv_txt = config.cfg_xmltvtimeshift
+    try:
+        deltaxmltv = timedelta(hours=float(config.cfg_xmltvtimeshift))
+    except:
+        deltaxmltv = timedelta(hours=0)
+    
     sqllist = []
     
     for attr,innertxt in getList(strp, 'programme'):    
-        dt1 = datetime.strptime(getAttr(attr, "start")[0:14],"%Y%m%d%H%M%S")        
-        dt2 = datetime.strptime(getAttr(attr, "stop")[0:14],"%Y%m%d%H%M%S")        
+        dt1 = datetime.strptime(getAttr(attr, "start")[0:14],"%Y%m%d%H%M%S") + deltaxmltv
+        dt2 = datetime.strptime(getAttr(attr, "stop")[0:14],"%Y%m%d%H%M%S") + deltaxmltv
         p_id = getAttr(attr, "channel")
         if len(channellist)==0 or p_id in channellist:
             desc = ""

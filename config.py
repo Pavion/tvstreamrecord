@@ -144,6 +144,12 @@ configuration = [
 'cfg_record_mask',
 "Record name mask",
 '%date% - %title%'
+],
+
+[
+'cfg_xmltvtimeshift',
+'Time shift for XMLTV data (in hours)',
+'0'
 ]
 
 ]

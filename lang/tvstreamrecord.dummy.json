@@ -37,6 +37,7 @@
     "Lenghten an EPG-record (delta before and after), [minutes]": "",
     "Enable XMLTV import": "",
     "Initial path for an XMLTV import": "",
+    "Time shift for XMLTV data (in hours)": "",
     "Enable stream scan/grab": "",
     "Maximal EPG scan duration per channel, [seconds] (default: '60')": "",
     "Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)": "",

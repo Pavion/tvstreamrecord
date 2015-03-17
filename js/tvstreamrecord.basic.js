@@ -823,7 +823,7 @@ $(function() {
         });
         $( "#datepicker_epg" ).val( localDate( $( "#datepicker_epg" ).attr("dbvalue") ) );
         
-        $( "[id^=event]" ).each(function(i) {
+        $( "[id^=event], [id=divider]" ).each(function(i) {
             w = +$(this).attr('width');
             x = +$(this).attr('x');
             cnt = +$(this).attr('cnt');
@@ -866,18 +866,34 @@ $(function() {
                 }
                 $("#mybody").css("height", (maxcnt * 100 + 200) +"px");
                 $("[id=channelgroup]").each(function(i) { $(this).css("clear", "left"); });
+                $("[id=channelgroup][cnt=0]").css({"margin-top": "0px"}); 
+                $("[id=channelgroup][cnt=0],#dividegroup").css({"width": ($("body").width()-42) + "px"}); // bad solution
+                $("[id^=divider]").css("height", (maxcnt * 100) +"px");
+                $("[id^=divider]").css("border-right-width", "1px");
+
+                $(window).scroll(function() {epg_zoom_hor();}).resize(function() {epg_zoom_hor();});
             } else {
-                $("[id=channelgroup]").each(function(i) {
+                $("[id=channelgroup],#dividegroup").each(function(i) {
                     $(this).css("float", "left");
                     $(this).css("height", (-zoom*800)+"px");
                 });
-    //            $("#tabs").css("width", (250*maxcnt+100)+"px");
                 if (250*maxcnt+100<1200) {
                     $("body").css("width", "100%");
                 } else {
                     $("body").css("width", (250*maxcnt+100)+"px");
                 }
                 $("#mybody").css("height", (-zoom*800+200)+"px");
+
+                $("#dividegroup").css("margin-top", "20px");
+                $("[id^=divider]").css("width", $("#mybody").width());
+                $("[id^=divider]").css("border-bottom-width", "1px");
+                $("[id^=divider]").css("box-sizing", "border-box");
+                $("[id^=epg_cname]").css("margin-top", "0px");
+                $("[id^=epg_cname]").addClass("ui-widget-header");
+                $("[id^=epg_cname]").css("box-sizing", "border-box");
+                
+                $(window).scroll(function() {epg_zoom_vert();}).resize(function() {epg_zoom_vert();});
+
             }
         }
 
@@ -1196,3 +1212,24 @@ $(function() {
     }
     
 });
+
+function epg_zoom_hor() {
+    if ($(window).scrollTop()>140) {
+        $("[id=channelgroup][cnt=0]").css({"margin-top": ($(window).scrollTop()) -140 + "px"});
+    } else {
+        $("[id=channelgroup][cnt=0]").css({"margin-top": "0px"});
+    }
+    $("[id=channelgroup][cnt=0],#dividegroup").css({"width": ($("body").width()-42) + "px"});
+    $("[id=epg_cname]").css({"margin-left": ($(window).scrollLeft()) }); 
+}
+
+function epg_zoom_vert() {
+    $("[id=channelgroup][cnt=0]").css({"margin-left": ($(window).scrollLeft()) + "px"});
+    $("#dividegroup").css({"height": ($("[id=channelgroup][cnt=0]").height()) + "px"});
+    $("[id^=divider]").css("width", $("#mybody").width());
+    if ($(window).scrollTop()>140) {
+        $("[id=epg_cname]").css({"margin-top": ($(window).scrollTop()) - 140 + "px" }); 
+    } else {
+        $("[id=epg_cname]").css({"margin-top": "0px"});
+    }
+}

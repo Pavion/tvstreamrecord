@@ -13,17 +13,29 @@
 %for rows in rowss:
     %if len(rows)>0:
         %if rows[0][0] == -1:
-<div id="epg_cname" cnt="{{cnt}}">
+<div>
         %else:
 <div id="epg_cname" cnt="{{cnt}}">
-    <div><b><a href="live/{{rows[0][0]}}.m3u">{{rows[0][8]}}</a></b>
+    <div id="epg_cname_child"><b><a href="live/{{rows[0][0]}}.m3u">{{rows[0][8]}}</a></b>
         <label title="Disable channel" id="iconsDisable-{{rows[0][0]}}" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-close"></span></label>
     </div>
         %end
 </div>
-<div id="channelgroup">
+        %if cnt==0:
+<div id="dividegroup">
+            %for row in rows:
+    <div id="divider" x="{{row[1]}}" width="{{row[2]}}"></div>
+            %end
+</div>
+        %end
+
+<div id="channelgroup" cnt="{{cnt}}">
         %for row in rows:
+            %if cnt==0:
+    <div class="ui-widget-header" id="event" cnt="{{cnt}}" cid="{{row[0]}}" x="{{row[1]}}" width="{{row[2]}}" at="{{row[4]}}" till="{{row[5]}}" fulltext="{{row[6]}}" rid="{{row[7]}}" recording="{{row[9]}}">{{row[3]}}</div>
+            %else:
     <div class="ui-state-default" id="event" cnt="{{cnt}}" cid="{{row[0]}}" x="{{row[1]}}" width="{{row[2]}}" at="{{row[4]}}" till="{{row[5]}}" fulltext="{{row[6]}}" rid="{{row[7]}}" recording="{{row[9]}}">{{row[3]}}</div>
+            %end
         %end
 </div>
         %cnt=cnt+1

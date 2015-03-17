@@ -1,19 +1,25 @@
-2014-02-27 1.0.5 Release version                 
-                 
+2014-03-17 1.0.7 EPG chart visual enhancements:
+                 Floating channel names and times, grid lines
+
+2014-03-05 1.0.6 Minor enhancements
+                 XMLTV time offset added
+
+2014-02-27 1.0.5 Release version
+
 2014-02-17 1.0.4 Fix for FFMPEG not responding part two
-                 
+
 2014-02-04 1.0.3 Fix for FFMPEG not responding
-                 
+
 2014-01-21 1.0.2 Fix for daylight saving time (#9)
                  Recurrent fix & retry on failed ffmpeg records (#10)
-                 
+
 2014-11-23 1.0.1 XMLTV generator 'TVH_W' supported
 
-2014-09-01 1.0.0 Mobile version for record management 
+2014-09-01 1.0.0 Mobile version for record management
                  Auto redirect for iOS and Android Mobile
                  Full Python 2.6.6/2.7/3 support
                  Better unicode support
-                 Enhanced performance and memory usage for XMLTV                 
+                 Enhanced performance and memory usage for XMLTV
                  Refactoring and cleaning up
                  Bug fixes
 
@@ -21,9 +27,9 @@
                  Browsing for target folder selection added
                  Record name mask added
                  New manual and About page
- 
+
 2014-04-06 0.6.3 Recurrent records hotfix
- 
+
 2014-03-27 0.6.2 UI redesign and theme roller
                  Added english, german and russian translations (excl. About page)
                  jQuery date/time locale support also for other countries
@@ -52,7 +58,7 @@
 2013-12-10 0.5.4 EPG removal bug fixed
 
 2013-11-20 0.5.3 EPG view is now configurable. Please check the 'Config' page for this option
-                 EPG grab can now be switched directly 
+                 EPG grab can now be switched directly
                  Records can also be created at the channel page
                  New view 'EPG list' has been added
 
@@ -61,19 +67,19 @@
                  Automatic timed EPG grab (see config)
                  Stream link at every page to use with video players and browser plugins
                  Several bug fixes
-                 Debug buttons moved to config page 
+                 Debug buttons moved to config page
 
 2013-08-19 0.5.1 EPG grabbing beta
 
 2013-08-19 0.5.0 Channel editing and moving added
                  Channel list can now be exported and saved
                  Record editing added
-                 Disabling/deleting channels also disable/delete all their records 
+                 Disabling/deleting channels also disable/delete all their records
                  Several bug fixes & dialog optimisation
 
 2013-05-27 0.4.8 URL length fixed / increased to 255
 
-2013-03-07 0.4.7 Recurrent FFMPEG records added/fixed 
+2013-03-07 0.4.7 Recurrent FFMPEG records added/fixed
 
 2013-02-19 0.4.6 Stream types, which should be forwarded to ffmpeg, are now configurable
                  ffmpeg output attributes now changeable
@@ -82,16 +88,16 @@
 2013-02-13 0.4.5 Channel file extension added
                  Experimental ffmpeg support for rtmp streams
                  Python check removed, support for other Pythons added
-                 EPG check for new added channels can be called anytime and has a running check  
+                 EPG check for new added channels can be called anytime and has a running check
 
 2013-02-06 0.4.4 Recurrent records are now available
 
 2013-02-06 0.4.3 About page and Wiki added, recorded file extension fixed and now configurable
-                 Default sorting column for all tables implemented                 
+                 Default sorting column for all tables implemented
                  Old records will be shown and must be purged manually
-                 
+
 2013-02-04 0.4.3 CherryPy Server implemented for better stability under load
- 
+
 2013-02-03 0.4.2a Syno-branch only: broken update script fixed. Sorry for inconvenience.
 
 2013-02-03 0.4.2 Logging, license information, further optimisation

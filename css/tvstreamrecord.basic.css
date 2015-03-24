@@ -141,7 +141,7 @@ label#append {float: left; margin-top: 3px;}
 
 [id="channelgroup"][cnt="0"] {
     position: absolute !important; 
-    z-index: 999;
+    z-index: 5;
 }
 
 #dividegroup {
@@ -169,6 +169,21 @@ label#append {float: left; margin-top: 3px;}
     float:left; 
     margin-left: 5px; 
     margin-right: 5px;
+    z-index: 7;
+    position: relative;
+}
+
+#date_prev, #date_next {
+    float: left;
+    height: 27px;
+}
+#date_prev {
+    margin-left: 5px;    
+    margin-right: -5px;    
+}
+#date_next {
+    margin-left: -5px;    
+    margin-right: 5px;    
 }
 
 #label_epg_1, #label_epg_2 { 

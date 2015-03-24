@@ -20,6 +20,17 @@
  */
 
 /**
+ * @param {int} days Number of days to be added to this date object
+ * @returns {Date|Date.prototype.addDays.dat}
+ */
+Date.prototype.addDays = function(days)
+{
+    var dat = new Date(this.valueOf());
+    dat.setDate(dat.getDate() + days);
+    return dat;
+};
+
+/**
  * String function substitute 
  */
 if(typeof String.prototype.trim !== 'function') {
@@ -812,6 +823,13 @@ $(function() {
         var zoom = +$("#zoom").attr('zoom');
         if (zoom==0) zoom=1;
         var maxcnt=0;
+
+        $( "#date_prev, #date_next" )
+            .button()
+            .click(function(event ) {                
+                post("epg", { datepicker_epg: $.datepicker.formatDate("yy-mm-dd", $( "#datepicker_epg" ).datepicker( "getDate" ).addDays( $(this).is( $( "#date_prev" ) )?-1:1 ) ) }, 1);
+                event.preventDefault();
+            });
 
         $( "#datepicker_epg" ).datepicker({
             constrainInput: true,

@@ -1,16 +1,19 @@
-2014-03-17 1.0.7 EPG chart visual enhancements:
+2015-xx-xx 1.0.8 EPG Chart date buttons
+                 Minor fixes
+
+2015-03-17 1.0.7 EPG chart visual enhancements:
                  Floating channel names and times, grid lines
 
-2014-03-05 1.0.6 Minor enhancements
+2015-03-05 1.0.6 Minor enhancements
                  XMLTV time offset added
 
-2014-02-27 1.0.5 Release version
+2015-02-27 1.0.5 Release version
 
-2014-02-17 1.0.4 Fix for FFMPEG not responding part two
+2015-02-17 1.0.4 Fix for FFMPEG not responding part two
 
-2014-02-04 1.0.3 Fix for FFMPEG not responding
+2015-02-04 1.0.3 Fix for FFMPEG not responding
 
-2014-01-21 1.0.2 Fix for daylight saving time (#9)
+2015-01-21 1.0.2 Fix for daylight saving time (#9)
                  Recurrent fix & retry on failed ffmpeg records (#10)
 
 2014-11-23 1.0.1 XMLTV generator 'TVH_W' supported

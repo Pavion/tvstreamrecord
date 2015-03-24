@@ -2,7 +2,9 @@
 <div id="users-contain" class="ui-widget">
     <h1>
         <div id="label_epg_1">§Electronic Program Guide§. §Current date§:</div>
+        <button id="date_prev"><</button>
         <input type="text" maxlength="10" id="datepicker_epg" class="text ui-widget-content ui-corner-all" name="datepicker_epg" dbvalue="{{curr}}"/> 
+        <button id="date_next">></button>
         <div id="label_epg_2">§Keyword§:</div>
         <input type="text" maxlength="50" id="searchepg" class="text ui-widget-content ui-corner-all" name="searchepg" value=""/> 
         <button id="searchepgbutton">§Highlight§</button>

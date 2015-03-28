@@ -43,14 +43,30 @@ def getAttr(stri, attr):
     return ret
 
 def getFirst(stri, attr):
+    ret,pos = getOne(stri, attr)
+    return ret
+
+def getOne(stri, attr, start=0):
     ret = ""
-    p1 = stri.find('<'+attr) 
+    p1 = stri.find('<'+attr, start) 
+    p3 = 0
     if p1 != -1:
         p1 = p1 + len(attr) + 1
         p2 = stri.find('>', p1) + 1 
         p3 = stri.find('</'+attr, p2) 
         ret = stri[p2:p3].strip()
-    return ret
+    return ret, p3+len(attr)+3
+
+def getAll(stri, attr):
+    retlist = []
+    p3 = 0
+    while p3<len(stri):
+        ret, p3 = getOne(stri, attr, p3)        
+        if ret == "":
+            break
+        else:
+            retlist.append(ret)
+    return retlist    
 
 def getList(stri, attr):
 #    treelist = list()
@@ -67,7 +83,7 @@ def getList(stri, attr):
 def checkType(typ):
     if typ == "nonametv": # separate files
         return 1
-    elif typ[:4] == "TVxb" or typ[:5] == "TVH_W" or typ=="SS": # same file
+    elif typ[:4] == "TVxb" or typ[:5] == "TVH_W" or typ=="SS" or typ=="mc2xml" or typ=="dummy": # same file
         return 2
     else: 
         return 0
@@ -75,49 +91,53 @@ def checkType(typ):
 def getProgList(ver=''):
     print ("tvstreamrecord v.%s / XMLTV import started" % ver)
     stri = getFile(config.cfg_xmltvinitpath, 1, ver)
+    #stri = getTestFile()
     
     channellist = []        
     typ = getAttr(stri[:200], "generator-info-name")
     
     for attr,innertxt in getList(stri, "channel"):
         g_id = getAttr(attr, "id")
-        name = getFirst(innertxt, 'display-name')
+        names = getAll(innertxt, 'display-name')
         if checkType(typ) == 1:
             url = getFirst(innertxt, 'base-url')
         elif checkType(typ) == 2:
             pass
         else: 
             print ("Unknown XMLTV generator '%s', please contact me if it fails" % typ)
-            url = getFirst(innertxt, 'base-url')
+            typ = "dummy" # override for unknown types
+            #url = getFirst(innertxt, 'base-url')
                 
-        rows=sqlRun("SELECT cname from channels WHERE cname = '%s' and cenabled=1 GROUP BY cname" % name)
-        if rows:
-            timerows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (g_id))
-            dtmax = datetime.now()
-            if checkType(typ) == 2:
-                channellist.append(g_id)
-            else:
-                lastdate = datetime.now()-timedelta(days=30)
-                if timerows:
-                    lastdate = datetime.strptime(timerows[0][0], "%Y-%m-%d %H:%M:%S")
-                dtmax = datetime.min
-                
-                for t_attr, dttext in getList(innertxt, "datafor"):
-                    dtepg  = datetime.strptime(dttext, "%Y-%m-%d")
-                    dt = datetime.strptime(getAttr(t_attr, "lastmodified")[0:14],"%Y%m%d%H%M%S")
-                    if dt>lastdate and dtepg>=datetime.now()-timedelta(days=1):
-                        source = url+g_id+"_"+dttext+".xml.gz"
-                        getProg(getFile(source,0,ver))
-                    if dt>dtmax:
-                        dtmax = dt
-            if not timerows:
-                sqlRun("INSERT OR IGNORE INTO guide_chan VALUES (?, ?, ?)", (g_id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
-            else:
-                sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))                       
+        for name in names: 
+            rows=sqlRun("SELECT cname from channels WHERE cname = '%s' and cenabled=1 GROUP BY cname" % name)
+            if rows:
+                timerows=sqlRun("SELECT g_lasttime FROM guide_chan WHERE g_id='%s'" % (g_id))
+                dtmax = datetime.now()
+                if checkType(typ) == 2:
+                    channellist.append(g_id)
+                else:
+                    lastdate = datetime.now()-timedelta(days=30)
+                    if timerows:
+                        lastdate = datetime.strptime(timerows[0][0], "%Y-%m-%d %H:%M:%S")
+                    dtmax = datetime.min
+
+                    for t_attr, dttext in getList(innertxt, "datafor"):
+                        dtepg  = datetime.strptime(dttext, "%Y-%m-%d")
+                        dt = datetime.strptime(getAttr(t_attr, "lastmodified")[0:14],"%Y%m%d%H%M%S")
+                        if dt>lastdate and dtepg>=datetime.now()-timedelta(days=1):
+                            source = url+g_id+"_"+dttext+".xml.gz"
+                            getProg(getFile(source,0,ver))
+                        if dt>dtmax:
+                            dtmax = dt
+                if not timerows:
+                    sqlRun("INSERT OR IGNORE INTO guide_chan VALUES (?, ?, ?)", (g_id, name, datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S") ))
+                else:
+                    sqlRun("UPDATE guide_chan SET g_lasttime=? WHERE g_id=?", (datetime.strftime(dtmax, "%Y-%m-%d %H:%M:%S"), g_id))
+                break
 
     if (checkType(typ)==2) and len(channellist)>0:
         getProg(stri, channellist)
-      
+
     del (stri)        
     print ("XMLTV import completed")
     return
@@ -152,11 +172,11 @@ def getProg(strp, channellist=[]):
             desc = desc + tmpdesc 
             sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
     sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
-
+#    print(len(sqllist))
     return    
         
 def getTestFile():
-    with open('e.xml', 'r') as content_file:
+    with open('d:/xmltv.xml', 'r') as content_file:
         stri = content_file.read()
     try:
         stri = stri.decode("UTF-8")

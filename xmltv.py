@@ -209,10 +209,10 @@ def getFile(file_in, override=0, ver=""):
             sqlRun("UPDATE caching SET crTime=datetime('now', 'localtime'), Last_Modified=?, ETag=? WHERE url='%s'" % file_in, (lastmod, etag))
         elif lastmod and etag:
             sqlRun("INSERT INTO caching VALUES (datetime('now', 'localtime'), ?, ?, ?)", (file_in, lastmod, etag))
-        if file_in[-3:] == ".gz":
+        try:
             d = zlib.decompressobj(16+zlib.MAX_WBITS)
             out = d.decompress(feeddata)
-        else:
+        except:
             out = feeddata
         print ("XMLTV: reading URL %s with %s bytes" % (file_in, len(out)))
         if not b"</tv>" in out[-1000:]:

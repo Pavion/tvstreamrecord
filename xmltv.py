@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 
 from datetime import datetime, timedelta
+from time import sleep
 try:
     import httplib
     import urllib2 as urllib32
@@ -193,14 +194,19 @@ def getFile(file_in, override=0, ver=""):
         lastmod = rows[0][2]
         etag = rows[0][3]
     try:
-        httplib.HTTPConnection.debuglevel = 0                            
+        httplib.HTTPConnection.debuglevel = 0
         request = urllib32.Request(file_in)
         request.add_header('User-Agent', 'tvstreamrecord/' + ver)
         if override==0:
             request.add_header('If-Modified-Since', lastmod)
             request.add_header('If-None-Match', etag)                
         opener = urllib32.build_opener()
-        hresponse = opener.open(request)
+        try:
+            hresponse = opener.open(request, timeout=10)
+        except: 
+            print ("XMLTV Warning: connection timeout detected, retry in 5 seconds")
+            sleep (5)
+            hresponse = opener.open(request, timeout=20)            
         feeddata = hresponse.read()
         hr = hresponse.info()        
         lastmod = hr.get('Last-Modified')

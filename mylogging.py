@@ -53,7 +53,7 @@ class Logger(object):
             self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + self.typ + " " + mylines + "\n")
 #        except Exception as ex:
 #            pass
-           
+
     def flush(self):
         pass
 

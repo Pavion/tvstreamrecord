@@ -44,9 +44,9 @@ import hashlib
 import codecs
 
 def total(timedelta):
-    try: 
+    try:
         return timedelta.total_seconds()
-    except: 
+    except:
         return (timedelta.microseconds + (timedelta.seconds + timedelta.days * 24 * 3600) * 10**6) / 10**6
 
 records = []
@@ -54,11 +54,11 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '1.0.8'
+version = '1.0.9'
 
 @route('/live/<filename>')
 def server_static9(filename):
-    rows = sqlRun("SELECT * FROM channels WHERE cid=%s" % filename.split(".")[0])
+    rows = sqlRun("SELECT * FROM channels WHERE cid=?", (filename.split(".")[0], ))
     if rows:
         write_m3u(rows[0][0], rows[0][1])
     else:
@@ -207,7 +207,7 @@ def internationalize(templ,noheader=False):
 
 def fileexists(file):
     try:
-        return os.path.isfile(file) 
+        return os.path.isfile(file)
     except Exception as ex:
         return os.path.isfile(file.encode('utf-8').decode(sys.getfilesystemencoding()))
 
@@ -215,10 +215,10 @@ def fileexists(file):
 
 @route('/')
 @route('/login')
-def root_s():    
+def root_s():
     agent = request.headers.get('User-Agent')
     if ("Android" in agent and "Mobile" in agent) or "berry" in agent or "Symbian" in agent or "Nokia" in agent or "iPhone" in agent:
-        count = sqlRun("select count(cid) from channels where cenabled=1")[0][0]        
+        count = sqlRun("select count(cid) from channels where cenabled=1")[0][0]
         if count > 0:
             redirect("/mobile")
         else:
@@ -302,7 +302,7 @@ def clgen_p():
 @post('/grab_channel')
 def grabchannel():
     myid = request.forms.myid
-    sqlRun("UPDATE channels SET epgscan=-epgscan+1 WHERE cid = %s" % myid)
+    sqlRun("UPDATE channels SET epgscan=-epgscan+1 WHERE cid = ?", (myid, ))
     return
 
 @post('/create_channel')
@@ -332,39 +332,39 @@ def createchannel():
         return
 
     if cext!='':
-        if cext[0:1]!='.': 
+        if cext[0:1]!='.':
             cext = '.' + cext
 
     exists = False
     if cid == prev:
         exists = True
     else:
-        rows3  = sqlRun("select cid from channels where cid=%s" % cid)
+        rows3  = sqlRun("select cid from channels where cid=?", (cid, ))
         if rows3:
             exists = True
 
     if prev!=-1:
         if cid == prev:  # editing/renaming only
-            sqlRun("UPDATE channels SET cname='%s', cpath='%s', cext='%s', cenabled=%s, epgscan=%s WHERE cid=%s" % (cname, cpath, cext, aktiv, epggrab, cid))
+            sqlRun("UPDATE channels SET cname=?, cpath=?, cext=?, cenabled=?, epgscan=? WHERE cid=?", (cname, cpath, cext, aktiv, epggrab, cid))
         else: # also moving
             if exists:
-                sqlRun("UPDATE channels SET cid = -1 WHERE cid = %s" % (prev))
-                sqlRun("UPDATE records  SET cid = -1 WHERE cid = %s" % (prev))
+                sqlRun("UPDATE channels SET cid = -1 WHERE cid = ?", (prev, ))
+                sqlRun("UPDATE records  SET cid = -1 WHERE cid = ?", (prev, ))
                 if prev > cid:
                     sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))
                     sqlRun("UPDATE records  SET cid = cid+1 WHERE cid >= %s AND cid < %s" % (cid, prev))
                 else:
                     sqlRun("UPDATE channels SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev, cid))
                     sqlRun("UPDATE records  SET cid = cid-1 WHERE cid > %s AND cid <= %s" % (prev, cid))
-                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s, epgscan=%s WHERE cid=-1" % (cname, cid, cpath, cext, aktiv, epggrab))
-                sqlRun("UPDATE records SET cid=%s WHERE cid=-1" % cid)
+                sqlRun("UPDATE channels SET cname=?, cid=?, cpath=?, cext=?, cenabled=?, epgscan=? WHERE cid=-1", (cname, cid, cpath, cext, aktiv, epggrab))
+                sqlRun("UPDATE records SET cid=? WHERE cid=-1", (cid, ))
             else:
-                sqlRun("UPDATE channels SET cname='%s', cid=%s, cpath='%s', cext='%s', cenabled=%s, epgscan=%s WHERE cid=%s" % (cname, cid, cpath, cext, aktiv, epggrab, prev))
-                sqlRun("UPDATE records SET cid=%s WHERE cid=%s" % (cid, prev))
+                sqlRun("UPDATE channels SET cname=?, cid=?, cpath=?, cext=?, cenabled=?, epgscan=? WHERE cid=?", (cname, cid, cpath, cext, aktiv, epggrab, prev))
+                sqlRun("UPDATE records SET cid=? WHERE cid=?", (cid, prev))
     else:
         if exists:
-            sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= %s" % cid)
-            sqlRun("UPDATE records SET cid = cid+1 WHERE cid >= %s" % cid)
+            sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= ?", (cid, ))
+            sqlRun("UPDATE records SET cid = cid+1 WHERE cid >= ?", (cid, ))
         sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid, epggrab))
     return
 
@@ -540,8 +540,8 @@ class epggrabthread(Thread):
                     print ("mc2xml ended without errors")
             except Exception as ex:
                 print ("Error calling mc2xml: %s" % (ex))
-                pass            
-                
+                pass
+
         try:
             xmltv.getProgList(version)
         except Exception as ex:
@@ -564,7 +564,7 @@ class epggrabthread(Thread):
             for l in fulllist:
                 actname = l[0]
                 if actname!=prevname:
-                    rows2 = sqlRun("SELECT cid FROM channels WHERE cenabled = 1 AND lower(cname)='%s'" % actname.lower())
+                    rows2 = sqlRun("SELECT cid FROM channels WHERE cenabled = 1 AND lower(cname)=?", (actname.lower(), ))
                     if rows2:
                         cid = rows2[0][0]
                         sqlchlist.append([cid, actname, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S") ] )
@@ -658,11 +658,11 @@ def epg_s():
         rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", "", -1, "", 0])
     ret.append(rtemp)
 
-    rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date('%s') OR date(g_stop)=date('%s')) GROUP BY channels.cid ORDER BY channels.cid" % (todaysql, todaysql))
+    rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date(?) OR date(g_stop)=date(?)) GROUP BY channels.cid ORDER BY channels.cid", (todaysql, todaysql))
     for row in rows:
         cid=row[1]
         rtemp = list()
-        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=%s AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE (date(g_start)=date('%s') OR date(g_stop)=date('%s')) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id='%s' ORDER BY g_start" % (cid, config.cfg_delta_for_epg, config.cfg_delta_for_epg, todaysql, todaysql, row[0]))
+        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=? AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE (date(g_start)=date(?) OR date(g_stop)=date(?)) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id=? ORDER BY g_start" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg), (cid, todaysql, todaysql, row[0]))
         for event in c_rows:
 
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
@@ -730,7 +730,7 @@ def epglist_getter():
 
     return json.dumps(
                       {"aaData": retlist,
-                       "sEcho": sEcho, 
+                       "sEcho": sEcho,
                       "iTotalRecords": totalrows,
                        "iTotalDisplayRecords": totalrows
                        } )
@@ -746,17 +746,17 @@ def getLocale():
             f = codecs.open("js/i18n/jquery.ui.datepicker-" + config.cfg_locale + ".js", "r", "utf-8")
             loc = f.read()
             f.close()
-            p1 = loc.find("{") 
+            p1 = loc.find("{")
             p1 = loc.find("{", p1+1)
             p2 = loc.find("}", p1+1)
             full = loc[p1+2:p2]
             f = codecs.open("js/i18n/jquery-ui-timepicker-" + config.cfg_locale + ".js", "r", "utf-8")
             loc = f.read()
             f.close()
-            p1 = loc.find("{") 
+            p1 = loc.find("{")
             p1 = loc.find("{", p1+1)
             p2 = loc.find("}", p1+1)
-            full = full + "," + loc[p1+1:p2]        
+            full = full + "," + loc[p1+1:p2]
             #full = full.replace('\t', '').replace(',\n', ',"').replace(': ', '": ').replace('\n', '').replace("\"'",'"').replace("'",'"')
             full = full.replace('\t', '').replace(',\n', ',"').replace(': ', '": ').replace('\n', '').replace("\"'",'"').replace("'",'"')
             return '{"' + full + '}'
@@ -770,7 +770,7 @@ def records_s():
 
 @route('/getchannelgroups')
 def getchannelgroups():
-    l = []   
+    l = []
     sql = "case WHEN  substr(upper(cname), 1, 1)  >= 'A' AND  substr(upper(cname), 1, 1) <= 'Z' THEN  substr(upper(cname), 1, 1) ELSE '0' END"
     sql = "select " + sql + ", count(cname) from channels where cenabled=1 group by " + sql
     rows=sqlRun(sql)
@@ -780,7 +780,7 @@ def getchannelgroups():
 
 @post('/getchannelgroup')
 def getchannelgroup():
-    l = []   
+    l = []
     id = request.forms.get("id")
     sql = "select cid, cname from channels where cenabled=1 "
     if id=='-':
@@ -792,7 +792,7 @@ def getchannelgroup():
     rows=sqlRun(sql)
     for row in rows:
         l.append([row[0], row[1]])
-    return json.dumps({"aaData": l} )    
+    return json.dumps({"aaData": l} )
 
 @post('/getepgday')
 def getepgday():
@@ -802,10 +802,9 @@ def getepgday():
     except:
         pass
     rdate = request.forms.get("rdate")
-    sql = "SELECT substr(g_title,1,50), g_start, substr(g_desc, 1, 100), g_stop FROM guide, guide_chan WHERE guide.g_id = guide_chan.g_id AND guide_chan.g_name='{0}' AND (date(g_start)=date('{1}') OR date(g_stop)=date('{1}')) AND datetime(guide.g_stop)>datetime('now', 'localtime') ORDER BY g_start".format(cname, rdate)
-    rows=sqlRun(sql)
-    if rows: 
-        return json.dumps({"aaData": rows} )    
+    rows=sqlRun("SELECT substr(g_title,1,50), g_start, substr(g_desc, 1, 100), g_stop FROM guide, guide_chan WHERE guide.g_id = guide_chan.g_id AND guide_chan.g_name=? AND (date(g_start)=date(?) OR date(g_stop)=date(?)) AND datetime(guide.g_stop)>datetime('now', 'localtime') ORDER BY g_start", (cname, rdate, rdate))
+    if rows:
+        return json.dumps({"aaData": rows} )
     else:
         return None
 
@@ -814,7 +813,6 @@ def getepgday():
 @route('/getrecordlist')
 def getrecordlist():
     l = []
-#    rows=sqlRun("SELECT recname, cname, strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rvon), strftime('"+"%"+"d."+"%"+"m."+"%"+"Y "+"%"+"H:"+"%"+"M', rbis), rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")
     rows=sqlRun("SELECT recname, cname, rvon, rbis, rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")
     for row in rows:
         m3u = "<a href=\"live/" + str(row[10]) + ".m3u\">" + row[1] + "</a>"
@@ -832,9 +830,9 @@ def records_p():
     if what=="-2":
         sqlRun("DELETE FROM records WHERE datetime(rbis)<datetime('now', 'localtime') AND NOT rmask>0")
     if what=="-1":
-        sqlRun("DELETE FROM records WHERE records.rowid=%s" % (myid))
+        sqlRun("DELETE FROM records WHERE records.rowid=?", (myid, ))
     else:
-        sqlRun("UPDATE records SET renabled=%s WHERE rowid=%s" % (what, myid))
+        sqlRun("UPDATE records SET renabled=? WHERE rowid=?" % (what, myid))
     setRecords()
     return
 
@@ -842,7 +840,7 @@ def records_p():
 
 @post('/createepg')
 def createepg():
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=%s GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, request.forms.ret, config.cfg_delta_for_epg))
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=? GROUP BY datetime(guide.g_start, '-? minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg), (request.forms.ret, config.cfg_delta_for_epg))
     setRecords()
     redirect("/records")
     return
@@ -869,7 +867,7 @@ def create_p():
     if prev=="":
         sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", (recname, sender, d_von, d_bis, aktiv, recurr))
     else:
-        sqlRun("UPDATE records SET recname='%s', cid=%s, rvon='%s', rbis='%s', renabled=%s, rmask=%s WHERE rowid=%s" % (recname, sender, d_von, d_bis, aktiv, recurr,  prev))
+        sqlRun("UPDATE records SET recname=?, cid=?, rvon=?, rbis=?, renabled=?, rmask=? WHERE rowid=?", (recname, sender, d_von, d_bis, aktiv, recurr,  prev))
 
     setRecords()
 
@@ -940,7 +938,7 @@ class record(Thread):
         ffargs = config.cfg_ffmpeg_params
         ffargs = ffargs.split()
         if streamtype in fftypes:
-            delta = total(tDiff(self.bis, datetime.now())) 
+            delta = total(tDiff(self.bis, datetime.now()))
             deltasec = '%d' % delta
             attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'fatal', '-t', deltasec] + ffargs + [fn]
             print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
@@ -965,7 +963,7 @@ class record(Thread):
                 u = urllib32.urlopen(self.url)
                 try:
                     f = open(fn, 'wb')
-                except:    
+                except:
                     f = open(fn.encode('utf-8').decode(sys.getfilesystemencoding()), 'wb')
             except urllib32.URLError:
                 print ("Stream could not be parsed (URL=%s), aborting..." % (self.url))
@@ -982,7 +980,7 @@ class record(Thread):
                 f.close()
                 print ("Record: '%s' ended" % (self.name))
         if self in records: records.remove(self)
-        # 2015-01-21 Fail & recurrency check       
+        # 2015-01-21 Fail & recurrency check
         if datetime.now() < self.bis - timedelta(seconds=10) and self.stopflag==0:
             print ("Something went wrong with '%s', retry in 10 seconds" % (self.name))
 
@@ -1002,7 +1000,7 @@ class record(Thread):
     def cleanProcess(self):
         try:
             if not self.process==None:
-                self.process.terminate()                
+                self.process.terminate()
             sleep(3)
             if not self.process==None:
                 self.process.kill()

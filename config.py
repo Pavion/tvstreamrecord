@@ -48,7 +48,7 @@ configuration = [
 'cfg_server_bind_address',
 'Server bind address (restart needed)',
 '0.0.0.0'
-],   
+],
 
 [
 'cfg_server_port',
@@ -61,7 +61,7 @@ configuration = [
 "File extension for the recorded stream (default='.ts')",
 '.ts'
 ],
-                 
+
 [
 'cfg_ffmpeg_path',
 'Full path to ffmpeg for other streams support',
@@ -73,19 +73,19 @@ configuration = [
 'Stream types, which should be forwarded to ffmpeg (space separated)',
 'rtmp rtp'
 ],
-                 
+
 [
 'cfg_ffmpeg_params',
 "Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')",
 '-acodec copy -vcodec copy'
-],                 
-                 
+],
+
 [
 'cfg_grab_time',
 "Time to perform daily EPG grab on all marked channels (hh:mm format, 24h based, default '0' for manual only)",
 '0'
 ],
-                 
+
 [
 'cfg_grab_max_duration',
 "Maximal EPG scan duration per channel, [seconds] (default '60')",
@@ -165,8 +165,8 @@ from datetime import datetime
 
 for config in configuration:
     globals()[config[0]] = config[2]
-    
-def getUser():    
+
+def getUser():
     rows = sqlRun("SELECT value FROM config WHERE param='credentials'")
     if rows:
         return rows[0][0]
@@ -174,31 +174,31 @@ def getUser():
         return setUser("")
 
 def setUser(userhash):
-    sqlRun("UPDATE config SET value = '%s' WHERE param='credentials'" % userhash)
+    sqlRun("UPDATE config SET value = ? WHERE param='credentials'", (userhash, ))
     return userhash
 
 def banIP(ip):
-    rows = sqlRun("SELECT trycount FROM blacklist WHERE ip='%s'" % ip)
+    rows = sqlRun("SELECT trycount FROM blacklist WHERE ip=?", (ip, ))
     now = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")
     if rows:
-        sqlRun("UPDATE blacklist SET trycount=%s, lasttry='%s' WHERE ip='%s'" % (rows[0][0]+1, now, ip)  )
+        sqlRun("UPDATE blacklist SET trycount=?, lasttry=? WHERE ip=?", (rows[0][0]+1, now, ip))
         if rows[0][0]+1==3:
             print ("IP %s has been blacklisted for for three unsuccessful login attempts" % ip)
 
     else:
-        sqlRun("INSERT INTO blacklist VALUES ('%s', %s, '%s')" % (ip, 1, now) )
-    
+        sqlRun("INSERT INTO blacklist VALUES (?, ?, ?)", (ip, 1, now) )
+
 def clearIP(ip):
-    sqlRun("DELETE FROM blacklist WHERE ip='%s'" % ip)    
-    
+    sqlRun("DELETE FROM blacklist WHERE ip=?", (ip, ))
+
 def checkIP(ip):
     sqlRun("DELETE FROM blacklist WHERE julianday('now', 'localtime')-julianday(lasttry)>=2;")
-    rows = sqlRun("SELECT trycount FROM blacklist WHERE ip='%s'" % ip)
+    rows = sqlRun("SELECT trycount FROM blacklist WHERE ip=?", (ip, ))
     if rows:
         if rows[0][0]>=3:
-            return False 
+            return False
     return True
-    
+
 def getDict():
     ret = []
     for r in globals():
@@ -211,7 +211,7 @@ def loadConfig():
     rows = sqlRun("SELECT param, value FROM config WHERE param<>'cfg_version'")
     setConfig(rows)
     return
-        
+
 def setConfig(attrlist = []):
     for attr in attrlist:
         if attr[0] in globals():
@@ -220,27 +220,27 @@ def setConfig(attrlist = []):
                     writeWebman(int(attr[1]))
             if attr[0]=="cfg_recordpath":
                 if attr[1][-1]!="/" and attr[1][-1]!="\\":
-                    if "\\" in attr[1]: 
+                    if "\\" in attr[1]:
                         attr=(attr[0], attr[1]+"\\")
                     else:
                         attr=(attr[0], attr[1]+"/")
-            globals()[attr[0]] = attr[1]                
+            globals()[attr[0]] = attr[1]
     saveConfig()
-            
-            
+
+
 def saveConfig():
-    sql = ''   
+    sql = ''
     for var in getDict():
-        sql += "UPDATE config SET value='%s' WHERE param='%s';" % (globals()[var], var) 
+        sql += "UPDATE config SET value='%s' WHERE param='%s';" % (globals()[var], var)
     sqlRun(sql, -1, 1)
 
 # Port changes should also be written in the Synology Webman configuration
-def writeWebman(port): 
+def writeWebman(port):
     webman = list()
     lfile = open("webman/config", "rb")
     for lline in lfile:
         webman.append(lline)
-    lfile.close()    
+    lfile.close()
     lfile = open("webman/config", "wb")
     for lline in webman:
         pos = lline.find('"port":')
@@ -250,6 +250,6 @@ def writeWebman(port):
             lfile.write(lline)
     lfile.close()
     print ("Port changes saved, new port: %s, please restart the software" % str(port))
-    return    
-        
+    return
+
 

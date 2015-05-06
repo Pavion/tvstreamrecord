@@ -34,10 +34,10 @@ class LocalTimezone(tzinfo):
         stamp = _time.mktime(tt)
         tt = _time.localtime(stamp)
         return tt.tm_isdst > 0
-    
+
 Local = LocalTimezone()
 
 def tDiff(dt2, dt1):
     return (dt2 - dt1) - (Local.dst(dt2) - Local.dst(dt1))
-    
-    
+
+

@@ -150,6 +150,12 @@ configuration = [
 'cfg_xmltvtimeshift',
 'Time shift for XMLTV data (in hours)',
 '0'
+],
+
+[
+'cfg_xmltv_mc2xml',
+'mc2xml command line',
+''
 ]
 
 ]

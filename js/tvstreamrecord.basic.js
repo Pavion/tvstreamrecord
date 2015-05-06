@@ -287,6 +287,27 @@ function paintTable() {
 }
 
 /**
+ * EPG button mode selector
+ */
+var epgmode = 0;
+
+/**
+ * Function for initializing EPG grab button
+ * @return none
+ */
+function initEpgState() {
+    getEpgState();
+    $( "#grabepg" ).button()
+    .click(function(event) {
+        $.post("/grabepg", {"mode": epgmode},  
+            function() {
+                getEpgState();
+            }, "json");
+        event.preventDefault();
+    });
+}
+
+/**
  * Function for getting the current EPG state from server
  * @return none
  */
@@ -294,7 +315,7 @@ function getEpgState() {
     $.get("/getepgstate", 
         function(data) {
             var state = data.grabState;
-            var epgmode = 0;
+            epgmode = 0;
             $( "#grabepg" ).removeProp("disabled");
             $( "#grabepg" ).removeClass("ui-state-disabled");
             if (state[2]=='0') {
@@ -311,15 +332,8 @@ function getEpgState() {
                         $( "#grabepg" ).addClass("ui-state-disabled");
                     }                    
                     epgmode = 1;
-                }        
-                $( "#grabepg" ).button()
-                .click(function(event) {
-                    $.post("/grabepg", {"mode": epgmode},  
-                        function() {
-                            getEpgState();                            
-                        }, "json");
-                    event.preventDefault();
-                });
+                }
+                $( "#grabepg" ).show();                
             }
         }, "json"
     );
@@ -972,7 +986,7 @@ $(function() {
         });
 
         initIcons();
-        getEpgState();   
+        initEpgState();   
         
     } else if (here("epglist")) {
 // ------------------------------------ EPG list tab only        
@@ -1005,7 +1019,7 @@ $(function() {
         });
 
         initIcons();
-        getEpgState();      
+        initEpgState();      
         
     } else if (here("config")) { 
 // ------------------------------------ Configuration tab only
@@ -1025,12 +1039,16 @@ $(function() {
                 $("#cfg_xmltvinitpath").removeClass("ui-state-disabled");
                 $("#cfg_xmltvtimeshift").removeAttr("disabled");
                 $("#cfg_xmltvtimeshift").removeClass("ui-state-disabled");            
+                $("#cfg_xmltv_mc2xml").removeAttr("disabled");
+                $("#cfg_xmltv_mc2xml").removeClass("ui-state-disabled");            
             },
             toggledOff: function() {
                 $("#cfg_xmltvinitpath").prop("disabled", "true");
                 $("#cfg_xmltvinitpath").addClass("ui-state-disabled");
                 $("#cfg_xmltvtimeshift").prop("disabled", "true");
                 $("#cfg_xmltvtimeshift").addClass("ui-state-disabled");
+                $("#cfg_xmltv_mc2xml").prop("disabled", "true");
+                $("#cfg_xmltv_mc2xml").addClass("ui-state-disabled");
             }
         });
     	$("#cfg_switch_grab_auto").slickswitch({

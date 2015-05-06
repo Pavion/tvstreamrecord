@@ -20,7 +20,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
 
-from bottle import CherryPyServer
+from bottle import CherryPyServer, TEMPLATES
 from bottle import route, run, template, post, request, response
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
@@ -187,6 +187,7 @@ def internationalize(templ,noheader=False):
     if login != "":
         return login
     else:
+        TEMPLATES.clear()
         if not noheader:
             header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale )
             footer = template('footer')
@@ -527,6 +528,20 @@ class epggrabthread(Thread):
         self.run()
 
     def grabXML(self):
+        if config.cfg_xmltv_mc2xml.strip() != "":
+            try:
+                mcargs = config.cfg_xmltv_mc2xml.strip().split()
+                print ("mc2xml will be called with: %s" % (mcargs))
+                mcproc = subprocess.Popen(mcargs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                out, err = mcproc.communicate()
+                if err:
+                    print ("mc2xml ended with an error:\n%s" % (err))
+                else:
+                    print ("mc2xml ended without errors")
+            except Exception as ex:
+                print ("Error calling mc2xml: %s" % (ex))
+                pass            
+                
         try:
             xmltv.getProgList(version)
         except Exception as ex:

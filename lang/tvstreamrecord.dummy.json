@@ -38,6 +38,7 @@
     "Enable XMLTV import": "",
     "Initial path for an XMLTV import": "",
     "Time shift for XMLTV data (in hours)": "",
+    "mc2xml full command line (x86 CPUs only, default: empty)": "",
     "Enable stream scan/grab": "",
     "Maximal EPG scan duration per channel, [seconds] (default: '60')": "",
     "Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)": "",
@@ -45,10 +46,12 @@
     "EPG list mode. Disable for client-side processing (more network load), enable for server-side processing (more server load)": "",
     "Client-side only: maximal number of events to request from server (earlier first), solves some perfomance issues": "",
     "Delete/reset all EPG data": "",
+    "For more information about installing and configuring mc2xml please visit its homepage at": "",
     
     "Stream types, which should be forwarded to ffmpeg (space separated)": "",
     "Full path to ffmpeg for other streams support": "",
     "Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')": "",
+    "For more information regarding ffmpeg and its command line parameters please visit its homepage at": "",
     
     "Purge database records older than [days]": "",
     "Server bind address (restart needed)": "",
@@ -144,5 +147,6 @@
     "Next": "",
     "Duration": "",
     "Skip": ""
+
 
 }

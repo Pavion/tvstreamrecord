@@ -91,7 +91,13 @@ def checkType(typ):
 
 def getProgList(ver=''):
     print ("tvstreamrecord v.%s / XMLTV import started" % ver)
-    stri = getFile(config.cfg_xmltvinitpath, 1, ver)
+    totalentries = 0
+    initpath = config.cfg_xmltvinitpath
+    if not ("http:" in initpath or "https:" in initpath or "www." in initpath or "ftp:" in initpath) or initpath[0]=="/" or initpath[1]==":" or "file://" in initpath:
+        stri = getLocalFile(initpath.replace("file://",""))
+    else:
+        stri = getFile(initpath, 1, ver)
+        
     #stri = getTestFile()
     
     channellist = []        
@@ -127,7 +133,7 @@ def getProgList(ver=''):
                         dt = datetime.strptime(getAttr(t_attr, "lastmodified")[0:14],"%Y%m%d%H%M%S")
                         if dt>lastdate and dtepg>=datetime.now()-timedelta(days=1):
                             source = url+g_id+"_"+dttext+".xml.gz"
-                            getProg(getFile(source,0,ver))
+                            totalentries = getProg(getFile(source,0,ver))
                         if dt>dtmax:
                             dtmax = dt
                 if not timerows:
@@ -137,10 +143,11 @@ def getProgList(ver=''):
                 break
 
     if (checkType(typ)==2) and len(channellist)>0:
-        getProg(stri, channellist)
+        totalentries = getProg(stri, channellist)
 
     del (stri)        
-    print ("XMLTV import completed")
+
+    print ("XMLTV import completed with %s entries" % totalentries)
     return
   
 
@@ -173,17 +180,18 @@ def getProg(strp, channellist=[]):
             desc = desc + tmpdesc 
             sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
     sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
-#    print(len(sqllist))
-    return    
+    return len(sqllist)
         
-def getTestFile():
-    with open('d:/xmltv.xml', 'r') as content_file:
-        stri = content_file.read()
+def getLocalFile(file_in):
+    print ("Trying to open a local XMLTV file: %s" % (file_in))
+    with open(file_in, 'r') as content_file:
+        out = content_file.read()
     try:
-        stri = stri.decode("UTF-8")
-    except:
+        out = out.decode("UTF-8")
+    except Exception as ex:
+        print (ex)
         pass
-    return stri
+    return out
 
 def getFile(file_in, override=0, ver=""):
     rows=sqlRun("SELECT * FROM caching WHERE url='%s'" % file_in)    
@@ -203,10 +211,10 @@ def getFile(file_in, override=0, ver=""):
         opener = urllib32.build_opener()
         try:
             hresponse = opener.open(request, timeout=10)
-        except: 
+        except Exception as ex: 
             print ("XMLTV Warning: connection timeout detected, retry in 5 seconds")
             sleep (5)
-            hresponse = opener.open(request, timeout=20)            
+            hresponse = opener.open(request, timeout=20)
         feeddata = hresponse.read()
         hr = hresponse.info()        
         lastmod = hr.get('Last-Modified')
@@ -231,7 +239,7 @@ def getFile(file_in, override=0, ver=""):
                 if pos != -1:
                     out = out[:pos+10]  + b"</tv>" 
     except Exception as ex:
-        print ("XMLTV: no new data, try again later (%s)" % file_in)
+        print ("XMLTV: no new data / unknown error, try again later (%s)" % file_in)
         pass
 
     try:

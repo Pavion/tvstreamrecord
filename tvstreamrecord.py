@@ -890,6 +890,8 @@ class record(Thread):
     ext = ""
     process = None
     myrow = None
+    retries = 0
+    retry_count = 0
 
     def __init__(self, row):
         Thread.__init__(self)
@@ -900,6 +902,8 @@ class record(Thread):
         self.url = row[1].strip()
         self.mask = row[6]
         self.myrow = row
+        if config.cfg_retry_count.isdigit():
+            self.retry_count = int(config.cfg_retry_count)        
         if row[7]=='':
             self.ext = config.cfg_file_extension
         else:
@@ -948,7 +952,7 @@ class record(Thread):
                 cleaner = Timer(delta+30, self.cleanProcess) # if ffmpeg won't exit, try to terminate its process in 30 seconds
                 cleaner.start()
                 out, err = self.process.communicate()
-                self.process.wait() # oops... not needed? harmless!
+                #self.process.wait() # oops... not needed? harmless!
                 cleaner.cancel()
                 if err:
                     print ("FFMPEG record '%s' ended with an error:\n%s" % (self.name, err))
@@ -979,11 +983,24 @@ class record(Thread):
                     f.write(mybuffer)
                 f.close()
                 print ("Record: '%s' ended" % (self.name))
-        if self in records: records.remove(self)
+        
         # 2015-01-21 Fail & recurrency check
         if datetime.now() < self.bis - timedelta(seconds=10) and self.stopflag==0:
-            print ("Something went wrong with '%s', retry in 10 seconds" % (self.name))
+            delta = total(tDiff(self.bis, datetime.now()))
+            if self.retry_count == 0:
+                print ("Something went wrong with '%s'. No retries configured, aborting..." % (self.name))
+                sleep(delta)
+            elif self.retries == self.retry_count:
+                print ("Something went wrong with '%s'. Last retry reached, aborting..." % (self.name))
+                sleep(delta)
+            elif self.retries < self.retry_count:
+                self.retries += 1
+                print ("Something went wrong with '%s', retry %s/%s in 10 seconds" % (self.name, self.retries, self.retry_count))
+                sleep(10)
+                self.run()
+                return
 
+        self.clean()
         rectimer = Timer(10, setRecords)
         rectimer.start()
 
@@ -994,9 +1011,12 @@ class record(Thread):
         if not self.process==None:
             if self.process.poll()==None:
                 self.process.terminate()
-        if self in records: records.remove(self)
+        self.clean()
         print ("Record: Stopflag for '%s' received" % (self.name))
 
+    def clean(self):
+        if self in records: records.remove(self)
+        
     def cleanProcess(self):
         try:
             if not self.process==None:
@@ -1007,10 +1027,12 @@ class record(Thread):
                 print ("FFMPEG Record '%s' had to be killed. R.I.P." % self.name)
             else:
                 print ("FFMPEG Record '%s' had to be terminated." % self.name)
+        except WindowsError:
+            pass
         except:
-            print ("FFMPEG Record '%s' termination error, process might be running" % self.name)
+            print ("FFMPEG Record '%s' termination error, process might be running" % self.name)            
         if not self.process==None:
-            print ("FFMPEG Record '%s': termination failed" % self.name)
+            print ("FFMPEG Record '%s': termination may have failed" % self.name)
 
 def setRecords():
     rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")

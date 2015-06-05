@@ -161,7 +161,7 @@ configuration = [
 [
 'cfg_retry_count',
 'Retry count for failed records',
-720
+99
 ]
 
 ]

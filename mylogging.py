@@ -44,15 +44,9 @@ class Logger(object):
         mylines = message.replace('\n', '')
         mylines = mylines.replace('\r', '')
         mylines = mylines.strip()
-#        try:
-            #mylines = mylines.encode("UTF-8", errors='replace')
-            #try:
-            #    mylines = mylines.encode("UTF-8", errors='replace')
-        #    pass
         if mylines!=u"":
-            self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " " + self.typ + " " + mylines + "\n")
-#        except Exception as ex:
-#            pass
+            ms = str(round(datetime.now().microsecond / 100))
+            self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "." + ms + " " + mylines + "\n")
 
     def flush(self):
         pass

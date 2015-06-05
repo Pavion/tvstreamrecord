@@ -257,7 +257,7 @@ def log_get():
     lfile = codecs.open("log.txt", "r", "utf-8")
     for lline in lfile:
         if len(lline)>24:
-            l.append([ lline[0:19], lline[20:23], lline[24:] ])
+            l.append([ lline[0:23], lline[24:] ])
     lfile.close()
     return json.dumps( {"aaData": l } )
 

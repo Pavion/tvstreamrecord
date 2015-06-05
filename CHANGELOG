@@ -1,5 +1,7 @@
-2015-06-05 1.1.0 Bug fixes
-                 Release version                 
+2015-06-05 1.1.0 rtsp added per default
+                 Retry count added in Advanced config tab
+                 Bug fixes
+                 Release version
 
 2015-05-06 1.0.9 mc2xml integration (please read manual)
                  Manual updated to be read

@@ -58,6 +58,7 @@
     "Server port (restart needed)": "",
     "Reset the log file": "",
     "Reset log": "",
+    "Retry count for failed records": "",
     "Do you want to delete all of your EPG data?": "",
     "Record name mask (valid placeholders: %date% and %title%, default: '%date% - %title%')": "",
     "Record name mask must have at least one placeholder": "",
@@ -133,6 +134,7 @@
     "Invalid bind address, please check your settings": "",
     "Invalid grab time, please check your settings": "",
     "Invalid EPG zoom, please check your settings": "",
+    "Invalid value, please enter a positive number or a zero": "",
     "Saving configuration...": "",
     
     "Set remote access password (leave blank for none)": "",

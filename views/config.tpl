@@ -111,6 +111,7 @@
 <tr><td>§Server port (restart needed)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_server_port" value="" autocomplete="off" alert="§Invalid port, please check your settings§"/></td></tr>
 <tr><td>§Record name mask (valid placeholders: %date% and %title%, default: '%date% - %title%')§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_record_mask" value="" autocomplete="off" alert="§Record name mask must have at least one placeholder§"/></td></tr>
 <tr><td>§Reset the log file§</td><td><button id="button_resetlog">§Reset log§</button></td></tr>
+<tr><td>§Retry count for failed records§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_retry_count" value="" autocomplete="off" alert="§Invalid value, please enter a positive number or a zero§"/></td></tr>
 </tbody>
 </table>
 </div>

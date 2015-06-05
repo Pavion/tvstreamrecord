@@ -1121,6 +1121,11 @@ $(function() {
                         alert( $(this).attr('alert') );
                         myalert = true; 
                     }                    
+                } else if ($(this).attr('id')=="cfg_retry_count") {
+                    if ( !checkRegexp( "cfg_retry_count", /^\d+$/, "" ) ) {
+                        alert( $(this).attr('alert') );
+                        myalert = true; 
+                    }                    
                 } else if ($(this).attr('id')=="cfg_grab_time") {
                     if ( value.trim() != "0" ) if ( ! $.datepicker.parseTime("H:m", $( "#cfg_grab_time" ).val()) ) {
                         alert( $(this).attr('alert') );

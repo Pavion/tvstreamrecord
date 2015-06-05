@@ -71,7 +71,7 @@ configuration = [
 [
 'cfg_ffmpeg_types',
 'Stream types, which should be forwarded to ffmpeg (space separated)',
-'rtmp rtp'
+'rtmp rtp rtsp'
 ],
 
 [
@@ -156,6 +156,12 @@ configuration = [
 'cfg_xmltv_mc2xml',
 'mc2xml command line',
 ''
+],
+
+[
+'cfg_retry_count',
+'Retry count for failed records',
+720
 ]
 
 ]

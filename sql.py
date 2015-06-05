@@ -105,6 +105,8 @@ def sqlCreateAll(version):
                                 sql += "UPDATE config SET value='%s' WHERE param='cfg_recordpath';" % val[0:c+1]
                                 sql += "INSERT OR REPLACE INTO config VALUES ('cfg_record_mask', '', '" + val[c+1:] + "%date% - %title%');"
                                 break
+                if oldver < '1.1.0':
+                    sql += "UPDATE config SET value=value || ' rtsp' WHERE param = 'cfg_ffmpeg_types' and not lower(value) LIKE '%rtsp%';"
 
                 if oldver > version:
                     print ("Critical error: Version mismatch!!!")

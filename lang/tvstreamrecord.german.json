@@ -58,6 +58,7 @@
     "Server port (restart needed)": "Serverport (Neustart erforderlich)",
     "Reset the log file": "Logdatei zurücksetzen",
     "Reset log": "Log zurücksetzen",
+    "Retry count for failed records": "Anzahl neuer Versuche beim Abbruch",
     "Do you want to delete all of your EPG data?": "Wollen Sie alle EPG-Daten löschen?",
     "Record name mask (valid placeholders: %date% and %title%, default: '%date% - %title%')": "Maske für den Namen der Aufnahme (zulässige Platzhalter: %date% und %title%, Vorgabe: '%date% - %title%'",
     "Record name mask must have at least one placeholder": "Die Maske für den Aufnahmenamen muss mindestens einen Platzhalter enthalten",
@@ -133,6 +134,7 @@
     "Invalid bind address, please check your settings": "Falsche Serveradresse, bitte überprüfen", 
     "Invalid grab time, please check your settings": "Falsche Uhrzeit für EPG-Import, bitte überprüfen",
     "Invalid EPG zoom, please check your settings": "Falsche EPG-Zoomstufe, bitte überprüfen",
+    "Invalid value, please enter a positive number or a zero": "Falsche Eingabe. Bitte eine positive Zahl oder eine Null eingeben",
     "Saving configuration...": "Konfiguration wird gespeichert...",
     
     "Set remote access password (leave blank for none)": "Passwort für den Fernzugriff setzen (leer für keine Abfrage)",

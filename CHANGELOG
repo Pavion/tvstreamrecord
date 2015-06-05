@@ -1,4 +1,5 @@
-2015-06-05 1.1.0 rtsp added per default
+2015-06-05 1.1.0 Log output changed
+                 rtsp added per default
                  Retry count added in Advanced config tab
                  Bug fixes
                  Release version

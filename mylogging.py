@@ -45,7 +45,7 @@ class Logger(object):
         mylines = mylines.replace('\r', '')
         mylines = mylines.strip()
         if mylines!=u"":
-            ms = str(round(datetime.now().microsecond / 100))
+            ms = '{:03d}'.format( int(datetime.now().microsecond / 1000) )                
             self.log.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "." + ms + " " + mylines + "\n")
 
     def flush(self):

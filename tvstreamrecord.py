@@ -832,7 +832,7 @@ def records_p():
     if what=="-1":
         sqlRun("DELETE FROM records WHERE records.rowid=?", (myid, ))
     else:
-        sqlRun("UPDATE records SET renabled=? WHERE rowid=?" % (what, myid))
+        sqlRun("UPDATE records SET renabled=? WHERE rowid=?", (what, myid))
     setRecords()
     return
 
@@ -840,7 +840,7 @@ def records_p():
 
 @post('/createepg')
 def createepg():
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=? GROUP BY datetime(guide.g_start, '-? minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg), (request.forms.ret, config.cfg_delta_for_epg))
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=? GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_delta_for_epg), (request.forms.ret, ))
     setRecords()
     redirect("/records")
     return

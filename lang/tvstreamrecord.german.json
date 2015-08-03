@@ -62,6 +62,8 @@
     "Do you want to delete all of your EPG data?": "Wollen Sie alle EPG-Daten löschen?",
     "Record name mask (valid placeholders: %date% and %title%, default: '%date% - %title%')": "Maske für den Namen der Aufnahme (zulässige Platzhalter: %date% und %title%, Vorgabe: '%date% - %title%'",
     "Record name mask must have at least one placeholder": "Die Maske für den Aufnahmenamen muss mindestens einen Platzhalter enthalten",
+    "Enable postprocessing": "Nachbearbeitung aktivieren",
+    "Postprocessing command (use %file% for full filename)": "Befehl für die Nachbearbeitung (Platzhalter %file% für vollständigen Dateinamen)",
 
     "at": "von",
     "till": "bis",

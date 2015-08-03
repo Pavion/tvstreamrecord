@@ -162,6 +162,18 @@ configuration = [
 'cfg_retry_count',
 'Retry count for failed records',
 99
+],
+
+[
+'cfg_switch_postprocess',
+"Enables postprocessing",
+'0'
+],
+
+[
+'cfg_postprocess',
+"Postprocessing",
+'synoindex -a %file%'
 ]
 
 ]

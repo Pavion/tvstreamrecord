@@ -54,7 +54,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '1.1.0'
+version = '1.1.1'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -983,6 +983,20 @@ class record(Thread):
                     f.write(mybuffer)
                 f.close()
                 print ("Record: '%s' ended" % (self.name))
+        
+        if config.cfg_switch_postprocess == "1" and config.cfg_postprocess != "":
+            if fileexists(fn):
+                attr = []
+                attr = config.cfg_postprocess.split(" ")                 
+                for i in range(0, len(attr)):
+                    attr[i] = attr[i].replace("%file%", fn)
+                print ("Postprocessing will be called with following parameters:")
+                print (attr)
+                try:
+                    postprocess = subprocess.Popen(attr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    out, err = postprocess.communicate()
+                except:
+                    print ("Exception calling postprocessing, please check your command line")                    
         
         # 2015-01-21 Fail & recurrency check
         if datetime.now() < self.bis - timedelta(seconds=10) and self.stopflag==0:

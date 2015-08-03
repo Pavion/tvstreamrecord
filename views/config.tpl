@@ -112,6 +112,8 @@
 <tr><td>§Record name mask (valid placeholders: %date% and %title%, default: '%date% - %title%')§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_record_mask" value="" autocomplete="off" alert="§Record name mask must have at least one placeholder§"/></td></tr>
 <tr><td>§Reset the log file§</td><td><button id="button_resetlog">§Reset log§</button></td></tr>
 <tr><td>§Retry count for failed records§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_retry_count" value="" autocomplete="off" alert="§Invalid value, please enter a positive number or a zero§"/></td></tr>
+<tr><td>§Enable postprocessing§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_postprocess" /></td></tr>
+<tr><td>§Postprocessing command (use %file% for full filename)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_postprocess" value="" autocomplete="off" /></td></tr>
 </tbody>
 </table>
 </div>

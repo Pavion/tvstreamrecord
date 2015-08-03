@@ -1059,6 +1059,16 @@ $(function() {
                 $("#cfg_grab_max_duration").spinner( "disable" );
             }
         });
+    	$("#cfg_switch_postprocess").slickswitch({
+            toggledOn: function() {
+                $("#cfg_postprocess").removeAttr("disabled");
+                $("#cfg_postprocess").removeClass("ui-state-disabled");            
+            },
+            toggledOff: function() {
+                $("#cfg_postprocess").prop("disabled", "true");
+                $("#cfg_postprocess").addClass("ui-state-disabled");
+            }
+        });
         
         $.get( "/getconfig", function( data )  {
             var p = new Function('return ' + data + ';')();

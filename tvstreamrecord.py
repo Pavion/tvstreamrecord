@@ -976,13 +976,31 @@ class record(Thread):
             except Exception as ex:
                 print ("Output file %s could not be created. Please check your settings. (Err: %s)" % (fn, ex))
             else:
-                while self.bis > datetime.now() and self.stopflag==0:
-                    mybuffer = u.read(block_sz)
-                    if not mybuffer:
-                        break
-                    f.write(mybuffer)
+                try:
+                    internalRetryCount = 0
+                    while self.bis > datetime.now() and self.stopflag==0:
+                        mybuffer = u.read(block_sz)
+                        if not mybuffer:
+                            if self.bis > datetime.now() and internalRetryCount < 100: # connection lost? 
+                                internalRetryCount += 1
+                                try:
+                                    u = urllib32.urlopen(self.url)
+                                    mybuffer = u.read(block_sz)
+                                    f.write(mybuffer)
+                                except:
+                                    pass                  # at least I've tried...                           
+                            else:                         # can it be empty anyway?
+                                break
+                        else:
+                            f.write(mybuffer)
+                except Exception as Ex2:
+                    print ("Record: '%s' caused an exception: %s", (self.name, Ex2))
+                    
                 f.close()
-                print ("Record: '%s' ended" % (self.name))
+                if internalRetryCount > 0:
+                    print ("Record: '%s' ended with %s internal retries, please check your connection stability" % (self.name, internalRetryCount))
+                else:
+                    print ("Record: '%s' ended" % (self.name))
         
         if config.cfg_switch_postprocess == "1" and config.cfg_postprocess != "":
             if fileexists(fn):

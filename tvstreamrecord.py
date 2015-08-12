@@ -992,7 +992,7 @@ class record(Thread):
                             f.write(mybuffer)
                         except:
                             pass
-                    elif maxRetryCount >= maxRetryCount:
+                    elif internalRetryCount >= maxRetryCount:
                         print ("Record: '%s': too many internal retries, aborting..." % (self.name))
                         break
                     else:

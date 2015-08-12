@@ -54,7 +54,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '1.1.1'
+version = '1.1.2'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -187,7 +187,7 @@ def internationalize(templ,noheader=False):
     if login != "":
         return login
     else:
-        TEMPLATES.clear()
+        #TEMPLATES.clear() # debug only, should be turned off! 
         if not noheader:
             header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale )
             footer = template('footer')
@@ -239,7 +239,7 @@ def about_s():
 
 logInit('a')
 
-print ("Starting tvstreamrecord v.%s with Python %s" % (version, sys.version_info[0]))
+print ("Starting tvstreamrecord v.%s with Python %s.%s" % (version, sys.version_info[0], sys.version_info[1]))
 print ("Logging output initialized")
 
 @post('/resetlog')
@@ -786,7 +786,7 @@ def getchannelgroup():
     if id=='-':
         sql = sql + "LIMIT 10"
     elif id=='0':
-        sql = sql + "AND substr(upper(cname), 1, 1)  >= '0' AND  substr(upper(cname), 1, 1) <= '9'"
+        sql = sql + "AND NOT (substr(upper(cname), 1, 1)  >= 'A' AND  substr(upper(cname), 1, 1) <= 'Z')"
     else:
         sql = sql + "AND substr(upper(cname), 1, 1)  = '" + id + "'"
     rows=sqlRun(sql)
@@ -976,25 +976,27 @@ class record(Thread):
             except Exception as ex:
                 print ("Output file %s could not be created. Please check your settings. (Err: %s)" % (fn, ex))
             else:
-                try:
-                    internalRetryCount = 0
-                    while self.bis > datetime.now() and self.stopflag==0:
+                internalRetryCount = 0
+                maxRetryCount = 100
+                while self.bis > datetime.now() and self.stopflag==0:
+                    try: 
                         mybuffer = u.read(block_sz)
-                        if not mybuffer:
-                            if self.bis > datetime.now() and internalRetryCount < 100: # connection lost? 
-                                internalRetryCount += 1
-                                try:
-                                    u = urllib32.urlopen(self.url)
-                                    mybuffer = u.read(block_sz)
-                                    f.write(mybuffer)
-                                except:
-                                    pass                  # at least I've tried...                           
-                            else:                         # can it be empty anyway?
-                                break
-                        else:
+                        doInternalRetry = False 
+                    except:
+                        doInternalRetry = True
+                    if (not mybuffer or doInternalRetry) and internalRetryCount < maxRetryCount: # connection lost? 
+                        internalRetryCount += 1
+                        try:
+                            u = urllib32.urlopen(self.url)
+                            mybuffer = u.read(block_sz)
                             f.write(mybuffer)
-                except Exception as Ex2:
-                    print ("Record: '%s' caused an exception: %s", (self.name, Ex2))
+                        except:
+                            pass
+                    elif maxRetryCount >= maxRetryCount:
+                        print ("Record: '%s': too many internal retries, aborting..." % (self.name))
+                        break
+                    else:
+                        f.write(mybuffer)
                     
                 f.close()
                 if internalRetryCount > 0:

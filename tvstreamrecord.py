@@ -929,18 +929,23 @@ class record(Thread):
 
     def doRecord(self):
         self.running = 1
-        dateholder = datetime.now().strftime("%Y%m%d%H%M%S")
-        titleholder = "".join([x if x.isalnum() else "_" for x in self.name])
-        fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + self.ext
-        num = 1
-        while fileexists(fn) and num<127:
-            fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + ("_%s" % num) + self.ext
-            num += 1
+        
         fftypes = config.cfg_ffmpeg_types
         fftypes = fftypes.lower().split()
         streamtype = self.url.lower().split(':', 1)[0]
         ffargs = config.cfg_ffmpeg_params
         ffargs = ffargs.split()
+
+        dateholder = datetime.now().strftime("%Y%m%d%H%M%S")
+        titleholder = "".join([x if x.isalnum() else "_" for x in self.name])
+        if sys.version_info[0] < 3 and streamtype in fftypes:
+            # workaround for unicode, damn me if I ever get it working with 2.x
+            titleholder = "".join([x if ord(x) < 128 else "_" for x in titleholder])
+        fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + self.ext
+        num = 1
+        while fileexists(fn) and num<127:
+            fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + ("_%s" % num) + self.ext
+            num += 1
         if streamtype in fftypes:
             delta = total(tDiff(self.bis, datetime.now()))
             deltasec = '%d' % delta

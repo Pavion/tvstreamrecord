@@ -92,6 +92,8 @@
 <tr><td>§Stream types, which should be forwarded to ffmpeg (space separated)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ffmpeg_types" value="" autocomplete="off" /></td></tr>
 <tr><td>§Full path to ffmpeg for other streams support§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ffmpeg_path" value="" autocomplete="off" /></td></tr>
 <tr><td>§Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')§ <sup>*</sup></td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ffmpeg_params" value="" autocomplete="off" /></td></tr>
+<tr><td>§Enable proxy for ffmpeg§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_proxy" /></td></tr>
+<tr><td>§Proxy URL for ffmpeg§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_proxy" value="" autocomplete="off" /></td></tr>
 </tbody>
 </table>
 <font size="0.6em">* §For more information regarding ffmpeg and its command line parameters please visit its homepage at§: <a href="http://ffmpeg.org">ffmpeg.org</a></font>

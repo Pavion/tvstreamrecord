@@ -52,6 +52,8 @@
     "Full path to ffmpeg for other streams support": "Полный путь к ffmpeg для поддержки дополнительных протоколов",
     "Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')": "Дополнительные параметры для ffmpeg (по умолчанию: '-acodec copy -vcodec copy')",
     "For more information regarding ffmpeg and its command line parameters please visit its homepage at": "Дополнительную информацию, касающуюся ffmpeg и его параметров, Вы можете получить на его странице",
+    "Enable proxy for ffmpeg": "Включить использование прокси для ffmpeg",
+    "Proxy URL for ffmpeg": "Адрес прокси для ffmpeg",
 
     "Purge database records older than [days]": "Удалять записи из базы данных после [дней]",
     "Server bind address (restart needed)": "Адрес сервера (требуется перезапуск)",

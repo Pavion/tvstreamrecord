@@ -54,7 +54,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-version = '1.1.2'
+version = '1.1.3'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -953,6 +953,8 @@ class record(Thread):
             print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
             print (attr)
             try:
+                if config.cfg_switch_proxy == "1" and config.cfg_proxy != "":
+                     os.environ["http_proxy"] = config.cfg_proxy
                 self.process = subprocess.Popen(attr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 cleaner = Timer(delta+30, self.cleanProcess) # if ffmpeg won't exit, try to terminate its process in 30 seconds
                 cleaner.start()

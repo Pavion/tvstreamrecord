@@ -174,6 +174,18 @@ configuration = [
 'cfg_postprocess',
 "Postprocessing",
 'synoindex -a %file%'
+], 
+
+[
+'cfg_switch_proxy',
+"Enables proxy",
+'0'
+],
+
+[
+'cfg_proxy',
+"Proxy URL",
+'http://127.0.0.1:8080'
 ]
 
 ]

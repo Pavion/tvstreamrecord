@@ -1069,6 +1069,16 @@ $(function() {
                 $("#cfg_postprocess").addClass("ui-state-disabled");
             }
         });
+    	$("#cfg_switch_proxy").slickswitch({
+            toggledOn: function() {
+                $("#cfg_proxy").removeAttr("disabled");
+                $("#cfg_proxy").removeClass("ui-state-disabled");            
+            },
+            toggledOff: function() {
+                $("#cfg_proxy").prop("disabled", "true");
+                $("#cfg_proxy").addClass("ui-state-disabled");
+            }
+        });
         
         $.get( "/getconfig", function( data )  {
             var p = new Function('return ' + data + ';')();

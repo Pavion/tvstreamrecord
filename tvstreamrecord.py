@@ -941,8 +941,34 @@ class record(Thread):
         if sys.version_info[0] < 3 and streamtype in fftypes:
             # workaround for unicode, damn me if I ever get it working with 2.x
             titleholder = "".join([x if ord(x) < 128 else "_" for x in titleholder])
-        fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + self.ext
+        
+        fn = config.cfg_record_mask
+        # Placeholders
+        fn = fn.replace("%date%", dateholder)
+        fn = fn.replace("%title%", titleholder)
+        fn = fn.replace("%month%", datetime.now().strftime("%m"))
+        fn = fn.replace("%year%", datetime.now().strftime("%Y"))
+        fn = fn.replace("%day%", datetime.now().strftime("%d"))
+        idholder = "%04d" % (self.myrow[8], )
+        fn = fn.replace("%channelid%", idholder)
+        fn = fn.replace("%channel%", self.myrow[9])
+        # Placeholders end
+        
+        if "/" in fn or "\\" in fn:
+            try:
+                path = fn.replace('\\', "/")
+                pos = path.rfind("/")
+                path = path[:pos]
+                path = config.cfg_recordpath + path
+                print (path)
+                os.makedirs (path)
+            except Exception as ex:
+                pass            
+        
+        fn = fn + self.ext
+        fn = config.cfg_recordpath + fn
         num = 1
+        print (fn)
         while fileexists(fn) and num<127:
             fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + ("_%s" % num) + self.ext
             num += 1
@@ -987,6 +1013,7 @@ class record(Thread):
             else:
                 internalRetryCount = 0
                 maxRetryCount = 100
+                mybuffer = None
                 while self.bis > datetime.now() and self.stopflag==0:
                     try: 
                         mybuffer = u.read(block_sz)
@@ -1078,7 +1105,7 @@ class record(Thread):
             print ("FFMPEG Record '%s': termination may have failed" % self.name)
 
 def setRecords():
-    rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
+    rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext, channels.cid, channels.cname FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
     for row in rows:
         chk = False
         for t in records:

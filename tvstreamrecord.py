@@ -954,7 +954,9 @@ class record(Thread):
             print (attr)
             try:
                 if config.cfg_switch_proxy == "1" and config.cfg_proxy != "":
-                     os.environ["http_proxy"] = config.cfg_proxy
+                    os.environ["http_proxy"] = config.cfg_proxy
+                else:
+                    os.environ["http_proxy"] = ""
                 self.process = subprocess.Popen(attr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 cleaner = Timer(delta+30, self.cleanProcess) # if ffmpeg won't exit, try to terminate its process in 30 seconds
                 cleaner.start()

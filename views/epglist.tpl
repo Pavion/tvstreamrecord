@@ -1,3 +1,4 @@
+%include ('create.tpl')
 <div id="users-contain" class="ui-widget">
 <h1>§Electronic Program Guide§ - §list view§:
     <button id="grabepg" text1="§Grab EPG from§" text2="§source(s)§" text3="§Stop loading EPG§" text4="§Stopping EPG, please refresh§"></button>
@@ -18,7 +19,7 @@
     </tbody>
 </table>
 </div>
-<div id="dialog_record_from_epg" title="§Detail view§" record="§Record§" cancel="§Cancel§">
+<div id="dialog_record_from_epg" title="§Detail view§" record="§Record§" tunerecord="§Edit&Record§" cancel="§Cancel§">
     <div id="dialog_content"></div>        
 </div>
 <form method='POST' enctype='multipart/form-data' action='/createepg' name='returnform'>

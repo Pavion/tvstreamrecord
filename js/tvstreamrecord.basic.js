@@ -19,6 +19,15 @@
  * Common functions
  */
 
+/** 
+ * Persistent variables
+ */
+var recName; 
+var recChannel;
+var recDate;
+var recStart;
+var recEnd;
+
 /**
  * @param {int} days Number of days to be added to this date object
  * @returns {Date|Date.prototype.addDays.dat}
@@ -217,15 +226,22 @@ function initIcons() {
                     var dat_v = data[i][3].split(" ")[1].substr(0,5); 
                     var dat_b = data[i][4].split(" ")[1].substr(0,5); 
                     $( "#dialog_content" ).html ("<b>" + data[i][1] + ": "+dat_v + " - " + dat_b + "</b><BR><BR>" + data[i][2].replace(/\n/g, '<BR>'));
+                    recName = data[i][1]; 
+                    recChannel = data[i][0];
+                    recDate = data[i][3].split(" ")[0];
+                    recStart = dat_v;
+                    recEnd = dat_b;
+                    
                     $( "#dialog_record_from_epg" ).dialog( "open" );
+                    event.preventDefault();
                     break;
                 }
             }
         }
 
         
-        $( "#dialog_create_record" ).dialog( "open" );
-        event.preventDefault();
+        //$( "#dialog_create_record" ).dialog( "open" );
+        //event.preventDefault();
     });
 
     $( "[id^=icons-]" ).click(function( event ) {
@@ -476,7 +492,7 @@ $(function() {
                 }
             };
 
-            if((dialognr!=-1 && !here('list'))) {
+            if((dialognr!=-1 && !here('list') && !here('epglist'))) {
                 $( this ).dialog( "option", "buttons", [deletebutton, updatebutton, cancelbutton] );
 
                 oTable = $('#table_recordlist').dataTable();
@@ -560,6 +576,31 @@ $(function() {
             click: function() {
                 $( this ).dialog( "close" );
                 document.returnform.submit();
+            }
+        },
+        {
+            text: $( "#dialog_record_from_epg" ).attr("tunerecord"),
+            click: function() {
+                $( this ).dialog( "close" );
+                $( "#dialog_create_record" ).dialog( "open" );
+
+                //$("#prev").val(dialognr);
+                $("#recname").val(recName);
+                $("#timepicker_inline_div1").val(recStart);
+                $("#timepicker_inline_div2").val(recEnd);                
+                
+                if (recChannel<9999) {
+                    $("#channel").val(recChannel);
+                } else {                
+                    var kids = $("#channel").children();
+                    for (var j=0;j<kids.length;j++) {
+                        if (kids[j].innerHTML==recChannel) {
+                            $("#channel").val(kids[j].value);
+                            break;
+                        }	
+                    }
+                }
+                $("#datepicker_create").val( localDate(recDate) );
             }
         },
         {
@@ -962,6 +1003,13 @@ $(function() {
                 if (ft)  {
                     $("#ret").val($(this).attr("rid"));
                     $("#dialog_content").html ( ft );
+                    
+                    recName = $(this).text(); 
+                    recChannel = $(this).attr("cid");
+                    recDate = $(this).attr("at").split(" ")[0];
+                    recStart = $(this).attr("at").split(" ")[1].substr(0,5);
+                    recEnd = $(this).attr("till").split(" ")[1].substr(0,5);
+                    
                     $( "#dialog_record_from_epg" ).dialog( "open" );
                     $(this).removeClass("ui-selected");
                 }

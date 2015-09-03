@@ -1,3 +1,4 @@
+%include ('create.tpl')
 <div id="zoom" zoom="{{zoom}}"></div>
 <div id="users-contain" class="ui-widget">
     <h1>
@@ -44,7 +45,7 @@
     %end
 %end
 </div>
-<div id="dialog_record_from_epg" title="§Detail view§" record="§Record§" cancel="§Cancel§">
+<div id="dialog_record_from_epg" title="§Detail view§" record="§Record§" tunerecord="§Edit&Record§" cancel="§Cancel§">
     <div id="dialog_content">
         <!-- Empty -->
     </div>

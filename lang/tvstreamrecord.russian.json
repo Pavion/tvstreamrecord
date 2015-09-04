@@ -63,7 +63,7 @@
     "Reset log": "Очистить",
     "Retry count for failed records": "Количество повторов при ошибке записи",
     "Do you want to delete all of your EPG data?": "Вы хотите удалить все данные EPG?",
-    "Record name mask (valid placeholders: %date% and %title%, default: '%date% - %title%')": "Маска для имени записи (возможные шаблоны: %date% и %title%, по умолчанию: '%date% - %title%')", 
+    "Record name/path mask (valid placeholders: %date%, %title%, %year%, %month%, %day%, %channel%, %channelid%. Default: '%date% - %title%')": "Маска/путь файла записи (возможные шаблоны: %date%, %title%, %year%, %month%, %day%, %channel%, %channelid%. По умолчанию: '%date% - %title%')", 
     "Record name mask must have at least one placeholder": "Маска для имени записи должна содержать как минимум один шаблон",
     "Enable postprocessing": "Разрешить дополнительную обработку записей",
     "Postprocessing command (use %file% for full filename)": "Командная строка дополнительной обработки (шаблон %file% для полного имени файла)",

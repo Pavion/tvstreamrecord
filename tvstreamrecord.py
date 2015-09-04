@@ -960,7 +960,7 @@ class record(Thread):
                 pos = path.rfind("/")
                 path = path[:pos]
                 path = config.cfg_recordpath + path
-                print (path)
+                #print (path)
                 os.makedirs (path)
             except Exception as ex:
                 pass            
@@ -968,7 +968,7 @@ class record(Thread):
         fn = fn + self.ext
         fn = config.cfg_recordpath + fn
         num = 1
-        print (fn)
+        #print (fn)
         while fileexists(fn) and num<127:
             fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + ("_%s" % num) + self.ext
             num += 1

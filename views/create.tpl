@@ -1,4 +1,4 @@
-<div id="dialog_create_record" title="§Create new record§" cancel="§Cancel§" delete="§Delete§" change="§Update§" schedule="§Create§">
+<div id="dialog_create_record" ctitle="§Create new record§" utitle="§Update record§" cancel="§Cancel§" delete="§Delete§" change="§Update§" schedule="§Create§">
 <form>
     <fieldset>
         <input type="hidden" maxlength="5" id="prev" value=""/> 

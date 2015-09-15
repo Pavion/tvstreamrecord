@@ -495,6 +495,7 @@ $(function() {
 
             if((dialognr!=-1 && !here('list') && !here('epglist'))) {
                 $( this ).dialog( "option", "buttons", [deletebutton, updatebutton, cancelbutton] );
+                $( this ).dialog( "option", "title", $( this ).attr("utitle"));
 
                 oTable = $('#table_recordlist').dataTable();
                 var data = oTable.fnGetData();
@@ -529,6 +530,7 @@ $(function() {
                 }
             } else {
                 $( this ).dialog( "option", "buttons", [updatebutton, cancelbutton] );
+                $( this ).dialog( "option", "title", $( this ).attr("ctitle"));
 
                 var today = new Date();
                 var dd = today.getDate();

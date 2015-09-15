@@ -1222,8 +1222,10 @@ $(function() {
             
             if (!myalert) {            	
                 var my_config_data_str = JSON.stringify(my_config_data);
-                post("/config", {configdata:my_config_data_str}, 1);                
                 $("#label_config_saved").text($("#label_config_saved").attr("info"));
+                $.post("/config",  {configdata:my_config_data_str}, function() {
+                        $("#label_config_saved").text("");
+                    }, "json");                
             }            
         });
 

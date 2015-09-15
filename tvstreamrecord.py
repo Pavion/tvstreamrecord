@@ -941,6 +941,7 @@ class record(Thread):
         if sys.version_info[0] < 3 and streamtype in fftypes:
             # workaround for unicode, damn me if I ever get it working with 2.x
             titleholder = "".join([x if ord(x) < 128 else "_" for x in titleholder])
+        idholder = "%04d" % (self.myrow[8], )
         
         fn = config.cfg_record_mask
         # Placeholders
@@ -949,10 +950,11 @@ class record(Thread):
         fn = fn.replace("%month%", datetime.now().strftime("%m"))
         fn = fn.replace("%year%", datetime.now().strftime("%Y"))
         fn = fn.replace("%day%", datetime.now().strftime("%d"))
-        idholder = "%04d" % (self.myrow[8], )
         fn = fn.replace("%channelid%", idholder)
         fn = fn.replace("%channel%", self.myrow[9])
         # Placeholders end
+        for i in range(0, len(ffargs)):
+            ffargs[i] = ffargs[i].replace("%date%", dateholder).replace("%title%", titleholder).replace("%month%", datetime.now().strftime("%m")).replace("%year%", datetime.now().strftime("%Y")).replace("%day%", datetime.now().strftime("%d")).replace("%channelid%", idholder).replace("%channel%", self.myrow[9])
         
         if "/" in fn or "\\" in fn:
             try:

@@ -1,5 +1,6 @@
 %include ('create.tpl')
 <div id="zoom" zoom="{{zoom}}"></div>
+<div id="delta_for_epg" delta="{{delta}}"></div>
 <div id="users-contain" class="ui-widget">
     <h1>
         <div id="label_epg_1">§Electronic Program Guide§. §Current date§:</div>

@@ -225,12 +225,13 @@ function initIcons() {
 //                    $("#dialog_content").html (data[i][7]);
                     var dat_v = data[i][3].split(" ")[1].substr(0,5); 
                     var dat_b = data[i][4].split(" ")[1].substr(0,5); 
+                    var delta = $("#delta_for_epg").attr("delta");
                     $( "#dialog_content" ).html ("<b>" + data[i][1] + ": "+dat_v + " - " + dat_b + "</b><BR><BR>" + data[i][2].replace(/\n/g, '<BR>'));
                     recName = data[i][1]; 
                     recChannel = data[i][0];
                     recDate = data[i][3].split(" ")[0];
-                    recStart = dat_v;
-                    recEnd = dat_b;
+                    recStart = new Date(Date.parse(data[i][3].replace(" ", "T"))-delta*60000).toTimeString().substring(0, 5);
+                    recEnd = new Date(Date.parse(data[i][4].replace(" ", "T"))+delta*60000).toTimeString().substring(0, 5);;
                     
                     $( "#dialog_record_from_epg" ).dialog( "open" );
                     event.preventDefault();
@@ -1007,9 +1008,10 @@ $(function() {
                     recName = $(this).text(); 
                     recChannel = $(this).attr("cid");
                     recDate = $(this).attr("at").split(" ")[0];
-                    recStart = $(this).attr("at").split(" ")[1].substr(0,5);
-                    recEnd = $(this).attr("till").split(" ")[1].substr(0,5);
-                    
+                    var delta = $("#delta_for_epg").attr("delta");
+                    recStart = new Date(Date.parse($(this).attr("at").replace(" ", "T"))-delta*60000).toTimeString().substring(0, 5);
+                    recEnd = new Date(Date.parse($(this).attr("till").replace(" ", "T"))+delta*60000).toTimeString().substring(0, 5);
+
                     $( "#dialog_record_from_epg" ).dialog( "open" );
                     $(this).removeClass("ui-selected");
                 }

@@ -77,7 +77,7 @@
 <tr><td>§Delete/reset all EPG data§</td><td><button id="button_removeepg">§Delete§</button></td></tr>
 </tbody>
 </table>
-<font size="0.6em">* §For more information about installing and configuring mc2xml please visit its homepage at§: <a href="http://mc2xml.hosterbox.net/">mc2xml.hosterbox.net</a></font>
+<font size="0.6em"><sup>*</sup> §For more information about installing and configuring mc2xml please visit its homepage at§: <a href="http://mc2xml.hosterbox.net/">mc2xml.hosterbox.net</a></font>
 </div>
 <div id="configtabs-3">
 <!--FFMPEG configuration-->
@@ -89,14 +89,15 @@
 </tr>
 </thead>
 <tbody>
-<tr><td>§Stream types, which should be forwarded to ffmpeg (space separated)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ffmpeg_types" value="" autocomplete="off" /></td></tr>
+<tr><td>§Stream types, which should be forwarded to ffmpeg (space separated)§<sup>*</sup></td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ffmpeg_types" value="" autocomplete="off" /></td></tr>
 <tr><td>§Full path to ffmpeg for other streams support§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ffmpeg_path" value="" autocomplete="off" /></td></tr>
-<tr><td>§Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')§ <sup>*</sup></td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ffmpeg_params" value="" autocomplete="off" /></td></tr>
+<tr><td>§Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')§<sup>**</sup></td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ffmpeg_params" value="" autocomplete="off" /></td></tr>
 <tr><td>§Enable proxy for ffmpeg§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_proxy" /></td></tr>
 <tr><td>§Proxy URL for ffmpeg§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_proxy" value="" autocomplete="off" /></td></tr>
 </tbody>
 </table>
-<font size="0.6em">* §For more information regarding ffmpeg and its command line parameters please visit its homepage at§: <a href="http://ffmpeg.org">ffmpeg.org</a></font>
+<font size="0.6em"><sup>*</sup> §For more information regarding ffmpeg and its command line parameters please visit its homepage at§: <a href="http://ffmpeg.org">ffmpeg.org</a></font><br>
+<font size="0.6em"><sup>**</sup> §Valid placeholders§: %date%, %title%, %year%, %month%, %day%, %channel%, %channelid%. </font>
 </div>
 <div id="configtabs-4">
 <!--Advanced configuration-->
@@ -111,13 +112,14 @@
 <tr><td>§Purge database records older than [days]§</td><td><input id="cfg_purgedelta" /></td></tr>
 <tr><td>§Server bind address (restart needed)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_server_bind_address" value="" autocomplete="off" alert="§Invalid bind address, please check your settings§" /></td></tr>
 <tr><td>§Server port (restart needed)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_server_port" value="" autocomplete="off" alert="§Invalid port, please check your settings§"/></td></tr>
-<tr><td>§Record name/path mask (valid placeholders: %date%, %title%, %year%, %month%, %day%, %channel%, %channelid%. Default: '%date% - %title%')§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_record_mask" value="" autocomplete="off" alert="§Record name mask must have at least one placeholder§"/></td></tr>
+<tr><td>§Record name/path mask (default: '%date% - %title%')§<sup>*</sup></td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_record_mask" value="" autocomplete="off" alert="§Record name mask must have at least one placeholder§"/></td></tr>
 <tr><td>§Reset the log file§</td><td><button id="button_resetlog">§Reset log§</button></td></tr>
 <tr><td>§Retry count for failed records§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_retry_count" value="" autocomplete="off" alert="§Invalid value, please enter a positive number or a zero§"/></td></tr>
 <tr><td>§Enable postprocessing§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_postprocess" /></td></tr>
 <tr><td>§Postprocessing command (use %file% for full filename)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_postprocess" value="" autocomplete="off" /></td></tr>
 </tbody>
 </table>
+<font size="0.6em"><sup>*</sup> §Valid placeholders§: %date%, %title%, %year%, %month%, %day%, %channel%, %channelid%. </font>
 </div>
 </div>
 <!--</form>-->

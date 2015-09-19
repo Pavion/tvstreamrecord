@@ -955,14 +955,13 @@ class record(Thread):
         # Placeholders end
         for i in range(0, len(ffargs)):
             ffargs[i] = ffargs[i].replace("%date%", dateholder).replace("%title%", titleholder).replace("%month%", datetime.now().strftime("%m")).replace("%year%", datetime.now().strftime("%Y")).replace("%day%", datetime.now().strftime("%d")).replace("%channelid%", idholder).replace("%channel%", self.myrow[9])
-        
+
         if "/" in fn or "\\" in fn:
             try:
                 path = fn.replace('\\', "/")
                 pos = path.rfind("/")
                 path = path[:pos]
                 path = config.cfg_recordpath + path
-                #print (path)
                 os.makedirs (path)
             except Exception as ex:
                 pass            

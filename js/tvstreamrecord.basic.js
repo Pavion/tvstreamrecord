@@ -40,6 +40,16 @@ Date.prototype.addDays = function(days)
 };
 
 /**
+ * Parse String to local Date
+ * @param {type} stringDate in form: yyyy-mm-dd hh:mm:ss
+ * @returns {Date} object
+ */
+function parseDate(stringDate) {
+    var comp = stringDate.replace(" ", "-").replace(/:/g, "-").split("-");
+    return new Date(comp[0], comp[1], comp[2], comp[3], comp[4], comp[5]);
+}
+
+/**
  * String function substitute 
  */
 if(typeof String.prototype.trim !== 'function') {
@@ -230,8 +240,8 @@ function initIcons() {
                     recName = data[i][1]; 
                     recChannel = data[i][0];
                     recDate = data[i][3].split(" ")[0];
-                    recStart = new Date(Date.parse(data[i][3].replace(" ", "T"))-delta*60000).toTimeString().substring(0, 5);
-                    recEnd = new Date(Date.parse(data[i][4].replace(" ", "T"))+delta*60000).toTimeString().substring(0, 5);;
+                    recStart = new Date( parseDate(data[i][3]).valueOf() - delta*60000 ).toTimeString().substring(0, 5);
+                    recEnd = new Date( parseDate(data[i][4]).valueOf() + delta*60000 ).toTimeString().substring(0, 5);
                     
                     $( "#dialog_record_from_epg" ).dialog( "open" );
                     event.preventDefault();
@@ -1011,9 +1021,8 @@ $(function() {
                     recChannel = $(this).attr("cid");
                     recDate = $(this).attr("at").split(" ")[0];
                     var delta = $("#delta_for_epg").attr("delta");
-                    recStart = new Date(Date.parse($(this).attr("at").replace(" ", "T"))-delta*60000).toTimeString().substring(0, 5);
-                    recEnd = new Date(Date.parse($(this).attr("till").replace(" ", "T"))+delta*60000).toTimeString().substring(0, 5);
-
+                    recStart = new Date( parseDate($(this).attr("at")).valueOf() - delta*60000 ).toTimeString().substring(0, 5);
+                    recEnd = new Date( parseDate($(this).attr("till")).valueOf() + delta*60000 ).toTimeString().substring(0, 5);
                     $( "#dialog_record_from_epg" ).dialog( "open" );
                     $(this).removeClass("ui-selected");
                 }

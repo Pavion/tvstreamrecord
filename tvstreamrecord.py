@@ -32,13 +32,15 @@ from sql import sqlRun, sqlCreateAll, purgeDB
 import grabber
 import xmltv
 import json
-try:
-    import urllib2 as urllib32
-except:
-    import urllib.request as urllib32
+import sys
+if sys.version_info[0] == 2: 
+    # Python 2.x
+    import urllib as urllib32    
+else: 
+    # Python 3.x
+    import urllib.request as urllib32 
 from threading import Thread, Timer
 import os
-import sys
 from mylogging import logInit, logRenew, logStop
 import hashlib
 import codecs

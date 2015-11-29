@@ -460,7 +460,7 @@ $(function() {
             };
 
             var updatebutton = {
-                text: ((dialognr==-1 || here('list'))?$(this).attr("schedule"):$(this).attr("change")), click: function()
+                text: ((dialognr==-1 || here('list') || here('epglist'))?$(this).attr("schedule"):$(this).attr("change")), click: function()
                 {
                     var bValid = true;
                     allFields.removeClass( "ui-state-error" );
@@ -498,7 +498,9 @@ $(function() {
                             am:  $.datepicker.formatDate("yy-mm-dd", $("#datepicker_create").datepicker( "getDate" )),
                             aktiv:akt,
                             recurr:mask
-                        }, 1);
+                        },
+                            (here('list') || here('epglist'))?0:1
+                        );
                     }
                 }
             };

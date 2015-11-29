@@ -914,7 +914,7 @@ $(function() {
             x = +$(this).attr('x');
             cnt = +$(this).attr('cnt');
             rec = $(this).attr('recording');
-            if(rec == 1) $(this).css("background", "#98FB98");
+            if(rec == 1) $(this).css({"background":"#98FB98","color":"#000"}); // thx Pavol
             $(this).css("font-size", ((cnt==0?11:8)+Math.round(Math.abs(zoom*2))) + 'px');
 
             if (zoom>0) {

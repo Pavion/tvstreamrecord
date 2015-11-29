@@ -82,7 +82,8 @@ function endsWith(str, suffix) {
  * @returns {String} location we are at 
  */
 function where() {
-    return window.location.href.slice(window.location.href.lastIndexOf("/"));
+    var pos = window.location.href.lastIndexOf("&");
+    return window.location.href.slice(window.location.href.lastIndexOf("/"), pos==-1?999:pos);
 }
 
 /** 
@@ -673,10 +674,10 @@ $(function() {
             "bStateSave": true,
             "fnStateSave": function (oSettings, oData) {
                 oData.oSearch.sSearch=''; // Don't save search text
-                localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
+                localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );
             },
             "fnStateLoad": function (oSettings) {
-                return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
+                return JSON.parse( localStorage.getItem('DataTables_'+where()) );
             },
             "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 6,7,8,9 ] },
                               { "iDataSort": 8, "aTargets": [ 2 ] },
@@ -868,10 +869,10 @@ $(function() {
             "bStateSave": true,
             "fnStateSave": function (oSettings, oData) {
                 oData.oSearch.sSearch=''; // Don't save search text
-                localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
+                localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );
             },
             "fnStateLoad": function (oSettings) {
-                return JSON.parse(localStorage.getItem('DataTables_'+window.location.pathname));
+                return JSON.parse(localStorage.getItem('DataTables_'+where()));
             },
             "fnDrawCallback": function( oSettings ) {
                 initSwitch();
@@ -1069,12 +1070,12 @@ $(function() {
             "bStateSave": true,
             "fnStateSave": function (oSettings, oData) {
                 oData.oSearch.sSearch=''; // Don't save search text
-                localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
+                localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );
             },
             "fnStateLoad": function (oSettings) {
-                var oData = JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
+                var oData = JSON.parse( localStorage.getItem('DataTables_'+where()) );
                 var keyword_for_epg = $('#keyword_for_epg').attr('keyword_for_epg');
-                if ( keyword_for_epg != '' ) {
+                if ( oData && keyword_for_epg != '' ) {
                     oData.oSearch.sSearch=keyword_for_epg;
                 }                 
                 return oData;
@@ -1319,10 +1320,10 @@ $(function() {
             "bStateSave": true,
             "fnStateSave": function (oSettings, oData) {
                 oData.oSearch.sSearch=''; // Don't save search text
-                localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
+                localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );
             },
             "fnStateLoad": function (oSettings) {
-                return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
+                return JSON.parse( localStorage.getItem('DataTables_'+where()) );
             },
             "fnDrawCallback": function( oSettings ) {
                 paintTable();

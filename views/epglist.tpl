@@ -1,4 +1,5 @@
 %include ('create.tpl')
+<div id="keyword_for_epg" keyword_for_epg="{{keyword_for_epg}}"></div>
 <div id="delta_for_epg" delta="{{delta}}"></div>
 <div id="users-contain" class="ui-widget">
 <h1>§Electronic Program Guide§ - §list view§:

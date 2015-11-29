@@ -692,8 +692,9 @@ def epg_s():
     return internationalize(template('epgchart', curr=datetime.strftime(d_von, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), delta=config.cfg_delta_for_epg))
 
 @route('/epglist')
-def epglist_s():
-    return internationalize(template('epglist', listmode=config.cfg_switch_epglist_mode, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), delta=config.cfg_delta_for_epg))
+@route('/epglist&<keyword>')
+def epglist_s(keyword=''):
+    return internationalize(template('epglist', keyword_for_epg=keyword, listmode=config.cfg_switch_epglist_mode, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), delta=config.cfg_delta_for_epg))
 
 @route('/epglist_getter')
 def epglist_getter():

@@ -1072,7 +1072,12 @@ $(function() {
                 localStorage.setItem( 'DataTables_'+window.location.pathname, JSON.stringify(oData) );
             },
             "fnStateLoad": function (oSettings) {
-                return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
+                var oData = JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
+                var keyword_for_epg = $('#keyword_for_epg').attr('keyword_for_epg');
+                if ( keyword_for_epg != '' ) {
+                    oData.oSearch.sSearch=keyword_for_epg;
+                }                 
+                return oData;
             },
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                 $('td:eq(3)', nRow).html( localDateTime( aData[3] ) );
@@ -1080,7 +1085,7 @@ $(function() {
                 $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
             }
         });
-
+                
         initIcons();
         initEpgState();      
         

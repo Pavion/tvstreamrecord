@@ -35,7 +35,7 @@ import json
 import sys
 if sys.version_info[0] == 2: 
     # Python 2.x
-    import urllib as urllib32    
+    import urllib as urllib32
 else: 
     # Python 3.x
     import urllib.request as urllib32 
@@ -56,6 +56,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
+shutdown = False 
 version = '1.1.4'
 
 @route('/live/<filename>')
@@ -247,7 +248,7 @@ print ("Logging output initialized")
 @post('/resetlog')
 def log_reset():
     logRenew()
-    return
+    return "null"
 
 @route('/log')
 def log_s():
@@ -285,7 +286,7 @@ def list_p():
         sqlRun("UPDATE channels SET cenabled=%s WHERE cid=%s" % (what, myid))
         sqlRun("UPDATE records SET renabled=%s WHERE cid=%s" % (what, myid))
     setRecords()
-    return
+    return "null"
 
 #------------------------------- Channel creation -------------------------------
 
@@ -299,13 +300,13 @@ def clgen_p():
             f.write("#EXTINF:0,"+row[1]+"\n")
             f.write(row[2]+"\n")
         f.close()
-    return
+    return "null"
 
 @post('/grab_channel')
 def grabchannel():
     myid = request.forms.myid
     sqlRun("UPDATE channels SET epgscan=-epgscan+1 WHERE cid = ?", (myid, ))
-    return
+    return "null"
 
 @post('/create_channel')
 def createchannel():
@@ -367,8 +368,8 @@ def createchannel():
         if exists:
             sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= ?", (cid, ))
             sqlRun("UPDATE records SET cid = cid+1 WHERE cid >= ?", (cid, ))
-        sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid, epggrab))
-    return
+        sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid, epggrab))    
+    return "null"
 
 @post('/upload')
 def upload_p():
@@ -421,7 +422,7 @@ def config_p():
             if cfg[1]!=config.cfg_grab_time:
                 grabthread.run()
     config.setConfig(configdata)
-    return
+    return "null"
 
 @route('/config')
 def config_s():
@@ -608,7 +609,7 @@ def grabepg():
             doGrab.start()
     elif mode == 1:
         grabthread.stop()
-    return
+    return "null"
 
 #------------------------------- EPG painting part -------------------------------
 
@@ -617,14 +618,21 @@ def removeepg():
     sqlRun("DELETE FROM guide")
     sqlRun("DELETE FROM guide_chan")
     print ("All EPG data was deleted")
-    return
+    return "null"
 
 @post('/epg')
 def epg_p():
     day = request.forms.datepicker_epg
     global dayshown
     dayshown = datetime.strptime(day,"%Y-%m-%d")
-    return
+    return "null"
+
+@post('/setzoom')
+def zoom_p():
+    zoom = request.forms.zoom
+    config.cfg_grab_zoom = zoom
+    config.saveConfig()
+    return "null"
 
 @route('/epgchart')
 def epg_s():
@@ -809,7 +817,7 @@ def getepgday():
     if rows:
         return json.dumps({"aaData": rows} )
     else:
-        return None
+        return "null"
 
 #------------------------------- Record List -------------------------------
 
@@ -837,7 +845,7 @@ def records_p():
     else:
         sqlRun("UPDATE records SET renabled=? WHERE rowid=?", (what, myid))
     setRecords()
-    return
+    return "null"
 
 #------------------------------- Record creation -------------------------------
 
@@ -846,7 +854,7 @@ def createepg():
     sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=? GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_delta_for_epg), (request.forms.ret, ))
     setRecords()
     redirect("/records")
-    return
+    return "null"
 
 @post('/create')
 def create_p():
@@ -874,7 +882,7 @@ def create_p():
 
     setRecords()
 
-    return
+    return "null"
 
 def getBool(stri):
     r = 0
@@ -1008,12 +1016,12 @@ class record(Thread):
                     f = open(fn, 'wb')
                 except:
                     f = open(fn.encode('utf-8').decode(sys.getfilesystemencoding()), 'wb')
-            except urllib32.URLError:
-                print ("Stream could not be parsed (URL=%s), aborting..." % (self.url))
+            #except urllib32.URLError:
+            #    print ("Stream could not be parsed (URL=%s), aborting..." % (self.url))
             except ValueError as ex:
                 print ("Unknown URL type (%s), record could not be started. Please check your channel settings" % (self.url))
             except Exception as ex:
-                print ("Output file %s could not be created. Please check your settings. (Err: %s)" % (fn, ex))
+                print ("Output file %s could not be created. Please check your settings. Description: %s" % (fn, ex))
             else:
                 internalRetryCount = 0
                 maxRetryCount = 100
@@ -1073,7 +1081,7 @@ class record(Thread):
                 sleep(10)
                 self.run()
                 return
-
+        
         self.clean()
         rectimer = Timer(10, setRecords)
         rectimer.start()
@@ -1109,6 +1117,8 @@ class record(Thread):
             print ("FFMPEG Record '%s': termination may have failed" % self.name)
 
 def setRecords():
+    if shutdown: 
+        return
     rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext, channels.cid, channels.cname FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
     for row in rows:
         chk = False
@@ -1124,7 +1134,6 @@ def setRecords():
             thread = record(row)
             thread.start()
             records.append(thread)
-
 
     for i in range(len(records)-1,-1,-1):
         t = records[i]
@@ -1153,6 +1162,8 @@ grabthread.run()
 print ("Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port))
 run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
 
+# Server is shutting down, all threads should be eliminated
+shutdown = True 
 print ("Server aborted. Stopping all records before exiting...")
 while len(records)>0:
     records[0].stop()

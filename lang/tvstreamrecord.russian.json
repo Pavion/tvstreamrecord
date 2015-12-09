@@ -43,11 +43,11 @@
     "Enable stream scan/grab": "Включить импорт из потокового видео",
     "Maximal EPG scan duration per channel, [seconds] (default: '60')": "Максимальная длительность импортирования одного канала [сек.] (по умолчанию '60')",
     "Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)": "Время для ежедневного импорта из выбранных источников (формат hh:mm, 24 часа, по умолчанию '0' для ручного импорта)",
-    "Zoom level for EPG view. Positive values for horizontal, negative for vertical view (default '1' for old style)": "Масштаб для EPG картинки. Положительные числа для горизонтального, негативные числа для вертикального вида (по умолчанию '1' для классического вида)",
     "EPG list mode. Disable for client-side processing (more network load), enable for server-side processing (more server load)": "Режим для EPG таблицы. Отключить для обработки данных клиентом (большая нагрузка на сеть), включить для обработки сервером (большая нагрузка на сервер)",
     "Client-side only: maximal number of events to request from server (earlier first), solves some perfomance issues": "Для обработки данных клиентом: максимальное количество записей, требуемых с сервера (сортировка по времени), помогает при медленной обработке таблицы",
     "Delete/reset all EPG data": "Удалить все данные EPG",
     "For more information about installing and configuring mc2xml please visit its homepage at": "Дополнительную информацию по установке и конфигурации mc2xml Вы можете получить на его странице",
+    "Deprecated and will be removed in a future version": "Устарело и будет в будущем удалено",
 
     "Stream types, which should be forwarded to ffmpeg (space separated)": "Потоковые протоколы, передающиеся ffmpeg (разделение пробелом)",
     "Full path to ffmpeg for other streams support": "Полный путь к ffmpeg для поддержки дополнительных протоколов",
@@ -110,6 +110,10 @@
     "Highlight": "Подсветить",
     "Channel disable": "Отключить канал",
     "Do you want to disable this channel? You can enable it again at the channel list page.": "Вы действительно хотите отключить этот канал? Вы можете вновь включить его на соответствующей страничке.",
+    "Zoom:": "Масштаб:",
+    "Reset zoom": "Восстановить масштаб",
+    "Vertical": "Вертикально",
+    "Horizontal": "Горизонтально",
 
     "list view": "таблица",
     "Title": "Название",
@@ -130,17 +134,13 @@
     "Detail view": "Детальный вид",
     "Purging records": "Очистка записей",
 
-    "Grab EPG from":"EPG импортировать из",
-    "source(s)":"источника(ов)",
-    "Stop loading EPG":"Прекратить EPG импорт",
-    "Stopping EPG, please refresh": "Импорт прекращается, обновите страничку",
+    "Import EPG": "Импорт EPG",
 
     "none": "нет",
 
     "Invalid port, please check your settings": "Неверно указан порт, пожалуйста проверьте настройки",
     "Invalid bind address, please check your settings": "Неправильный адрес сервера, пожалуйста проверьте настройки",
     "Invalid grab time, please check your settings": "Неверное время дня для импортирования EPG, пожалуйста проверьте настройки",
-    "Invalid EPG zoom, please check your settings": "Неверный масштаб для EPG картинки, пожалуйста проверьте настройки",
     "Invalid value, please enter a positive number or a zero": "Неверное значение. Пожалуйста введите положительное число или ноль",
     "Saving configuration...": "Конфигурация сохраняется...",
     

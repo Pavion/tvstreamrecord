@@ -43,11 +43,11 @@
     "Enable stream scan/grab": "Import aus Streams einschalten",
     "Maximal EPG scan duration per channel, [seconds] (default: '60')": "Maximale Importdauer pro Sender [Sekunden] (Vorgabe '60')",
     "Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)": "Uhrzeit für täglichen automatischen Import (hh:mm Format, 24h-basiert, Vorgabe '0' zum Ausschalten)",
-    "Zoom level for EPG view. Positive values for horizontal, negative for vertical view (default '1' for old style)": "Zoom-Stufe für die EPG-Chartdarstellung. Positive Werte für horizontale, negative Werte für vertikale Ansicht (Vorgabe '1' für die klassische Ansicht)",
     "EPG list mode. Disable for client-side processing (more network load), enable for server-side processing (more server load)": "EPG-Listenmodus. Ausschalten für die Client-seitige Verarbeitung (mehr Netzwerklast), einschalten für die Server-seitige Verarbeitung (mehr Serverauslastung)",
     "Client-side only: maximal number of events to request from server (earlier first), solves some perfomance issues": "Nur Client-seitig: maximale Anzahl von Programmen, die vom Server angefragt werden (frühere zuerst), hilft beim langsamen Seitenaufbau",
     "Delete/reset all EPG data": "Alle EPG-Daten löschen/zurücksetzen",
     "For more information about installing and configuring mc2xml please visit its homepage at": "Für mehr Information über die Installation und Konfiguration von mc2xml besuchen Sie bitte seine Seite",
+    "Deprecated and will be removed in a future version": "Veraltet und wird in einer zukünftigen Version entfernt",
     
     "Stream types, which should be forwarded to ffmpeg (space separated)": "Stream-Protokolle, die an ffmpeg weitergeleitet werden sollen (leerzeichengetrennt)",
     "Full path to ffmpeg for other streams support": "Kompletter Pfad für ffmpeg",
@@ -110,6 +110,10 @@
     "Highlight": "Markieren",
     "Channel disable": "Sender ausschalten",
     "Do you want to disable this channel? You can enable it again at the channel list page.": "Wollen Sie diesen Sender ausschalten? Sie können ihn auf der Senderseite wiederzuschalten.",
+    "Zoom:": "Zoom:",
+    "Reset zoom": "Zoom zurücksetzen",
+    "Vertical": "Vertikal",
+    "Horizontal": "Horizontal",
     
     "list view": "Listenansicht",
     "Title": "Titel",
@@ -130,17 +134,13 @@
     "Detail view": "Detailierte Ansicht",
     "Purging records": "Aufnahmen bereinigen",
     
-    "Grab EPG from":"EPG importieren aus",
-    "source(s)":"Quelle(n)",
-    "Stop loading EPG":"EPG Import anhalten",
-    "Stopping EPG, please refresh":"Wird angehalten, bitte aktualisieren",
+    "Import EPG": "EPG importieren",
         
     "none": "keine",
     
     "Invalid port, please check your settings": "Falsche Portangabe, bitte überprüfen",
     "Invalid bind address, please check your settings": "Falsche Serveradresse, bitte überprüfen", 
     "Invalid grab time, please check your settings": "Falsche Uhrzeit für EPG-Import, bitte überprüfen",
-    "Invalid EPG zoom, please check your settings": "Falsche EPG-Zoomstufe, bitte überprüfen",
     "Invalid value, please enter a positive number or a zero": "Falsche Eingabe. Bitte eine positive Zahl oder eine Null eingeben",
     "Saving configuration...": "Konfiguration wird gespeichert...",
     

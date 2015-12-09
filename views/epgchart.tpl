@@ -1,5 +1,4 @@
 %include ('create.tpl')
-<div id="zoom" zoom="{{zoom}}"></div>
 <div id="delta_for_epg" delta="{{delta}}"></div>
 <div id="users-contain" class="ui-widget">
     <h1>
@@ -10,7 +9,9 @@
         <div id="label_epg_2">§Keyword§:</div>
         <input type="text" maxlength="50" id="searchepg" class="text ui-widget-content ui-corner-all" name="searchepg" value=""/> 
         <button id="searchepgbutton">§Highlight§</button>
-        <button id="grabepg" text1="§Grab EPG from§" text2="§source(s)§" text3="§Stop loading EPG§" text4="§Stopping EPG, please refresh§"></button>
+        <button id="grabepg">§Import EPG§</button>
+        <br><br>    
+        <div id="zoom_info"><div class="lefty">§Zoom:§</div><input type="text" zoom="{{zoom}}" id="zoom_amount" readonly class="text ui-widget-content ui-corner-all" style="border:0; font-weight:bold;"><div class="lefty">§Vertical§</div><div id="slider_zoom"></div><div class="lefty">§Horizontal§</div><button id="zoom_reset">§Reset zoom§</button></div>
     </h1>
 </div>
 %cnt=0

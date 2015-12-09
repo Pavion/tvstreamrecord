@@ -191,8 +191,8 @@ label#append {float: left; margin-top: 3px;}
     margin-top: 3px; 
 }
 
-th.ccontrols { width: 8.5em; min-width: 8.5em; }
-th.cid { width: 40px; }
+th.ccontrols { width: 7.5em; min-width: 7.5em; }
+th.cid { width: 70px; }
 th.cname { width: 150px; }
 th.cext { width: 50px; }
 
@@ -221,21 +221,6 @@ th.econtrol { width: 30px; }
 
 #label_config_saved { float: right;  margin-top: 5px; }
 
-/* blue table style */
-/*
-table.dataTable tr.odd { background-color: #E2E4FF; }
-table.dataTable tr.even { background-color: white; }
-table.dataTable tr.odd td.sorting_1 { background-color: #D3D6FF; }
-table.dataTable tr.even td.sorting_1 { background-color: #EAEBFF; }
-*/
-
-/* green table style */
-
-table.dataTable tr.odd { background-color: #ddffdd; }
-table.dataTable tr.even { background-color: #eeffee; }
-table.dataTable tr.odd td.sorting_1 { background-color: #C4FFC4; }
-table.dataTable tr.even td.sorting_1 { background-color: #D5FFD5; }
-
 table.dataTable { color:black; }
 table.dataTable a { color:black; }
 
@@ -263,4 +248,27 @@ div#users-contain table td, div#users-contain table th { border: 1px solid #eee;
     margin-top: 20%;
     position: absolute;
     z-index: 999;
+}
+
+#slider_zoom {
+    float: left;
+    width: 400px;
+    margin: 0.1em 0.5em 0em 0.5em;
+}
+#zoom_reset  {
+    margin-top: -0.2em;
+    margin-left: 0.5em;
+}
+#zoom_amount {
+    width: 40px;
+    margin-left: 1em;
+    margin-right: 0.5em; 
+    float: left; 
+    margin-top: -0.2em;
+}
+#zoom_info {
+    margin-bottom: -1em;
+}
+.lefty {
+    float: left; 
 }

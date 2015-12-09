@@ -3,7 +3,7 @@
 <div id="delta_for_epg" delta="{{delta}}"></div>
 <div id="users-contain" class="ui-widget">
 <h1>§Electronic Program Guide§ - §list view§:
-    <button id="grabepg" text1="§Grab EPG from§" text2="§source(s)§" text3="§Stop loading EPG§" text4="§Stopping EPG, please refresh§"></button>
+    <button id="grabepg">§Import EPG§</button>
     <div id="listmode" value="{{listmode}}"></div>
 </h1>
 <table id="table_epglist">

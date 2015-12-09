@@ -13,7 +13,7 @@ import cherrypy as _cherrypy
 from cherrypy._cpcompat import BytesIO, bytestr, ntob, ntou, py3k, unicodestr
 from cherrypy import _cperror
 from cherrypy.lib import httputil
-
+from cherrypy.lib import is_closable_iterator
 
 def downgrade_wsgi_ux_to_1x(environ):
     """Return a new environ dict for WSGI 1.x from the given WSGI u.x environ.
@@ -278,13 +278,26 @@ class AppResponse(object):
 
     def close(self):
         """Close and de-reference the current request and response. (Core)"""
+        streaming = _cherrypy.serving.response.stream
         self.cpapp.release_serving()
+
+        # We avoid the expense of examining the iterator to see if it's
+        # closable unless we are streaming the response, as that's the
+        # only situation where we are going to have an iterator which
+        # may not have been exhausted yet.
+        if streaming and is_closable_iterator(self.iter_response):
+            iter_close = self.iter_response.close
+            try:
+                iter_close()
+            except Exception:
+                _cherrypy.log(traceback=True, severity=40)
 
     def run(self):
         """Create a Request object using environ."""
         env = self.environ.get
 
-        local = httputil.Host('', int(env('SERVER_PORT', 80)),
+        local = httputil.Host('',
+                              int(env('SERVER_PORT', 80) or -1),
                               env('SERVER_NAME', ''))
         remote = httputil.Host(env('REMOTE_ADDR', ''),
                                int(env('REMOTE_PORT', -1) or -1),

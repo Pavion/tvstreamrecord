@@ -43,11 +43,11 @@
     "Enable stream scan/grab": "",
     "Maximal EPG scan duration per channel, [seconds] (default: '60')": "",
     "Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)": "",
-    "Zoom level for EPG view. Positive values for horizontal, negative for vertical view (default '1' for old style)": "",
     "EPG list mode. Disable for client-side processing (more network load), enable for server-side processing (more server load)": "",
     "Client-side only: maximal number of events to request from server (earlier first), solves some perfomance issues": "",
     "Delete/reset all EPG data": "",
     "For more information about installing and configuring mc2xml please visit its homepage at": "",
+    "Deprecated and will be removed in a future version": "",
     
     "Stream types, which should be forwarded to ffmpeg (space separated)": "",
     "Full path to ffmpeg for other streams support": "",
@@ -110,6 +110,10 @@
     "Highlight": "",
     "Channel disable": "",
     "Do you want to disable this channel? You can enable it again at the channel list page.": "",
+    "Zoom:": "",
+    "Reset zoom": "",
+    "Vertical": "",
+    "Horizontal": "",
     
     "list view": "",
     "Title": "",
@@ -130,17 +134,13 @@
     "Detail view": "",
     "Purging records": "",
     
-    "Grab EPG from": "",
-    "source(s)": "",
-    "Stop loading EPG": "",
-    "Stopping EPG, please refresh": "",
+    "Import EPG": "",
         
     "none": "",
     
     "Invalid port, please check your settings": "",
     "Invalid bind address, please check your settings": "",
     "Invalid grab time, please check your settings": "",
-    "Invalid EPG zoom, please check your settings": "",
     "Invalid value, please enter a positive number or a zero": "",
     "Saving configuration...": "",
     

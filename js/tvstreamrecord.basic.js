@@ -190,7 +190,7 @@ function initProgressbar() {
  */
 var dialognr = -1;
 function initIcons() {
-    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsERec-], [id^=iconsDisable-]" ).hover(
+    $( /*"[id^=iconsEPG-], */"[id^=icons-], [id^=iconsRec-], [id^=iconsERec-], [id^=iconsDisable-]" ).hover(
         function() {
             $( this ).addClass( "ui-state-hover" );
         },
@@ -205,7 +205,7 @@ function initIcons() {
         event.preventDefault();
     });
 
-    $( "[id^=iconsEPG-]" ).click(function( event ) {
+  /*  $( "[id^=iconsEPG-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("iconsEPG-",""));
         post('/grab_channel', { myid:dialognr }, 0);
         if($( this ).children().hasClass( "ui-icon-plus" )) {
@@ -215,7 +215,7 @@ function initIcons() {
              $( this ).children().removeClass( "ui-icon-minus" );
              $( this ).children().addClass( "ui-icon-plus" );
         }
-    });
+    });*/
 
     $( "[id^=iconsRec-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("iconsRec-",""));
@@ -296,7 +296,7 @@ function post(dest1, data1, rel) {
         url: dest1,
         data: data1,
         dataType: "json",
-        success: function(data, textStatus) {
+        success: function() {
             if(rel==1) {
                 window.location.reload(false);
             }
@@ -350,15 +350,15 @@ function getEpgState() {
                 $( "#grabepg" ).hide();
             } else {
                 if (state[0] == false) {
-                    $( "#grabepg" ).html($( "#grabepg" ).attr("text1") + " " + state[2] + " " + $( "#grabepg" ).attr("text2") );
+                    //$( "#grabepg" ).html($( "#grabepg" ).attr("text1") );
                 } else {
-                    if (state[3] == false) {
-                        $( "#grabepg" ).html($( "#grabepg" ).attr("text3") + " (" + state[1] + '/' + state[2] + ")");
-                    } else {
-                        $( "#grabepg" ).html($( "#grabepg" ).attr("text4"));
+                    //if (state[3] == false) {
+                        //$( "#grabepg" ).html($( "#grabepg" ).attr("text3") + " (" + state[1] + '/' + state[2] + ")");
+                    //} else {
+                        //$( "#grabepg" ).html($( "#grabepg" ).attr("text4"));
                         $( "#grabepg" ).prop("disabled", true);
                         $( "#grabepg" ).addClass("ui-state-disabled");
-                    }                    
+                    //}                    
                     epgmode = 1;
                 }
                 $( "#grabepg" ).show();                
@@ -665,6 +665,7 @@ $(function() {
 
 
         $('#table_recordlist').dataTable({
+            "select": "single",
             "oLanguage": {"sUrl": "lang/dataTables." + language + ".json"},
             "bJQueryUI": true,
             "sPaginationType": "full_numbers",
@@ -833,7 +834,7 @@ $(function() {
                             if(data[i][0]==dialognr) {
 
                                 switchMe("#switch_list_active", ($("#switch-" + data[i][0]).attr("checked") == "checked") );
-                                switchMe("#switch_list_grab", ( $("#iconsEPG-" + dialognr).children().attr("class").indexOf("plus") > 0) );
+                                //switchMe("#switch_list_grab", ( $("#iconsEPG-" + dialognr).children().attr("class").indexOf("plus") > 0) );
 
                                 $("#prev").val(data[i][0]);
                                 $("#ccid").val(data[i][0]);
@@ -861,6 +862,7 @@ $(function() {
         });
 
         $('#table_channellist').dataTable({
+            "select": "single",
             "oLanguage": {"sUrl": "lang/dataTables." + language + ".json"},
             "bJQueryUI": true,
             "sPaginationType": "full_numbers",
@@ -885,15 +887,38 @@ $(function() {
                 if (aData[4] == 1) data4 = "plus"; else data4="minus";
                 var chk = "";
                 if (aData[5] == 1) chk = 'checked="checked"';
-                $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-'+data4+'"></span></label><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
+                //$('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-'+data4+'"></span></label><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
+                $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
             }
         });
    } else if (here("epgchart")) {
 // ------------------------------------ EPG chart tab
        
-        var zoom = +$("#zoom").attr('zoom');
+        var zoom = $("#zoom_amount").attr("zoom");
         if (zoom==0) zoom=1;
+        $( "#zoom_amount" ).val(zoom);        
         var maxcnt=0;
+
+        $( "#slider_zoom" ).slider({
+            value: zoom,
+            min: -10,
+            max: 5,
+            step: 0.2,
+            slide: function( event, ui ) {
+                $( "#zoom_amount" ).val( ui.value );
+            },
+            stop: function( event, ui ) {
+                post("setzoom", { zoom: $( "#zoom_amount" ).val() }, 1);
+            }            
+        });
+
+        $( "#zoom_reset" )
+            .button()
+            .click(function(event ) {                
+                post("setzoom", { zoom: 1 }, 1);
+                event.preventDefault();
+            });
+
 
         $( "#date_prev, #date_next" )
             .button()
@@ -1007,7 +1032,7 @@ $(function() {
                 event.preventDefault();
             });
 
-        $("[id=event]").live("click", function(event) {
+        $("[id=event]").on("click", function(event) {
             $("[id=event]").siblings().removeClass("ui-selected");
             if ($(this).attr("cnt")!=="0") {
                 $(this).addClass("ui-selected");
@@ -1217,11 +1242,6 @@ $(function() {
                     }                    
                 } else if ($(this).attr('id')=="cfg_grab_time") {
                     if ( value.trim() != "0" ) if ( ! $.datepicker.parseTime("H:m", $( "#cfg_grab_time" ).val()) ) {
-                        alert( $(this).attr('alert') );
-                        myalert = true; 
-                    }                    
-                } else if ($(this).attr('id')=="cfg_grab_zoom") {
-                    if (!( value.trim() > 0 || value.trim() < 0 )) {
                         alert( $(this).attr('alert') );
                         myalert = true; 
                     }                    

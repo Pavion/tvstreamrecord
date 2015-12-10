@@ -566,7 +566,7 @@ $(function() {
 
                 switchMe("#switch_create", true);
 
-                $("#channel").val(0);
+                $("#channel").val(1);
                 $("#prev").val("");
                 $("#recname").val("");
 

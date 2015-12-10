@@ -57,7 +57,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False 
-version = '1.1.4'
+version = '1.2.0'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -190,7 +190,7 @@ def internationalize(templ,noheader=False):
     if login != "":
         return login
     else:
-        TEMPLATES.clear() # debug only, should be turned off! 
+        #TEMPLATES.clear() # debug only, should be turned off! 
         if not noheader:
             header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale )
             footer = template('footer')

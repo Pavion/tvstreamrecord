@@ -1,9 +1,23 @@
+2015-12-10 1.2.0 EPG zoom redesigned and moved to EPG chart page
+                 Further theme support for tables
+                 EPG grab is now deprecated and will be completely removed in a future version, XMLTV should be the only way for now
+                 Some unneeded redirects and reloads removed
+                 Some visual and layout improvements
+                 Keyword tag for EPG list added (for example /epglist&UFO should always show all events with 'UFO')
+                 Saving such URL as a favorite allows a quick access. Extended support may be added later.
+                 Dependencies updated:
+                    - jQuery
+                    - jQuery Mobile
+                    - DataTables
+                    - CherryPy
+                 Several bug fixes after dependencies update
+
 2015-11-20 1.1.4 Record&Edit support for both EPG pages with no redirect
                  Fix for chunked streams (thanks Karl)
 
 2015-09-02 1.1.3 Proxy support for ffmpeg added
 
-2015-08-11 1.1.2 Internal retries for HTTP connection added 
+2015-08-11 1.1.2 Internal retries for HTTP connection added
 
 2015-08-03 1.1.1 Postprocessing added (can be used to trigger media index)
 

@@ -28,7 +28,11 @@
         
         <!-- Main header -->
         <div data-role="header" class="jqm-header" id="header1">
-            <a href="http://pavion.github.io/tvstreamrecord/" data-role="none" id="logo"><h2><img src="images/tvstreamrecordlogo.png" alt="tvstreamrecord Mobile"></h2></a>
+        <a href="http://pavion.github.io/tvstreamrecord/" data-role="none" id="logo"><h2><img src="images/tvstreamrecordlogo.png" alt="tvstreamrecord Mobile"></h2></a>
+%from datetime import datetime
+%if datetime.now().month == 12:
+<div style="margin: -60px 0 0 150px; z-index: 999;"><img src="images/mc.png"></div>
+%end
             <a href="/records" rel="external" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-back ui-nodisc-icon ui-alt-icon ui-btn-left">Back</a>
             <a href="#" id="btn_add" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-plus ui-nodisc-icon ui-alt-icon ui-btn-right">Add</a>
         </div>

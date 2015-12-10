@@ -33,7 +33,7 @@
 <div id="mybody" class="ui-tabs-panel ui-widget-content ui-corner-bottom" language="{{language}}">
 <div id="menus">
 <div id="logo">
-	<a href="http://pavion.github.io/tvstreamrecord/"><img src="images/tvstreamrecordlogo.png"></a> 
+<a href="http://pavion.github.io/tvstreamrecord/"><img id="img_logo" alt="logo" src="images/tvstreamrecordlogo.png"></a> 
 </div>
     <div id="loaderImage"></div>
 <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
@@ -48,4 +48,8 @@
     <li id="menu-6" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/about">§About§</a></li>
   </ul>
 </div>
+%from datetime import datetime
+%if datetime.now().month == 12:
+<div style="float: right; margin: -6px -192px 0 0; z-index: 999;"><img src="images/mc.png"></div>
+%end
 </div>

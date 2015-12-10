@@ -1,19 +1,26 @@
 %include ('create.tpl')
 <div id="delta_for_epg" delta="{{delta}}"></div>
 <div id="users-contain" class="ui-widget">
-    <h1>
-        <div id="label_epg_1">§Electronic Program Guide§. §Current date§:</div>
-        <button id="date_prev"><</button>
-        <input type="text" maxlength="10" id="datepicker_epg" class="text ui-widget-content ui-corner-all" name="datepicker_epg" dbvalue="{{curr}}"/> 
-        <button id="date_next">></button>
-        <div id="label_epg_2">§Keyword§:</div>
-        <input type="text" maxlength="50" id="searchepg" class="text ui-widget-content ui-corner-all" name="searchepg" value=""/> 
-        <button id="searchepgbutton">§Highlight§</button>
-        <button id="grabepg">§Import EPG§</button>
-        <br><br>    
-        <div id="zoom_info"><div class="lefty">§Zoom:§</div><input type="text" zoom="{{zoom}}" id="zoom_amount" readonly class="text ui-widget-content ui-corner-all" style="border:0; font-weight:bold;"><div class="lefty">§Vertical§</div><div id="slider_zoom"></div><div class="lefty">§Horizontal§</div><button id="zoom_reset">§Reset zoom§</button></div>
-    </h1>
+    <div id="chartheader">
+        <h1>
+            <div id="label_epg_1">§Electronic Program Guide§. §Current date§:</div>
+            <button id="date_prev"><</button>
+            <input type="text" maxlength="10" id="datepicker_epg" class="text ui-widget-content ui-corner-all" name="datepicker_epg" dbvalue="{{curr}}"/> 
+            <button id="date_next">></button>
+            <div id="label_epg_2">§Keyword§:</div>
+            <input type="text" maxlength="50" id="searchepg" class="text ui-widget-content ui-corner-all" name="searchepg" value=""/> 
+            <button id="searchepgbutton">§Highlight§</button>
+            <button id="grabepg">§Import EPG§</button>
+            <div id="zoom_info">
+                <div class="lefty">§Zoom:§</div>
+                <div id="slider_zoom"></div>
+                <input type="text" zoom="{{zoom}}" id="zoom_amount" readonly class="text ui-widget-content ui-corner-all" style="border:0; font-weight:bold;">
+                <button id="flipepg">§Flip chart§</button>
+            </div>
+        </h1>
+    </div>
 </div>
+<div class="clearer"></div>
 %cnt=0
 %for rows in rowss:
     %if len(rows)>0:

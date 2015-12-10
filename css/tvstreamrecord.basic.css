@@ -129,7 +129,7 @@ label#append {float: left; margin-top: 3px;}
 #channelgroup .ui-selected { background: #F39814; color: white; }
 #channelgroup { 
     position: relative; 
-    margin-top: 20px; 
+    margin-top: 50px; 
 }
 
 #channelgroup div { 
@@ -146,7 +146,7 @@ label#append {float: left; margin-top: 3px;}
 
 #dividegroup {
     box-sizing:border-box;
-    position: absolute;    
+    position: absolute; 
 }
 
 #divider {
@@ -156,12 +156,13 @@ label#append {float: left; margin-top: 3px;}
     border-bottom-width: 0px;
     position: absolute;
     float: left;
-    margin-top: 0px; 
+    margin-top: 30px; 
 }
 
 #epg_cname { 
     position: absolute; 
     width: 200px;
+    top: 170px;
 }
 
 #datepicker_epg, #searchepg { 
@@ -173,10 +174,14 @@ label#append {float: left; margin-top: 3px;}
     position: relative;
 }
 
-#date_prev, #date_next {
+#date_prev, #date_next, #searchepgbutton, #grabepg, #flipepg  {
     float: left;
     height: 27px;
 }
+#flipepg {
+    margin-top: -0.3em;
+}
+
 #date_prev {
     margin-left: 5px;    
     margin-right: -5px;    
@@ -253,22 +258,27 @@ div#users-contain table td, div#users-contain table th { border: 1px solid #eee;
 #slider_zoom {
     float: left;
     width: 400px;
-    margin: 0.1em 0.5em 0em 0.5em;
-}
-#zoom_reset  {
-    margin-top: -0.2em;
-    margin-left: 0.5em;
+    margin: 0.1em 0.5em 0em 1em;
 }
 #zoom_amount {
-    width: 40px;
-    margin-left: 1em;
-    margin-right: 0.5em; 
+    width: 35px;
     float: left; 
     margin-top: -0.2em;
 }
 #zoom_info {
     margin-bottom: -1em;
+    float: left;
 }
 .lefty {
     float: left; 
+}
+
+#chartheader {
+    float: left;
+    width:1200px;
+    margin-top: -2.1em;
+}
+
+.clearer {
+    clear: both;
 }

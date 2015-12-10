@@ -111,10 +111,8 @@
     "Channel disable": "Sender ausschalten",
     "Do you want to disable this channel? You can enable it again at the channel list page.": "Wollen Sie diesen Sender ausschalten? Sie können ihn auf der Senderseite wiederzuschalten.",
     "Zoom:": "Zoom:",
-    "Reset zoom": "Zoom zurücksetzen",
-    "Vertical": "Vertikal",
-    "Horizontal": "Horizontal",
-    
+    "Flip chart": "Ansicht drehen",
+
     "list view": "Listenansicht",
     "Title": "Titel",
     "Description": "Beschreibung",

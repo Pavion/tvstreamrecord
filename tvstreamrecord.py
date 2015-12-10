@@ -190,7 +190,7 @@ def internationalize(templ,noheader=False):
     if login != "":
         return login
     else:
-        #TEMPLATES.clear() # debug only, should be turned off! 
+        TEMPLATES.clear() # debug only, should be turned off! 
         if not noheader:
             header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale )
             footer = template('footer')

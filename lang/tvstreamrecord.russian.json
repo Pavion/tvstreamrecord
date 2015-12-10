@@ -111,9 +111,7 @@
     "Channel disable": "Отключить канал",
     "Do you want to disable this channel? You can enable it again at the channel list page.": "Вы действительно хотите отключить этот канал? Вы можете вновь включить его на соответствующей страничке.",
     "Zoom:": "Масштаб:",
-    "Reset zoom": "Восстановить масштаб",
-    "Vertical": "Вертикально",
-    "Horizontal": "Горизонтально",
+    "Flip chart": "Повернуть",
 
     "list view": "таблица",
     "Title": "Название",

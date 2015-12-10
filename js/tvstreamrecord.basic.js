@@ -896,29 +896,34 @@ $(function() {
        
         var zoom = $("#zoom_amount").attr("zoom");
         if (zoom==0) zoom=1;
-        $( "#zoom_amount" ).val(zoom);        
+        $( "#zoom_amount" ).val(Math.abs(zoom));
         var maxcnt=0;
 
-        $( "#slider_zoom" ).slider({
-            value: zoom,
-            min: -10,
+        $( "#slider_zoom" ).slider({            
+            value: Math.abs(zoom),
+            min: 1,
             max: 5,
             step: 0.2,
             slide: function( event, ui ) {
-                $( "#zoom_amount" ).val( ui.value );
+                $( "#zoom_amount" ).val( Math.abs(ui.value) );
             },
             stop: function( event, ui ) {
-                post("setzoom", { zoom: $( "#zoom_amount" ).val() }, 1);
+                var new_zoom = $( "#zoom_amount" ).val();
+                if (zoom<0) {
+                    zoom = -new_zoom; 
+                } else {
+                    zoom = new_zoom;
+                }
+                post("setzoom", { zoom: zoom }, 1);
             }            
         });
 
-        $( "#zoom_reset" )
+        $( "#flipepg" )
             .button()
             .click(function(event ) {                
-                post("setzoom", { zoom: 1 }, 1);
+                post("setzoom", { zoom: -zoom }, 1);
                 event.preventDefault();
             });
-
 
         $( "#date_prev, #date_next" )
             .button()
@@ -947,7 +952,7 @@ $(function() {
 
             if (zoom>0) {
                 $(this).css("height", cnt==0?'20px':'60px');
-                $(this).css("margin-top", cnt==0?10:(80+(cnt-1)*100) + 'px');
+                $(this).css("margin-top", cnt==0?20:(20+(cnt-1)*100) + 'px');
                 $(this).css("margin-left", x+'%');
                 $(this).css("width", w+'%');
 //                if (cnt==0) $(this).css("position", 'fixed');
@@ -964,7 +969,7 @@ $(function() {
             cnt = +$(this).attr('cnt');
             if (cnt>maxcnt) maxcnt=cnt;
             if (zoom>0) {
-                $(this).css("margin-top", (50+(cnt-1)*100) + 'px' );
+                $(this).css("margin-top", (25+(cnt-1)*100) + 'px' );
             } else {
                 $(this).css("width", cnt==0?'50px':'240px');
                 $(this).css("margin-top", '-10px');

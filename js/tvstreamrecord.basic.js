@@ -15,14 +15,14 @@
     @author: Pavion
 */
 
-/** 
+/**
  * Common functions
  */
 
-/** 
+/**
  * Persistent variables
  */
-var recName; 
+var recName;
 var recChannel;
 var recDate;
 var recStart;
@@ -50,7 +50,7 @@ function parseDate(stringDate) {
 }
 
 /**
- * String function substitute 
+ * String function substitute
  */
 if(typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {
@@ -59,7 +59,7 @@ if(typeof String.prototype.trim !== 'function') {
 }
 
 /**
- * String function substitute 
+ * String function substitute
  */
 if (typeof String.prototype.startsWith !== 'function') {
   String.prototype.startsWith = function (str){
@@ -69,7 +69,7 @@ if (typeof String.prototype.startsWith !== 'function') {
 
 /**
  * Search function
- * @param {type} str Input string 
+ * @param {type} str Input string
  * @param {type} suffix Search suffix
  * @returns {Boolean} if the input string ends with supplied suffix
  */
@@ -79,14 +79,14 @@ function endsWith(str, suffix) {
 
 /**
  * Get location we are at now
- * @returns {String} location we are at 
+ * @returns {String} location we are at
  */
 function where() {
     var pos = window.location.href.lastIndexOf("&");
     return window.location.href.slice(window.location.href.lastIndexOf("/"), pos==-1?999:pos);
 }
 
-/** 
+/**
  * Checks if we are at desired location
  * @param {type} url location to check with
  * @returns {Boolean} if we are located here
@@ -105,7 +105,7 @@ function here(url) {
 function switchMe(sw,  how) {
     if (how) {
         $(sw).trigger('ss-toggleOn');
-    
+
     /*    $(sw).attr("checked","checked");
         $("a"+sw).children(".ss-on").attr("style", "");
         $("a"+sw).children(".ss-slider").attr("style", "left: 13px;");*/
@@ -117,7 +117,7 @@ function switchMe(sw,  how) {
     }
 }
 
-/** 
+/**
  * Common function for updating tooltips
  * @param {type} t Tooltip text
  * @returns {undefined}
@@ -169,7 +169,7 @@ function checkRegexp(o, regexp, n ) {
     }
 }
 
-/** 
+/**
  * Function to initialize all progress bars in a table
  * @returns {undefined}
  */
@@ -234,16 +234,16 @@ function initIcons() {
                     $("#ret").val(dialognr);
 //                    $("#dialog_content").html ("<b>" + data[i][1] + "<br>"+data[i][3]+" - " + data[i][4] + "</b><br><br>" + data[i][2]);
 //                    $("#dialog_content").html (data[i][7]);
-                    var dat_v = data[i][3].split(" ")[1].substr(0,5); 
-                    var dat_b = data[i][4].split(" ")[1].substr(0,5); 
+                    var dat_v = data[i][3].split(" ")[1].substr(0,5);
+                    var dat_b = data[i][4].split(" ")[1].substr(0,5);
                     var delta = $("#delta_for_epg").attr("delta");
                     $( "#dialog_content" ).html ("<b>" + data[i][1] + ": "+dat_v + " - " + dat_b + "</b><BR><BR>" + data[i][2].replace(/\n/g, '<BR>'));
-                    recName = data[i][1]; 
+                    recName = data[i][1];
                     recChannel = data[i][0];
                     recDate = data[i][3].split(" ")[0];
                     recStart = new Date( parseDate(data[i][3]).valueOf() - delta*60000 ).toTimeString().substring(0, 5);
                     recEnd = new Date( parseDate(data[i][4]).valueOf() + delta*60000 ).toTimeString().substring(0, 5);
-                    
+
                     $( "#dialog_record_from_epg" ).dialog( "open" );
                     event.preventDefault();
                     break;
@@ -251,7 +251,7 @@ function initIcons() {
             }
         }
 
-        
+
         //$( "#dialog_create_record" ).dialog( "open" );
         //event.preventDefault();
     });
@@ -304,8 +304,8 @@ function post(dest1, data1, rel) {
     });
 }
 
-/** 
- * Can be used to dynamic adjust row colors for DataTables. Not used for now. 
+/**
+ * Can be used to dynamic adjust row colors for DataTables. Not used for now.
  * @returns {undefined}
  */
 function paintTable() {
@@ -327,7 +327,7 @@ function initEpgState() {
     getEpgState();
     $( "#grabepg" ).button()
     .click(function(event) {
-        $.post("/grabepg", {"mode": epgmode},  
+        $.post("/grabepg", {"mode": epgmode},
             function() {
                 getEpgState();
             }, "json");
@@ -340,7 +340,7 @@ function initEpgState() {
  * @return none
  */
 function getEpgState() {
-    $.get("/getepgstate", 
+    $.get("/getepgstate",
         function(data) {
             var state = data.grabState;
             epgmode = 0;
@@ -358,19 +358,19 @@ function getEpgState() {
                         //$( "#grabepg" ).html($( "#grabepg" ).attr("text4"));
                         $( "#grabepg" ).prop("disabled", true);
                         $( "#grabepg" ).addClass("ui-state-disabled");
-                    //}                    
+                    //}
                     epgmode = 1;
                 }
-                $( "#grabepg" ).show();                
+                $( "#grabepg" ).show();
             }
         }, "json"
     );
 }
 
-$(function() {           
+$(function() {
     $(document).tooltip();
 
-// Localization    
+// Localization
     var language = $("#mybody").attr("language");
 
     $( "#datepicker_local" ).datepicker();
@@ -379,12 +379,12 @@ $(function() {
     var mytimeformat = "HH:mm"; //$( "#timepicker_local" ).datepicker( "option", "timeFormat" );
     var weekdays = $( "#datepicker_local" ).datepicker( "option", "dayNamesMin");
     var firstday = $( "#datepicker_local" ).datepicker( "option", "firstDay");
-    
+
 // Common menu handling
     for ( var m = 0; m < $("#mainmenu").children().length; m ++ ) {
         if (where() ==  $( $("#mainmenu").children()[m] ).children().attr("href") ) {
             $( $("#mainmenu").children()[m] ).addClass('ui-tabs-active ui-state-active');
-            break; 
+            break;
         }
     }
 
@@ -392,7 +392,7 @@ $(function() {
     $("#timepicker_inline_div1,#timepicker_inline_div2,#cfg_grab_time").timepicker({
         constrainInput: true,
         showPeriodLabels: false,
-        timeFormat: mytimeformat 
+        timeFormat: mytimeformat
     });
 
     $( "#dialog_remove" ).dialog({
@@ -407,7 +407,7 @@ $(function() {
                 }
                 $( this ).dialog( "close" );
             }
-        }, 
+        },
         {
             text: $( "#dialog_remove" ).attr("cancel"),
             click: function() {
@@ -415,18 +415,18 @@ $(function() {
             }
         }]
     });
-    
+
 // Record create dialogs and forms
     var allFields =  $( [] ).add( "#recname" ).add( "#channel" ).add( "#datepicker_create" ).add( "#timepicker_inline_div1" ).add( "#timepicker_inline_div2" ).add("#cname").add("#ccid").add("#cpath");
 
     for(var i=0;i<7;i++) {
         $("#wwd"+i).text(weekdays[i]);
-    }    
+    }
     for(var i=0;i<firstday;i++) {
-        $( "#wwd"+i ).insertAfter( $( "#wwd" + (i===0?6:i-1) ));        
+        $( "#wwd"+i ).insertAfter( $( "#wwd" + (i===0?6:i-1) ));
     }
     $( "#weekday" ).buttonset();
-    
+
 
     $( "#switch_create").slickswitch();
 
@@ -441,7 +441,7 @@ $(function() {
         width: 400,
         modal: true,
         open: function( event, ui ) {
-            
+
             for(var i=0;i<7;i++) {
                 $("#wwd"+i).removeClass("ui-state-active");
             }
@@ -465,16 +465,16 @@ $(function() {
                 {
                     var bValid = true;
                     allFields.removeClass( "ui-state-error" );
-                    
+
                     if ( $( "#recname" ).val().length == 0 ) { $( "#recname" ).addClass( "ui-state-error" ); bValid = false; }
                     if ( ! $.datepicker.parseTime("H:m", $( "#timepicker_inline_div1" ).val()) ) { $( "#timepicker_inline_div1" ).addClass( "ui-state-error" ); bValid = false; }
                     if ( ! $.datepicker.parseTime("H:m", $( "#timepicker_inline_div2" ).val()) ) { $( "#timepicker_inline_div2" ).addClass( "ui-state-error" ); bValid = false; }
-                                      
+
 //                    bValid = bValid && checkLength( "recname", "record name", 1, 255 );
 //                    bValid = bValid && checkRegexp( "recname", /^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\";|//]+$/, "No special chars in this field please" );
 //                    bValid = bValid && checkLength( "channel", "channel", 1, 50 );
 //                    bValid = bValid && checkLength( "datepicker_create", "date", 10, 10 );
-                    
+
 //                    bValid = bValid && checkRegexp( "datepicker_create", /^((((0?[1-9]|[12]\d|3[01])[\.\-\/](0?[13578]|1[02])[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|((0?[1-9]|[12]\d|30)[\.\-\/](0?[13456789]|1[012])[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|((0?[1-9]|1\d|2[0-8])[\.\-\/]0?2[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}))|(29[\.\-\/]0?2[\.\-\/]((1[6-9]|[2-9]\d)?(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)|00)))|(((0[1-9]|[12]\d|3[01])(0[13578]|1[02])((1[6-9]|[2-9]\d)?\d{2}))|((0[1-9]|[12]\d|30)(0[13456789]|1[012])((1[6-9]|[2-9]\d)?\d{2}))|((0[1-9]|1\d|2[0-8])02((1[6-9]|[2-9]\d)?\d{2}))|(2902((1[6-9]|[2-9]\d)?(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)|00))))$/, "Please use DD.MM.YYYY for this field" );
 //                    bValid = bValid && checkLength( "timepicker_inline_div1", "start time", 5, 5 );
 //                    bValid = bValid && checkRegexp( "timepicker_inline_div1", /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/, "Please use HH:MM format for this field" );
@@ -523,10 +523,10 @@ $(function() {
 
                             var kids = $("#channel").children();
                             for (var j=0;j<kids.length;j++) {
-                            	if (kids[j].innerHTML==data[i][1].replace(/<(?:.|\n)*?>/gm, '')) {
+                                if (kids[j].innerHTML==data[i][1].replace(/<(?:.|\n)*?>/gm, '')) {
                                     $("#channel").val(kids[j].value);
                                     break;
-                            	}	
+                                }
                             }
 
                             switchMe("#switch_create", ($("#switch-" + dialognr).attr("checked") == "checked") );
@@ -535,7 +535,7 @@ $(function() {
                             $("#timepicker_inline_div1").val(data[i][2].slice(11,16));
                             $("#timepicker_inline_div2").val(data[i][3].slice(11,16));
                             //$("#datepicker_create").val(data[i][2].slice(0,10)); //??
-                            //$("#datepicker_create").datepicker( "setDate", mydatetime );      
+                            //$("#datepicker_create").datepicker( "setDate", mydatetime );
                             $("#datepicker_create").val( localDate(data[i][2]) );
                             break;
                         }
@@ -556,7 +556,7 @@ $(function() {
                 $("#datepicker_create").val( localDate(today) );
 
                 //console.log(localDate(today));
-    
+
                 if(hr<10){hr='0'+hr;} if(min<10){min='0'+min;} today = hr+':'+min;//+':00';
                 $("#timepicker_inline_div1").val(today);
                 today = new Date();
@@ -603,17 +603,17 @@ $(function() {
                 //$("#prev").val(dialognr);
                 $("#recname").val(recName);
                 $("#timepicker_inline_div1").val(recStart);
-                $("#timepicker_inline_div2").val(recEnd);                
-                
+                $("#timepicker_inline_div2").val(recEnd);
+
                 if (recChannel<9999) {
                     $("#channel").val(recChannel);
-                } else {                
+                } else {
                     var kids = $("#channel").children();
                     for (var j=0;j<kids.length;j++) {
                         if (kids[j].innerHTML==recChannel) {
                             $("#channel").val(kids[j].value);
                             break;
-                        }	
+                        }
                     }
                 }
                 $("#datepicker_create").val( localDate(recDate) );
@@ -631,20 +631,20 @@ $(function() {
     });
 
     if (here("records")) {
-// ------------------------------------ Records tab only        
+// ------------------------------------ Records tab only
         $( "#button_create_record" )
         .button()
         .click(function() {
             dialognr = -1;
             $( "#dialog_create_record" ).dialog( "open" );
         });
-    
+
         $( "#button_purge_records" )
         .button()
         .click(function() {
-        	$( "#dialog_purge" ).dialog( "open" );
+            $( "#dialog_purge" ).dialog( "open" );
         });
-        
+
         $( "#dialog_purge" ).dialog({
             autoOpen: false,
             buttons: [{
@@ -700,7 +700,7 @@ $(function() {
                         var day = i>=7?i-7:i;
                         if ( (aData[4] & Math.pow(2,day)) == Math.pow(2,day)) recurr += weekdays[day];
                     }
-                }                
+                }
                 $('td:eq(4)', nRow).html(recurr);
                 var chk = "";
                 if (aData[5] == 1) chk = 'checked="checked"';
@@ -745,7 +745,7 @@ $(function() {
                 }
             });
         });
-        
+
         $( "#dialog_import_clist" ).dialog({
             autoOpen: false,
             modal: true,
@@ -761,9 +761,9 @@ $(function() {
                 click: function() {
                     $( this ).dialog( "close" );
                 }
-            }] 
+            }]
         });
-    
+
         $( "#dialog_download_clist" ).dialog({
             autoOpen: false,
             buttons: [{
@@ -882,7 +882,7 @@ $(function() {
                 paintTable();
             },
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                $('td:eq(1)', nRow).html('<a href=\"live/'+aData[0]+'.m3u\">'+aData[1]+'</a>');    
+                $('td:eq(1)', nRow).html('<a href=\"live/'+aData[0]+'.m3u\">'+aData[1]+'</a>');
                 var data4 = "";
                 if (aData[4] == 1) data4 = "plus"; else data4="minus";
                 var chk = "";
@@ -893,13 +893,13 @@ $(function() {
         });
    } else if (here("epgchart")) {
 // ------------------------------------ EPG chart tab
-       
+
         var zoom = $("#zoom_amount").attr("zoom");
         if (zoom==0) zoom=1;
         $( "#zoom_amount" ).val(Math.abs(zoom));
         var maxcnt=0;
 
-        $( "#slider_zoom" ).slider({            
+        $( "#slider_zoom" ).slider({
             value: Math.abs(zoom),
             min: 1,
             max: 5,
@@ -910,24 +910,24 @@ $(function() {
             stop: function( event, ui ) {
                 var new_zoom = $( "#zoom_amount" ).val();
                 if (zoom<0) {
-                    zoom = -new_zoom; 
+                    zoom = -new_zoom;
                 } else {
                     zoom = new_zoom;
                 }
                 post("setzoom", { zoom: zoom }, 1);
-            }            
+            }
         });
 
         $( "#flipepg" )
             .button()
-            .click(function(event ) {                
+            .click(function(event ) {
                 post("setzoom", { zoom: -zoom }, 1);
                 event.preventDefault();
             });
 
         $( "#date_prev, #date_next" )
             .button()
-            .click(function(event ) {                
+            .click(function(event ) {
                 post("epg", { datepicker_epg: $.datepicker.formatDate("yy-mm-dd", $( "#datepicker_epg" ).datepicker( "getDate" ).addDays( $(this).is( $( "#date_prev" ) )?-1:1 ) ) }, 1);
                 event.preventDefault();
             });
@@ -941,7 +941,7 @@ $(function() {
             }
         });
         $( "#datepicker_epg" ).val( localDate( $( "#datepicker_epg" ).attr("dbvalue") ) );
-        
+
         $( "[id^=event], [id=divider]" ).each(function(i) {
             w = +$(this).attr('width');
             x = +$(this).attr('x');
@@ -985,7 +985,7 @@ $(function() {
                 }
                 $("#mybody").css("height", (maxcnt * 100 + 200) +"px");
                 $("[id=channelgroup]").each(function(i) { $(this).css("clear", "left"); });
-                $("[id=channelgroup][cnt=0]").css({"margin-top": "0px"}); 
+                $("[id=channelgroup][cnt=0]").css({"margin-top": "0px"});
                 $("[id=channelgroup][cnt=0],#dividegroup").css({"width": ($("body").width()-42) + "px"}); // bad solution
                 $("[id^=divider]").css("height", (maxcnt * 100) +"px");
                 $("[id^=divider]").css("border-right-width", "1px");
@@ -1010,7 +1010,7 @@ $(function() {
                 $("[id^=epg_cname]").css("margin-top", "0px");
                 $("[id^=epg_cname]").addClass("ui-widget-header");
                 $("[id^=epg_cname]").css("box-sizing", "border-box");
-                
+
                 $(window).scroll(function() {epg_zoom_vert();}).resize(function() {epg_zoom_vert();});
 
             }
@@ -1042,15 +1042,15 @@ $(function() {
             if ($(this).attr("cnt")!=="0") {
                 $(this).addClass("ui-selected");
 
-                var ft = "<b>" + $(this).text() + ": " + localDateTime($(this).attr("at")) + " - " 
+                var ft = "<b>" + $(this).text() + ": " + localDateTime($(this).attr("at")) + " - "
                        + localDateTime($(this).attr("till")) + "</b><BR><BR>" + $(this).attr("fulltext");
                 ft = ft.replace(/\n/g, '<BR>');
 
                 if (ft)  {
                     $("#ret").val($(this).attr("rid"));
                     $("#dialog_content").html ( ft );
-                    
-                    recName = $(this).text(); 
+
+                    recName = $(this).text();
                     recChannel = $(this).attr("cid");
                     recDate = $(this).attr("at").split(" ")[0];
                     var delta = $("#delta_for_epg").attr("delta");
@@ -1080,11 +1080,11 @@ $(function() {
         });
 
         initIcons();
-        initEpgState();   
-        
+        initEpgState();
+
     } else if (here("epglist")) {
-// ------------------------------------ EPG list tab only        
-    	var serverSide = ($("#listmode").attr("value") == "1");  
+// ------------------------------------ EPG list tab only
+        var serverSide = ($("#listmode").attr("value") == "1");
 
         $('#table_epglist').dataTable({
             "oLanguage": {"sUrl": "lang/dataTables." + language+ ".json"},
@@ -1107,39 +1107,40 @@ $(function() {
                 var keyword_for_epg = $('#keyword_for_epg').attr('keyword_for_epg');
                 if ( oData && keyword_for_epg != '' ) {
                     oData.oSearch.sSearch=keyword_for_epg;
-                }                 
+                }
                 return oData;
             },
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                 $('td:eq(3)', nRow).html( localDateTime( aData[3] ) );
-                $('td:eq(4)', nRow).html( localDateTime( aData[4] ) );                
+                $('td:eq(4)', nRow).html( localDateTime( aData[4] ) );
                 $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
             }
         });
-                
+
         initIcons();
-        initEpgState();      
-        
-    } else if (here("config")) { 
+        initEpgState();
+
+    } else if (here("config")) {
 // ------------------------------------ Configuration tab only
+        var configdata = null;
         var passFields =  $( [] ).add( "#pass_old" ).add( "#pass_new_1" ).add( "#pass_new_2" );
-        
+
         $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
         $( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
-    	$("#cfg_purgedelta,#cfg_delta_for_epg,#cfg_grab_max_duration").spinner();
+        $("#cfg_purgedelta,#cfg_delta_for_epg,#cfg_grab_max_duration").spinner();
         $("#cfg_grab_zoom").spinner( { step: 0.1 } );
-        $("#cfg_epg_max_events").spinner( { step: 1000 } );       
-	    
-    	$("#cfg_switch_epglist_mode").slickswitch();
-    	$("#cfg_switch_xmltv_auto").slickswitch({
+        $("#cfg_epg_max_events").spinner( { step: 1000 } );
+
+        $("#cfg_switch_epglist_mode").slickswitch();
+        $("#cfg_switch_xmltv_auto").slickswitch({
             toggledOn: function() {
                 $("#cfg_xmltvinitpath").removeAttr("disabled");
                 $("#cfg_xmltvinitpath").removeClass("ui-state-disabled");
                 $("#cfg_xmltvtimeshift").removeAttr("disabled");
-                $("#cfg_xmltvtimeshift").removeClass("ui-state-disabled");            
+                $("#cfg_xmltvtimeshift").removeClass("ui-state-disabled");
                 $("#cfg_xmltv_mc2xml").removeAttr("disabled");
-                $("#cfg_xmltv_mc2xml").removeClass("ui-state-disabled");            
+                $("#cfg_xmltv_mc2xml").removeClass("ui-state-disabled");
             },
             toggledOff: function() {
                 $("#cfg_xmltvinitpath").prop("disabled", "true");
@@ -1150,7 +1151,7 @@ $(function() {
                 $("#cfg_xmltv_mc2xml").addClass("ui-state-disabled");
             }
         });
-    	$("#cfg_switch_grab_auto").slickswitch({
+        $("#cfg_switch_grab_auto").slickswitch({
             toggledOn: function() {
                 $("#cfg_grab_max_duration").spinner( "enable"  );
             },
@@ -1158,41 +1159,39 @@ $(function() {
                 $("#cfg_grab_max_duration").spinner( "disable" );
             }
         });
-    	$("#cfg_switch_postprocess").slickswitch({
+        $("#cfg_switch_postprocess").slickswitch({
             toggledOn: function() {
                 $("#cfg_postprocess").removeAttr("disabled");
-                $("#cfg_postprocess").removeClass("ui-state-disabled");            
+                $("#cfg_postprocess").removeClass("ui-state-disabled");
             },
             toggledOff: function() {
                 $("#cfg_postprocess").prop("disabled", "true");
                 $("#cfg_postprocess").addClass("ui-state-disabled");
             }
         });
-    	$("#cfg_switch_proxy").slickswitch({
+        $("#cfg_switch_proxy").slickswitch({
             toggledOn: function() {
                 $("#cfg_proxy").removeAttr("disabled");
-                $("#cfg_proxy").removeClass("ui-state-disabled");            
+                $("#cfg_proxy").removeClass("ui-state-disabled");
             },
             toggledOff: function() {
                 $("#cfg_proxy").prop("disabled", "true");
                 $("#cfg_proxy").addClass("ui-state-disabled");
             }
         });
-        
+
         $.get( "/getconfig", function( data )  {
             var p = new Function('return ' + data + ';')();
-            var data = p.configdata;
-            for (var i = 0; i < data.length; i++) {
-            	if (data[i][0].startsWith('cfg_switch')) {
-                    //$("#" + data[i][0]).trigger('ss-toggleOn');
-                
-                    switchMe( "#" + data[i][0], data[i][2]=='1');
-            	} else {            			
-                    $("#" + data[i][0]).val(data[i][2]);
-            	}
+            configdata = p.configdata;
+            for (var i = 0; i < configdata.length; i++) {
+                if (configdata[i][0].startsWith('cfg_switch')) {
+                    switchMe( "#" + configdata[i][0], configdata[i][2]=='1');
+                } else {
+                    $("#" + configdata[i][0]).val(configdata[i][2]);
+                }
             }
         });
-        
+
         $( "#button_resetlog" )
         .button()
         .click(function(event ) {
@@ -1208,7 +1207,7 @@ $(function() {
             $( "#dialog_password" ).dialog( "open" );
             event.preventDefault();
         });
-        
+
         $( "#button_pathchooser" )
         .button()
         .click(function(event ) {
@@ -1216,61 +1215,74 @@ $(function() {
             $( "#dialog_pathchooser" ).dialog( "open" );
             event.preventDefault();
         });
-        
+
         $( "#button_removeepg" )
         .button()
         .click(function(event ) {
             $( "#dialog_remove" ).dialog( "open" );
             event.preventDefault();
         });
-        
+
         $( "#submit_cfg" ).button().click(function(event ) {
-            var my_config_data = new Array(); 
-            var myalert = false; 
+            var my_config_data = new Array();
+            var myalert = false;
+            var reload = false;
             $("[id^=cfg_]").each(function() {
-	            var value = $(this).val(); 
+                var value = $(this).val();
                 if ($(this).attr('id')=="cfg_server_port") {
                     var port = parseInt(value);
                     if (!checkRegexp("cfg_server_port", /^[0-9]{1,5}$/, "") || port<80 || isNaN(port) || port > 65535 ) {
                         alert( $(this).attr('alert') );
-                        myalert = true; 
-                    }                    
+                        myalert = true;
+                    }
                 } else if ($(this).attr('id')=="cfg_server_bind_address") {
                     if ( value != "localhost") if ( !checkRegexp( "cfg_server_bind_address", /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/, "" ) ) {
                         alert( $(this).attr('alert') );
-                        myalert = true; 
-                    }                    
+                        myalert = true;
+                    }
                 } else if ($(this).attr('id')=="cfg_retry_count") {
                     if ( !checkRegexp( "cfg_retry_count", /^\d+$/, "" ) ) {
                         alert( $(this).attr('alert') );
-                        myalert = true; 
-                    }                    
+                        myalert = true;
+                    }
                 } else if ($(this).attr('id')=="cfg_grab_time") {
                     if ( value.trim() != "0" ) if ( ! $.datepicker.parseTime("H:m", $( "#cfg_grab_time" ).val()) ) {
                         alert( $(this).attr('alert') );
-                        myalert = true; 
-                    }                    
+                        myalert = true;
+                    }
                 } else if ($(this).attr('id')=="cfg_record_mask") {
                     if ( value.lastIndexOf("%date%")==-1 && value.lastIndexOf("%title%")==-1) {
                         alert( $(this).attr('alert') );
-                        myalert = true; 
-                    }                    
+                        myalert = true;
+                    }
                 } else if ($(this).attr('id').startsWith('cfg_switch') && $(this).attr('type')!="checkbox") {
-                	value = "null";                	                	
+                    value = "null";
                 } else if ($(this).attr('id').startsWith('cfg_switch')) {
-                	value = ($(this).attr('checked')=="checked") ? "1" : "0";  
+                    value = ($(this).attr('checked')=="checked") ? "1" : "0";
+                } else if ( // Reload page on this changes only 
+                    ($(this).attr('id')=="cfg_theme") ||
+                    ($(this).attr('id')=="cfg_language") ||
+                    ($(this).attr('id')=="cfg_locale") 
+                    ) {
+                    for (var i = 0; i < configdata.length; i++) {
+                        if ( configdata[i][0] == $(this).attr('id') ) {
+                            if ( configdata[i][2] != value) reload = true;
+                            break;
+                        }
+                    }
                 }
-                               
+
                 if(value != "null") my_config_data.push(new Array($(this).attr('id'), value));
             });
-            
-            if (!myalert) {            	
+
+            if (!myalert) {
                 var my_config_data_str = JSON.stringify(my_config_data);
                 $("#label_config_saved").text($("#label_config_saved").attr("info"));
                 $.post("/config",  {configdata:my_config_data_str}, function() {
                         $("#label_config_saved").text("");
-                    }, "json");                
-            }            
+                        if(reload) window.location.reload(false);
+                    }, "json");
+            }
         });
 
         $( "#dialog_password" ).dialog({
@@ -1278,12 +1290,12 @@ $(function() {
             buttons: [{
                 text: $( "#dialog_password" ).attr("ok"),
                 click: function() {
-                    $.post("/setpass", 
+                    $.post("/setpass",
                         {
-                            "pass_old": $("#pass_old").val(), 
-                            "pass_new_1": $("#pass_new_1").val(), 
+                            "pass_old": $("#pass_old").val(),
+                            "pass_new_1": $("#pass_new_1").val(),
                             "pass_new_2": $("#pass_new_2").val()
-                        },  
+                        },
                         function(data) {
                             ret = data.ret;
                             passFields.removeClass( "ui-state-error" );
@@ -1297,7 +1309,7 @@ $(function() {
                             }
                         }, "json");
                 }
-            }, 
+            },
             {
                 text: $( "#dialog_password" ).attr("cancel"),
                 click: function() {
@@ -1313,11 +1325,11 @@ $(function() {
             height: 500,
             buttons: [{
                 text: $( "#dialog_pathchooser" ).attr("ok"),
-                click: function() {   
+                click: function() {
                     $('#cfg_recordpath').val($(".folderselected").attr("rel"));
                     $( this ).dialog( "close" );
                 }
-            }, 
+            },
             {
                 text: $( "#dialog_pathchooser" ).attr("cancel"),
                 click: function() {
@@ -1326,7 +1338,7 @@ $(function() {
             }]
         });
 
-        
+
     } else if (here("log")) {
 // ------------------------------------ Log tab only
         $( "#downlog" )
@@ -1358,16 +1370,16 @@ $(function() {
 
     function localDate(sqldate) {
         var myday = $.datepicker.parseDate('yy-mm-dd', sqldate.substr(0,10));
-        return $.datepicker.formatDate(mydateformat, myday);    
+        return $.datepicker.formatDate(mydateformat, myday);
     }
     function localTime(sqltime) {
         var mytime = $.datepicker.parseTime('HH:mm:ss', sqltime);
-        return $.datepicker.formatTime(mytimeformat, mytime);    
+        return $.datepicker.formatTime(mytimeformat, mytime);
     }
     function localDateTime(sqldatetime) {
         return localDate(sqldatetime.substr(0,10)) + " " + localTime(sqldatetime.substr(11,19));
     }
-    
+
 });
 
 function epg_zoom_hor() {
@@ -1377,7 +1389,7 @@ function epg_zoom_hor() {
         $("[id=channelgroup][cnt=0]").css({"margin-top": "0px"});
     }
     $("[id=channelgroup][cnt=0],#dividegroup").css({"width": ($("body").width()-42) + "px"});
-    $("[id=epg_cname]").css({"margin-left": ($(window).scrollLeft()) }); 
+    $("[id=epg_cname]").css({"margin-left": ($(window).scrollLeft()) });
 }
 
 function epg_zoom_vert() {
@@ -1385,7 +1397,7 @@ function epg_zoom_vert() {
     $("#dividegroup").css({"height": ($("[id=channelgroup][cnt=0]").height()) + "px"});
     $("[id^=divider]").css("width", $("#mybody").width());
     if ($(window).scrollTop()>140) {
-        $("[id=epg_cname]").css({"margin-top": ($(window).scrollTop()) - 140 + "px" }); 
+        $("[id=epg_cname]").css({"margin-top": ($(window).scrollTop()) - 140 + "px" });
     } else {
         $("[id=epg_cname]").css({"margin-top": "0px"});
     }

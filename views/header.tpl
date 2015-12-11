@@ -38,7 +38,7 @@
     <div id="loaderImage"></div>
 <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
   <ul id="mainmenu" class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
-    <a id="mobipic" title="tvstreamrecord Mobile" class="ui-tabs-anchor" href="/mobile"><img src="images/iphone-control-panel-px-png.png">
+    <li><a id="mobipic" title="tvstreamrecord Mobile" class="ui-tabs-anchor" href="/mobile"><img src="images/iphone-control-panel-px-png.png"></a></li>
     <li id="menu-0" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/records">§Records§</a></li>
     <li id="menu-1" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/list">§Channels§</a></li>
     <li id="menu-2" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epgchart">§EPG Chart§</a></li>

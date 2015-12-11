@@ -272,10 +272,10 @@ def writeWebman(port):
         webman.append(lline)
     lfile.close()
     lfile = open("webman/config", "wb")
-    for lline in webman:
-        pos = lline.find('"port":')
+    for lline in webman:        
+        pos = lline.find(b'"port":')
         if pos>0:
-            lfile.write(lline[:pos+8]+'"' + str(port) + '"\n')
+            lfile.write( lline[:pos+8] + b'"' + str(port).encode() + b'"\n')
         else:
             lfile.write(lline)
     lfile.close()

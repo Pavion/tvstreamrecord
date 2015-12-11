@@ -8,7 +8,7 @@
     <table id="table_channellist"> 
         <thead>
             <tr class="ui-widget-header ">
-                <th class="cid">§Channel ID§</th>
+                <th class="cid">ID</th>
                 <th class="cname">§Channel name§</th>
                 <th class="curl">§Channel URL§</th>
                 <th class="cext">§Type§</th>

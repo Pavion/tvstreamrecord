@@ -1160,8 +1160,13 @@ grabthread = epggrabthread()
 grabthread.run()
 
 print ("Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port))
-run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
-
+try:
+    run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
+except Exception as ex:
+    print ("Server exception. Default network settings will be used this time. Please log in using port 8030 and check your network settings.")
+    print ("Starting server on: 0.0.0.0:8030")
+    run(host="0.0.0.0", port=8030, server=CherryPyServer, quiet=True)
+    
 # Server is shutting down, all threads should be eliminated
 shutdown = True 
 print ("Server aborted. Stopping all records before exiting...")

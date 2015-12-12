@@ -38,7 +38,7 @@
     "Lenghten an EPG-record (delta before and after), [minutes]": "Продлевать EPG записи на (до и после) [мин.])",
     "Enable XMLTV import": "Включить XMLTV-импорт",
     "Initial path for an XMLTV import": "Адрес для XMLTV-импорта",
-    "Time shift for XMLTV data (in hours)": "Сдвиг пво времени данных XMLTV (в часах)",
+    "Time shift for XMLTV data (in hours)": "Сдвиг во времени данных XMLTV (в часах)",
     "mc2xml full command line (x86 CPUs only, default: empty)": "mc2xml полная командная строка (только для x86 процессоров, по умолчанию: пусто)",
     "Enable stream scan/grab": "Включить импорт из потокового видео",
     "Maximal EPG scan duration per channel, [seconds] (default: '60')": "Максимальная длительность импортирования одного канала [сек.] (по умолчанию '60')",
@@ -51,7 +51,7 @@
 
     "Stream types, which should be forwarded to ffmpeg (space separated)": "Потоковые протоколы, передающиеся ffmpeg (разделение пробелом)",
     "Full path to ffmpeg for other streams support": "Полный путь к ffmpeg для поддержки дополнительных протоколов",
-    "Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')": "Дополнительные параметры для ffmpeg (по умолчанию: '-acodec copy -vcodec copy')",
+    "Additional output arguments for ffmpeg (default: '-loglevel fatal -acodec copy -vcodec copy')": "Дополнительные параметры для ffmpeg (по умолчанию: '-loglevel fatal -acodec copy -vcodec copy')",
     "For more information regarding ffmpeg and its command line parameters please visit its homepage at": "Дополнительную информацию, касающуюся ffmpeg и его параметров, Вы можете получить на его странице",
     "Enable proxy for ffmpeg": "Включить использование прокси для ffmpeg",
     "Proxy URL for ffmpeg": "Адрес прокси для ffmpeg",

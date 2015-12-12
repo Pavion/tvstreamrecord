@@ -77,7 +77,7 @@ configuration = [
 [
 'cfg_ffmpeg_params',
 "Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')",
-'-acodec copy -vcodec copy'
+'-loglevel fatal -acodec copy -vcodec copy'
 ],
 
 [

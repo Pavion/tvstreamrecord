@@ -51,7 +51,7 @@
     
     "Stream types, which should be forwarded to ffmpeg (space separated)": "",
     "Full path to ffmpeg for other streams support": "",
-    "Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')": "",
+    "Additional output arguments for ffmpeg (default: '-loglevel fatal -acodec copy -vcodec copy')": "",
     "For more information regarding ffmpeg and its command line parameters please visit its homepage at": "",
     "Enable proxy for ffmpeg": "",
     "Proxy URL for ffmpeg": "",

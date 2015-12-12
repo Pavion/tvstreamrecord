@@ -107,6 +107,8 @@ def sqlCreateAll(version):
                                 break
                 if oldver < '1.1.0':
                     sql += "UPDATE config SET value=value || ' rtsp' WHERE param = 'cfg_ffmpeg_types' and not lower(value) LIKE '%rtsp%';"
+                if oldver < '1.2.1':
+                    sql += "UPDATE config SET value='-loglevel fatal ' || value WHERE param = 'cfg_ffmpeg_params' and not lower(value) LIKE '%loglevel%';"
 
                 if oldver > version:
                     print ("Critical error: Version mismatch!!!")

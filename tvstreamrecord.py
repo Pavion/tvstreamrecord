@@ -987,7 +987,7 @@ class record(Thread):
         if streamtype in fftypes:
             delta = total(tDiff(self.bis, datetime.now()))
             deltasec = '%d' % delta
-            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-loglevel', 'fatal', '-t', deltasec] + ffargs + [fn]
+            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-t', deltasec] + ffargs + [fn]
             print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
             print (attr)
             try:

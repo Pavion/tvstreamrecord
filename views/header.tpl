@@ -19,7 +19,6 @@
     <script type="text/javascript" src="js/jquery.slickswitch.js"></script>
     <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="js/dataTables.jqueryui.min.js"></script>
-    <script type="text/javascript" src="js/dataTables.select.min.js"></script>
 %if not locale == 'default':
     <script type="text/javascript" src="js/i18n/jquery-ui-timepicker-{{locale}}.js"></script>	
     <script type="text/javascript" src="js/i18n/jquery.ui.datepicker-{{locale}}.js"></script>	

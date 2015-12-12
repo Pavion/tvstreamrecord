@@ -288,3 +288,8 @@ table.dataTable tr.even { background-color: #ffffff; }
 table.dataTable tr.odd td.sorting_1 { background-color: #f1f1f1; }
 table.dataTable tr.even td.sorting_1 { background-color: #fafafa; }
 div#users-contain table th { font-weight: bold; }
+
+.grabepgclass {
+    float: left;
+    margin: -5px 0 10px 10px;
+}

@@ -1,10 +1,10 @@
 %include ('create.tpl')
 <div id="keyword_for_epg" keyword_for_epg="{{keyword_for_epg}}"></div>
 <div id="delta_for_epg" delta="{{delta}}"></div>
-<div id="users-contain" class="ui-widget">
-<h1>§Electronic Program Guide§ - §list view§:
-    <button id="grabepg">§Import EPG§</button>
     <div id="listmode" value="{{listmode}}"></div>
+<div id="users-contain" class="ui-widget">
+    <h1><div class="lefty">§Electronic Program Guide§ - §list view§</div>
+<button id="grabepg" class="grabepgclass">§Import EPG§</button>
 </h1>
 <table id="table_epglist">
     <thead>

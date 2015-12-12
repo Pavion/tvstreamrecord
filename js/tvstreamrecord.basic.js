@@ -665,19 +665,18 @@ $(function() {
 
 
         $('#table_recordlist').dataTable({
-            "select": "single",
             "oLanguage": {"sUrl": "lang/dataTables." + language + ".json"},
             "bJQueryUI": true,
             "sPaginationType": "full_numbers",
             "bProcessing": true,
             "bAutoWidth": false,
             "sAjaxSource": "/getrecordlist",
-            "bStateSave": true,
-            "fnStateSave": function (oSettings, oData) {
-                oData.oSearch.sSearch=''; // Don't save search text
+            "stateSave": true,
+            "stateSaveCallback": function (oSettings, oData) {
+                oData.search.search=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );
             },
-            "fnStateLoad": function (oSettings) {
+            "stateLoadCallback": function (oSettings) {
                 return JSON.parse( localStorage.getItem('DataTables_'+where()) );
             },
             "aoColumnDefs": [ { "bSearchable": false, "bVisible": false, "aTargets": [ 6,7,8,9 ] },
@@ -862,18 +861,18 @@ $(function() {
         });
 
         $('#table_channellist').dataTable({
-            "select": "single",
             "oLanguage": {"sUrl": "lang/dataTables." + language + ".json"},
             "bJQueryUI": true,
             "sPaginationType": "full_numbers",
+            "bAutoWidth": false,
             "bProcessing": true,
             "sAjaxSource": "/channellist",
-            "bStateSave": true,
-            "fnStateSave": function (oSettings, oData) {
-                oData.oSearch.sSearch=''; // Don't save search text
+            "stateSave": true,
+            "stateSaveCallback": function (oSettings, oData) {
+                oData.search.search=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );
             },
-            "fnStateLoad": function (oSettings) {
+            "stateLoadCallback": function (oSettings) {
                 return JSON.parse(localStorage.getItem('DataTables_'+where()));
             },
             "fnDrawCallback": function( oSettings ) {
@@ -1091,23 +1090,24 @@ $(function() {
             "bJQueryUI": true,
             "sPaginationType": "full_numbers",
             "bProcessing": true,
+            "bAutoWidth": false,
             "sAjaxSource": "/epglist_getter",
             "fnDrawCallback": function( oSettings ) {
                 initIcons();
                 paintTable();
             },
             "bServerSide": serverSide,
-            "bStateSave": true,
-            "fnStateSave": function (oSettings, oData) {
-                oData.oSearch.sSearch=''; // Don't save search text
+            "stateSave": true,
+            "stateSaveCallback": function (oSettings, oData) {
+                oData.search.search=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );
             },
-            "fnStateLoad": function (oSettings) {
+            "stateLoadCallback": function (oSettings) {
                 var oData = JSON.parse( localStorage.getItem('DataTables_'+where()) );
                 var keyword_for_epg = $('#keyword_for_epg').attr('keyword_for_epg');
-                if ( oData && keyword_for_epg != '' ) {
-                    oData.oSearch.sSearch=keyword_for_epg;
-                }
+                if ( keyword_for_epg != '' ) {
+                    oData.search.search=keyword_for_epg;
+                }                
                 return oData;
             },
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
@@ -1116,7 +1116,7 @@ $(function() {
                 $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
             }
         });
-
+        
         initIcons();
         initEpgState();
 
@@ -1352,14 +1352,15 @@ $(function() {
             "oLanguage": {"sUrl": "lang/dataTables." + language + ".json"},
             "bJQueryUI": true,
             "sPaginationType": "full_numbers",
+            "bAutoWidth": false,
             "bProcessing": true,
             "sAjaxSource": "/logget",
-            "bStateSave": true,
-            "fnStateSave": function (oSettings, oData) {
-                oData.oSearch.sSearch=''; // Don't save search text
+            "stateSave": true,
+            "stateSaveCallback": function (oSettings, oData) {
+                oData.search.search=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );
             },
-            "fnStateLoad": function (oSettings) {
+            "stateLoadCallback": function (oSettings) {
                 return JSON.parse( localStorage.getItem('DataTables_'+where()) );
             },
             "fnDrawCallback": function( oSettings ) {

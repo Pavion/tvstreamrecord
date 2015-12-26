@@ -617,6 +617,7 @@ def grabepg():
 def removeepg():
     sqlRun("DELETE FROM guide")
     sqlRun("DELETE FROM guide_chan")
+    sqlRun("DELETE FROM caching")
     print ("All EPG data was deleted")
     return "null"
 

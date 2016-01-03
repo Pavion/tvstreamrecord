@@ -196,7 +196,7 @@ label#append {float: left; margin-top: 3px;}
     margin-top: 3px; 
 }
 
-th.ccontrols { width: 7.5em; min-width: 7.5em; }
+th.ccontrols { width: 8.5em; min-width: 8.5em; }
 th.cid { width: 70px; }
 th.cname { width: 150px; }
 th.cext { width: 50px; }
@@ -271,6 +271,7 @@ div#users-contain table td, div#users-contain table th { border: 1px solid #eee;
 }
 .lefty {
     float: left; 
+    margin-bottom: 10px;
 }
 
 #chartheader {

@@ -190,7 +190,7 @@ function initProgressbar() {
  */
 var dialognr = -1;
 function initIcons() {
-    $( /*"[id^=iconsEPG-], */"[id^=icons-], [id^=iconsRec-], [id^=iconsERec-], [id^=iconsDisable-]" ).hover(
+    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsERec-], [id^=iconsDisable-]" ).hover(
         function() {
             $( this ).addClass( "ui-state-hover" );
         },
@@ -205,7 +205,7 @@ function initIcons() {
         event.preventDefault();
     });
 
-  /*  $( "[id^=iconsEPG-]" ).click(function( event ) {
+    $( "[id^=iconsEPG-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("iconsEPG-",""));
         post('/grab_channel', { myid:dialognr }, 0);
         if($( this ).children().hasClass( "ui-icon-plus" )) {
@@ -215,7 +215,7 @@ function initIcons() {
              $( this ).children().removeClass( "ui-icon-minus" );
              $( this ).children().addClass( "ui-icon-plus" );
         }
-    });*/
+    });
 
     $( "[id^=iconsRec-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("iconsRec-",""));
@@ -801,6 +801,8 @@ $(function() {
                             var epggrab = 0;
                             if ($("#switch_list_active").attr("checked") == "checked") {akt = 1;}
                             if ($("#switch_list_grab").attr("checked") == "checked") {epggrab = 1;}
+                            console.log(akt);
+                            console.log(epggrab);
                             post("/create_channel", {
                                 prev: $("#prev").val(),
                                 ccid: $("#ccid").val(),
@@ -833,7 +835,7 @@ $(function() {
                             if(data[i][0]==dialognr) {
 
                                 switchMe("#switch_list_active", ($("#switch-" + data[i][0]).attr("checked") == "checked") );
-                                //switchMe("#switch_list_grab", ( $("#iconsEPG-" + dialognr).children().attr("class").indexOf("plus") > 0) );
+                                switchMe("#switch_list_grab", ( $("#iconsEPG-" + dialognr).children().attr("class").indexOf("plus") > 0) );                                
 
                                 $("#prev").val(data[i][0]);
                                 $("#ccid").val(data[i][0]);
@@ -886,8 +888,8 @@ $(function() {
                 if (aData[4] == 1) data4 = "plus"; else data4="minus";
                 var chk = "";
                 if (aData[5] == 1) chk = 'checked="checked"';
-                //$('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-'+data4+'"></span></label><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
-                $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
+                $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-'+data4+'"></span></label><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
+                //$('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
             }
         });
    } else if (here("epgchart")) {

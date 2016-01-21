@@ -50,3 +50,4 @@ coverage.xml
 docs/_build/channels.m3u
 /nbproject/
 !/cherrypy/lib/
+/live.m3u

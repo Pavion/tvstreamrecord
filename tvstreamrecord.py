@@ -921,13 +921,13 @@ class record(Thread):
         else:
             self.ext = row[7]
         if self.mask > 0:
-            w = self.bis.isoweekday() if self.bis.isoweekday()<7 else 0
-            if not (self.bis>=datetime.now() and getWeekdays(self.mask)[w]):
+            w = self.von.isoweekday() if self.von.isoweekday()<7 else 0
+            if not (self.von>=datetime.now() and getWeekdays(self.mask)[w]):
                 delta = timedelta(days=1)
-                while not (self.bis>=datetime.now() and getWeekdays(self.mask)[w]):
+                while not (self.von>=datetime.now() and getWeekdays(self.mask)[w]):
                     self.von = self.von + delta
                     self.bis = self.bis + delta
-                    w = self.bis.isoweekday() if self.bis.isoweekday()<7 else 0
+                    w = self.von.isoweekday() if self.von.isoweekday()<7 else 0
                 print ("Recurrent record '%s' moved to %s" % (self.name, self.von))
                 sqlRun("UPDATE records SET rvon='%s', rbis='%s' WHERE rowid=%d" % (datetime.strftime(self.von,"%Y-%m-%d %H:%M:%S"), datetime.strftime(self.bis,"%Y-%m-%d %H:%M:%S"), self.id ) )
 

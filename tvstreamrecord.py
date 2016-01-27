@@ -978,13 +978,15 @@ class record(Thread):
             except Exception as ex:
                 pass            
         
-        fn = fn + self.ext
         fn = config.cfg_recordpath + fn
+        # Check, if destination file already exists
+        fn_check = fn + self.ext
         num = 1
-        #print (fn)
-        while fileexists(fn) and num<127:
-            fn = config.cfg_recordpath + config.cfg_record_mask.replace("%date%", dateholder).replace("%title%", titleholder) + ("_%s" % num) + self.ext
+        while fileexists(fn_check) and num<127:
+            fn_check = fn + ("_%s" % num) + self.ext
             num += 1
+        fn = fn_check
+        # End check
         if streamtype in fftypes:
             delta = total(tDiff(self.bis, datetime.now()))
             deltasec = '%d' % delta

@@ -162,7 +162,10 @@ def getProg(strp, channellist=[]):
 
     for attr,innertxt in getList(strp, 'programme'):
         dt1 = datetime.strptime(getAttr(attr, "start")[0:14],"%Y%m%d%H%M%S") + deltaxmltv
-        dt2 = datetime.strptime(getAttr(attr, "stop")[0:14],"%Y%m%d%H%M%S") + deltaxmltv
+        try:
+            dt2 = datetime.strptime(getAttr(attr, "stop")[0:14],"%Y%m%d%H%M%S") + deltaxmltv
+        except: 
+            dt2 = datetime.strptime(getAttr(attr, "end")[0:14],"%Y%m%d%H%M%S") + deltaxmltv
         p_id = getAttr(attr, "channel")
         if len(channellist)==0 or p_id in channellist:
             desc = ""

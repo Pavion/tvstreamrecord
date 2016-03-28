@@ -22,7 +22,8 @@ findpython() {
 
 
 stop() {
-	PID=`ps -A v | grep '[t]vstreamrecord.py' | cut -c 1-5`
+	PID=`ps -w | grep '[t]vstreamrecord.py' | cut -c 1-5`
+    if [ -z "$PID" ]; then PID=`ps -A v | grep '[t]vstreamrecord.py' | cut -c 1-5`; fi;
     kill ${PID}
 	sleep 3
 	kill -2 ${PID}	

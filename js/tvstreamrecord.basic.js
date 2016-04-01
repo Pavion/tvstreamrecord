@@ -672,6 +672,7 @@ $(function() {
             "bAutoWidth": false,
             "sAjaxSource": "/getrecordlist",
             "stateSave": true,
+            "stateDuration": 60 * 60 * 60 * 24,
             "stateSaveCallback": function (oSettings, oData) {
                 oData.search.search=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );
@@ -801,8 +802,7 @@ $(function() {
                             var epggrab = 0;
                             if ($("#switch_list_active").attr("checked") == "checked") {akt = 1;}
                             if ($("#switch_list_grab").attr("checked") == "checked") {epggrab = 1;}
-                            console.log(akt);
-                            console.log(epggrab);
+
                             post("/create_channel", {
                                 prev: $("#prev").val(),
                                 ccid: $("#ccid").val(),
@@ -870,6 +870,7 @@ $(function() {
             "bProcessing": true,
             "sAjaxSource": "/channellist",
             "stateSave": true,
+            "stateDuration": 60 * 60 * 60 * 24,
             "stateSaveCallback": function (oSettings, oData) {
                 oData.search.search=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );
@@ -1100,6 +1101,7 @@ $(function() {
             },
             "bServerSide": serverSide,
             "stateSave": true,
+            "stateDuration": 60 * 60 * 60 * 24,
             "stateSaveCallback": function (oSettings, oData) {
                 oData.search.search=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );
@@ -1259,7 +1261,7 @@ $(function() {
                     }
                 } else if ($(this).attr('id').startsWith('cfg_switch') && $(this).attr('type')!="checkbox") {
                     value = "null";
-                } else if ($(this).attr('id').startsWith('cfg_switch')) {
+                } else if ($(this).attr('id').startsWith('cfg_switch')) {                    
                     value = ($(this).attr('checked')=="checked") ? "1" : "0";
                 } else if ( // Reload page on this changes only 
                     ($(this).attr('id')=="cfg_theme") ||
@@ -1358,6 +1360,7 @@ $(function() {
             "bProcessing": true,
             "sAjaxSource": "/logget",
             "stateSave": true,
+            "stateDuration": 60 * 60 * 60 * 24,
             "stateSaveCallback": function (oSettings, oData) {
                 oData.search.search=''; // Don't save search text
                 localStorage.setItem( 'DataTables_'+where(), JSON.stringify(oData) );

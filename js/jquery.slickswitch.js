@@ -62,6 +62,7 @@
 
                 self.bind('ss-toggleOn', function () {
                     self[0].checked = true;
+                    self.attr("checked","checked");
                     settings.toggledOn(self);
                     settings.toggled(self);
                     self.trigger('ss-update');
@@ -69,6 +70,7 @@
 
                 self.bind('ss-toggleOff', function () {
                     self[0].checked = false;
+                    self.removeAttr("checked");
                     settings.toggledOff(self);
                     settings.toggled(self);
                     self.trigger('ss-update');

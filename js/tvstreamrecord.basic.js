@@ -275,11 +275,14 @@ function initIcons() {
 function initSwitch() {
     $('[id^=switch-]').each(function() {
         var switchnr = parseInt($(this).attr('id').replace("switch-",""));
+        var data = $('.dataTable').DataTable().row( "tr:has(input#switch-" + switchnr + ")" ).data();
         $(this).slickswitch({
-            toggledOn: function() {
+            toggledOn: function() {                        
+                data[5]=1;
                 post(where(), { myid:switchnr, what:"1" }, 0);
             },
             toggledOff: function() {
+                data[5]=0;
                 post(where(), { myid:switchnr, what:"0" }, 0);
             }
         });

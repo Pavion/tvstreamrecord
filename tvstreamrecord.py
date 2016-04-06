@@ -678,16 +678,6 @@ def epg_s():
 
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
-            #fulltext = "<b>"+event[0]+": "+datetime.strftime(d_von, localtime) + " - " + datetime.strftime(d_bis, localtime) + "</b><BR><BR>"+event[3]
-            #title = fulltext
-            #if len(title)>300:
-            #    for char in range (300, 280, -1):
-            #        try:
-            #            title = title[:char]+"..."
-            #            title.decode("UTF-8")
-            #            break
-            #        except:
-            #            pass
 
             if d_von < daystart:
                 d_von = daystart
@@ -695,6 +685,11 @@ def epg_s():
                 d_bis=datetime.combine(d_bis.date(),time.min)
             x = total(d_von - daystart)
             w = total(d_bis - d_von)
+
+            # restoring dates for correct record times
+            d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
+            d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
+
             if x >= 0 and w > 0:
                 rtemp.append ([cid, x/totalwidth*100.0*widthq, w/totalwidth*100.0*widthq, event[0], d_von, d_bis, event[3], event[4], row[2], event[5]])
         ret.append(rtemp)

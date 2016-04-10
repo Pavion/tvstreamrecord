@@ -67,6 +67,7 @@
     "Record name mask must have at least one placeholder": "",
     "Enable postprocessing": "",
     "Postprocessing command (use %file% for full filename)": "",
+    "Password-free IPs start with (comma separated, default": "",
     "Valid placeholders": "",
     
     "at": "",

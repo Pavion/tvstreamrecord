@@ -67,6 +67,7 @@
     "Record name mask must have at least one placeholder": "Die Maske für den Aufnahmenamen muss mindestens einen Platzhalter enthalten",
     "Enable postprocessing": "Nachbearbeitung aktivieren",
     "Postprocessing command (use %file% for full filename)": "Befehl für die Nachbearbeitung (Platzhalter %file% für vollständigen Dateinamen)",
+    "Password-free IPs start with (comma separated, default": "Keine Passwortabfrage für IPs beginnend mit (kommagetrennt, Vorgabe",
     "Valid placeholders": "Zulässige Platzhalter",
 
     "at": "von",

@@ -141,11 +141,15 @@ def setPass():
         ret = 2
     return json.dumps( {"ret": ret } )
 
-def checkLogin():
-    localhost = ['192','10.']
+def checkLogin():    
+    patterns = config.cfg_ip_filter.strip().split(',')
+    localhost = False
+    for pattern in patterns:
+        if request.remote_addr.startswith(pattern) and not len(pattern.strip())==0:
+            localhost = True
     global credentials
-    if credentials:
-        if credentials != request.get_cookie(b"tvstreamrecord_user") and not request.remote_addr[:3] in localhost and request.remote_addr != '127.0.0.1':
+    if credentials and not localhost:
+        if credentials != request.get_cookie(b"tvstreamrecord_user"):
             if config.checkIP(request.remote_addr) == True:
                 return template('login')
             else:

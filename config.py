@@ -186,6 +186,12 @@ configuration = [
 'cfg_proxy',
 "Proxy URL",
 'http://127.0.0.1:8080'
+],
+
+[
+'cfg_ip_filter',
+"IP Filter",
+'10.,127.,192.,localhost'
 ]
 
 ]

@@ -57,7 +57,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False 
-version = '1.2.7'
+version = '1.2.7a'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -121,8 +121,11 @@ def postLogin():
         config.clearIP(request.remote_addr)
     else:
         config.banIP(request.remote_addr)
-    expire = None if not request.forms.store_pw else 315360000
-    response.set_cookie(name=b"tvstreamrecord_user", value=hash, max_age=expire)
+    if not request.forms.store_pw:
+        response.set_cookie(name=b"tvstreamrecord_user", value=hash)
+    else:
+        response.set_cookie(name=b"tvstreamrecord_user", value=hash, max_age=315360000)    
+    
     redirect("/")
 
 @post('/setpass')

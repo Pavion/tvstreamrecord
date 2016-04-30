@@ -128,6 +128,12 @@ def postLogin():
     
     redirect("/")
 
+@route('/logoff')
+def postLogout():
+    response.delete_cookie(b"tvstreamrecord_user")
+    if config.checkIP(request.remote_addr) == True:
+        return template('login')
+
 @post('/setpass')
 def setPass():
     global credentials
@@ -199,7 +205,7 @@ def internationalize(templ,noheader=False):
     else:
         #TEMPLATES.clear() # debug only, should be turned off! 
         if not noheader:
-            header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale )
+            header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale, logout=(not credentials=="") )
             footer = template('footer')
             templ = header + templ + footer
         if not config.cfg_language == "english":

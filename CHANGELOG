@@ -1,4 +1,6 @@
 2016-04-xx 1.2.8 Password-free IP mask added into advanced configuration
+                 Fix for login on iOS devices
+                 Logout link added
 
 2016-04-06 1.2.7 Fix for table switches
                  Fix for overnight records using EPG chart

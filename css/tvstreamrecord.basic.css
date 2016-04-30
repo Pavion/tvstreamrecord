@@ -14,7 +14,7 @@ body {
 
 #tabs {
     position: absolute;
-    min-width: 1000px;
+    min-width: 970px;
     float:left;
 }
     
@@ -293,4 +293,8 @@ div#users-contain table th { font-weight: bold; }
 .grabepgclass {
     float: left;
     margin: -5px 0 10px 10px;
+}
+
+#mainmenu {
+    font-family: Arial, Helvetica, sans-serif;
 }

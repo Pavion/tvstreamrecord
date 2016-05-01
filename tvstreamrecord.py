@@ -433,6 +433,7 @@ def config_p():
     for cfg in configdata:
         if cfg[0]=="cfg_grab_time":
             if cfg[1]!=config.cfg_grab_time:
+                config.cfg_grab_time = cfg[1]
                 grabthread.run()
     config.setConfig(configdata)
     return "null"

@@ -36,9 +36,11 @@ import sys
 if sys.version_info[0] == 2: 
     # Python 2.x
     import urllib as urllib32
+    tvcookie = b"tvstreamrecord_user"
 else: 
     # Python 3.x
     import urllib.request as urllib32 
+    tvcookie = "tvstreamrecord_user"
 from threading import Thread, Timer
 import os
 from mylogging import logInit, logRenew, logStop
@@ -116,21 +118,22 @@ def server_static5(filename):
 @post('/login')
 def postLogin():
     global credentials
-    hash = hashlib.sha224(request.forms.pw).hexdigest()
+    pw = request.forms.pw.encode("utf-8")
+    hash = hashlib.sha224(pw).hexdigest()
     if hash == credentials:
         config.clearIP(request.remote_addr)
     else:
         config.banIP(request.remote_addr)
-    if not request.forms.store_pw:
-        response.set_cookie(name=b"tvstreamrecord_user", value=hash)
+    if not request.forms.store_pw:        
+        response.set_cookie(name=tvcookie, value=hash)
     else:
-        response.set_cookie(name=b"tvstreamrecord_user", value=hash, max_age=315360000)    
+        response.set_cookie(name=tvcookie, value=hash, max_age=315360000)    
     
     redirect("/")
 
 @route('/logoff')
 def postLogout():
-    response.delete_cookie(b"tvstreamrecord_user")
+    response.delete_cookie(tvcookie)
     if config.checkIP(request.remote_addr) == True:
         return template('login')
 
@@ -141,7 +144,7 @@ def setPass():
     pass_new_1 = hashlib.sha224(request.forms.pass_new_1).hexdigest() if request.forms.pass_new_1 else ""
     pass_new_2 = hashlib.sha224(request.forms.pass_new_2).hexdigest() if request.forms.pass_new_2 else ""
     if pass_old == credentials and pass_new_1 == pass_new_2:
-        response.delete_cookie(b"tvstreamrecord_user")
+        response.delete_cookie(tvcookie)
         credentials = config.setUser(pass_new_1)
         ret = 0
     elif pass_old != credentials:
@@ -158,7 +161,7 @@ def checkLogin():
             localhost = True
     global credentials
     if credentials and not localhost:
-        if credentials != request.get_cookie(b"tvstreamrecord_user"):
+        if credentials != request.get_cookie(tvcookie):
             if config.checkIP(request.remote_addr) == True:
                 return template('login')
             else:

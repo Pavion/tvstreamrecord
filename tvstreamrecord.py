@@ -59,7 +59,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False 
-version = '1.2.7a'
+version = '1.2.7b'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -1124,8 +1124,6 @@ class record(Thread):
                 print ("FFMPEG Record '%s' had to be killed. R.I.P." % self.name)
             else:
                 print ("FFMPEG Record '%s' had to be terminated." % self.name)
-        except WindowsError:
-            pass
         except:
             print ("FFMPEG Record '%s' termination error, process might be running" % self.name)            
         if not self.process==None:

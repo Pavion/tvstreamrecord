@@ -187,8 +187,14 @@ def getProg(strp, channellist=[]):
 
 def getLocalFile(file_in):
     print ("Trying to open a local XMLTV file: %s" % (file_in))
-    with open(file_in, 'r') as content_file:
+    with open(file_in, 'rb') as content_file:
         out = content_file.read()
+    if file_in.endswith(".gz"):
+        try:
+            d = zlib.decompressobj(16+zlib.MAX_WBITS)
+            out = d.decompress(out)
+        except:
+            pass       
     try:
         out = out.decode("UTF-8")
     except Exception as ex:

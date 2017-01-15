@@ -1,5 +1,5 @@
 package="tvstreamrecord"
-version="1.2.7c"
+version="1.2.7d"
 maintainer="Pavion"
 description="Program to record TV streams. Python required. Server runs at port 8030 (changeable)"
 reloadui="yes"

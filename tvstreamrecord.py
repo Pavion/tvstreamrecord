@@ -59,7 +59,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False 
-version = '1.2.7c'
+version = '1.2.7d'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -868,6 +868,32 @@ def createepg():
     setRecords()
     redirect("/records")
     return "null"
+
+@post('/createtvb')
+def create_tvb():
+    
+    recname = request.forms.recname
+    sender = request.forms.sender
+    von = request.forms.von
+    bis = request.forms.bis
+    am = request.forms.am
+
+    d_von = datetime.strptime(am + " " + von, "%Y-%m-%d %H:%M")
+    d_bis = datetime.strptime(am + " " + bis, "%Y-%m-%d %H:%M")
+    delta = timedelta(days=1)
+    if d_bis < d_von:
+        d_bis = d_bis + delta
+
+    print ("POST request received from TV-Browser plugin")
+    print ("Name: %s, channel: %s, start: %s, stop: %s" % (recname, sender, d_von, d_bis))
+    rows=sqlRun("SELECT cid FROM channels WHERE cname=? AND cenabled=1", (sender, ))
+    if rows:
+        cid = rows[0][0]
+        print ("Channel %s was found with CID %s, creating record" % (sender, cid))
+        sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, 1, 0)", (recname, cid, d_von, d_bis))
+    else:
+        print ("Channel %s could not be found, please check your channel names" % (sender))
+
 
 @post('/create')
 def create_p():

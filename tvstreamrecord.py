@@ -880,16 +880,19 @@ def create_tvb():
 
     d_von = datetime.strptime(am + " " + von, "%Y-%m-%d %H:%M")
     d_bis = datetime.strptime(am + " " + bis, "%Y-%m-%d %H:%M")
-    delta = timedelta(days=1)
+    delta = timedelta(days=1)    
     if d_bis < d_von:
         d_bis = d_bis + delta
-
+    
     print ("POST request received from TV-Browser plugin")
     print ("Name: %s, channel: %s, start: %s, stop: %s" % (recname, sender, d_von, d_bis))
     rows=sqlRun("SELECT cid FROM channels WHERE cname=? AND cenabled=1", (sender, ))
     if rows:
         cid = rows[0][0]
         print ("Channel %s was found with CID %s, creating record" % (sender, cid))
+        deltaepg = timedelta(minutes=int(config.cfg_delta_for_epg))
+        d_von = d_von - deltaepg
+        d_bis = d_bis + deltaepg        
         sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, 1, 0)", (recname, cid, d_von, d_bis))
     else:
         print ("Channel %s could not be found, please check your channel names" % (sender))

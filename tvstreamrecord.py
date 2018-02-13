@@ -395,12 +395,12 @@ def upload_p():
     if not upfile:
         print ("No file specified, please try again")
     else:
-        content = upfile.file.read()
+        content = upfile.file.read()        
         try:
             content = content.decode("UTF-8")
         except:
             pass
-        if content[:7] == "#EXTM3U":
+        if "#EXTM3U" in content:
             how = getBool(request.forms.get("switch_list_append"))
             rowid = 1
             if how==0:
@@ -416,7 +416,7 @@ def upload_p():
             i = 0
             name = ""
             for line in lines:
-                if line[0:10] != "#EXTVLCOPT" and line!="" and line[:7] != "#EXTM3U":
+                if line != "" and not "#EXTVLCOPT" in line and not "#EXTM3U" in line:
                     i = i + 1
                     if i % 2 == 1:
                         name = line.split(",",1)[1]
@@ -425,6 +425,9 @@ def upload_p():
                         rowid = rowid + 1
                         name = ""
             sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?, 0)", retl, 1)
+            print("M3U parsing completed with %d entries" % len(retl))
+        else:
+            print("Bad M3U format detected (missing #EXTM3U tag)")
 
     redirect("/list")
 

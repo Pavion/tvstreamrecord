@@ -894,6 +894,7 @@ def create_tvb():
         d_von = d_von - deltaepg
         d_bis = d_bis + deltaepg        
         sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, 1, 0)", (recname, cid, d_von, d_bis))
+        setRecords()
     else:
         print ("Channel %s could not be found, please check your channel names" % (sender))
 

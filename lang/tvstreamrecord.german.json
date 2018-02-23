@@ -67,6 +67,7 @@
     "Record name mask must have at least one placeholder": "Die Maske für den Aufnahmenamen muss mindestens einen Platzhalter enthalten",
     "Enable postprocessing": "Nachbearbeitung aktivieren",
     "Postprocessing command (use %file% for full filename)": "Befehl für die Nachbearbeitung (Platzhalter %file% für vollständigen Dateinamen)",
+    "Alternative URL (host:port only) for FFMPEG (if using two similar devices)": "Alternative URL (nur host/port) für FFMPEG (beim Nutzen von zwei ähnlichen Geräten)",
     "Password-free IPs start with (comma separated, default": "Keine Passwortabfrage für IPs beginnend mit (kommagetrennt, Vorgabe",
     "Valid placeholders": "Zulässige Platzhalter",
 

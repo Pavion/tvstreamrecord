@@ -36,10 +36,12 @@ import sys
 if sys.version_info[0] == 2: 
     # Python 2.x
     import urllib as urllib32
+    import urlparse
     tvcookie = b"tvstreamrecord_user"
 else: 
     # Python 3.x
     import urllib.request as urllib32 
+    import urllib.parse as urlparse
     tvcookie = "tvstreamrecord_user"
 from threading import Thread, Timer
 import os
@@ -949,6 +951,7 @@ class record(Thread):
     myrow = None
     retries = 0
     retry_count = 0
+    ffmpeg = 0
 
     def __init__(self, row):
         Thread.__init__(self)
@@ -1035,6 +1038,24 @@ class record(Thread):
         if streamtype in fftypes:
             delta = total(tDiff(self.bis, datetime.now()))
             deltasec = '%d' % delta
+            
+            try:
+                if config.cfg_ffmpeg_alternate_url != "":
+                    for t in records:
+                        if t.isRunning() == 1 and t.isFfmpeg() == 1: 
+                            print("DEBUG: URL before: %s" % self.url)
+                            parser = urlparse.urlsplit(self.url)
+                            self.url = urlparse.urlunsplit([parser.scheme, config.cfg_ffmpeg_alternate_url, parser.path, parser.query, parser.fragment])
+                            print("DEBUG: URL after: %s" % self.url)
+                            print ("FFMPEG record already in progress, substituting URL...")
+                            self.ffmpeg = 2
+                            break
+            except:
+                pass
+
+            if self.ffmpeg == 0:
+                self.ffmpeg = 1
+            
             attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-t', deltasec] + ffargs + [fn]
             print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
             print (attr)
@@ -1145,6 +1166,7 @@ class record(Thread):
         print ("Record: Stopflag for '%s' received" % (self.name))
 
     def clean(self):
+        self.running = 0
         if self in records: records.remove(self)
         
     def cleanProcess(self):
@@ -1161,6 +1183,13 @@ class record(Thread):
             print ("FFMPEG Record '%s' termination error, process might be running" % self.name)            
         if not self.process==None:
             print ("FFMPEG Record '%s': termination may have failed" % self.name)
+        self.running = 0
+
+    def isFfmpeg(self):
+        return self.ffmpeg
+    
+    def isRunning(self):
+        return self.running
 
 def setRecords():
     if shutdown: 

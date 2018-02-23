@@ -81,6 +81,12 @@ configuration = [
 ],
 
 [
+'cfg_ffmpeg_alternate_url',
+"Alternative URL for a second device",
+''
+],
+
+[
 'cfg_grab_time',
 "Time to perform daily EPG grab on all marked channels (hh:mm format, 24h based, default '0' for manual only)",
 '0'

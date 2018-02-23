@@ -67,6 +67,7 @@
     "Record name mask must have at least one placeholder": "Маска для имени записи должна содержать как минимум один шаблон",
     "Enable postprocessing": "Разрешить дополнительную обработку записей",
     "Postprocessing command (use %file% for full filename)": "Командная строка дополнительной обработки (шаблон %file% для полного имени файла)",
+    "Alternative URL (host:port only) for FFMPEG (if using two similar devices)": "Альтернативный URL (только host:port) для FFMPEG (при использовании двух схожих устройств)",
     "Password-free IPs start with (comma separated, default": "Беспарольные IP-адреса начинаются с (через запятую, по умолчанию",
     "Valid placeholders": "Допустимые шаблоны",
 

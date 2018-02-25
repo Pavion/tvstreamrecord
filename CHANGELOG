@@ -1,3 +1,6 @@
+2018-02-25 1.3.2 Extending TV Browser support (with newest plugin)
+                 Events to be recorded are marked in TVBrowser and shown in tree view
+
 2018-02-13 1.3.1 Fix for TV Browser records
                  Fix for importing m3u files with utf8bom encoding
 

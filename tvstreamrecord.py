@@ -61,7 +61,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False 
-version = '1.3.1a'
+version = '1.3.2'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -881,7 +881,8 @@ def create_tvb():
     sender = request.forms.sender
     von = request.forms.von
     bis = request.forms.bis
-    am = request.forms.am
+    am = request.forms.am    
+    uniqueid = request.forms.uniqueid
 
     d_von = datetime.strptime(am + " " + von, "%Y-%m-%d %H:%M")
     d_bis = datetime.strptime(am + " " + bis, "%Y-%m-%d %H:%M")
@@ -898,12 +899,21 @@ def create_tvb():
         deltaepg = timedelta(minutes=int(config.cfg_delta_for_epg))
         d_von = d_von - deltaepg
         d_bis = d_bis + deltaepg        
-        sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, 1, 0)", (recname, cid, d_von, d_bis))
+        sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, 1, 0, ?)", (recname, cid, d_von, d_bis, uniqueid))
         setRecords()
+        return "true"
     else:
         print ("Channel %s could not be found, please check your channel names" % (sender))
+        return "false"
 
-
+@route('/gettvb')
+def gettvb():
+    ret = ""
+    rows=sqlRun("SELECT uniqueid FROM records WHERE uniqueid <> '' AND renabled=1")
+    for row in rows:
+        ret += row[0] + "\n"
+    return ret.rstrip()
+    
 @post('/create')
 def create_p():
     prev = request.forms.prev
@@ -1043,10 +1053,8 @@ class record(Thread):
                 if config.cfg_ffmpeg_alternate_url != "":
                     for t in records:
                         if t.isRunning() == 1 and t.isFfmpeg() == 1: 
-                            print("DEBUG: URL before: %s" % self.url)
                             parser = urlparse.urlsplit(self.url)
                             self.url = urlparse.urlunsplit([parser.scheme, config.cfg_ffmpeg_alternate_url, parser.path, parser.query, parser.fragment])
-                            print("DEBUG: URL after: %s" % self.url)
                             print ("FFMPEG record already in progress, substituting URL...")
                             self.ffmpeg = 2
                             break

@@ -869,7 +869,7 @@ def records_p():
 
 @post('/createepg')
 def createepg():
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0 FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=? GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_delta_for_epg), (request.forms.ret, ))
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0, '' FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=? GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_delta_for_epg), (request.forms.ret, ))
     setRecords()
     redirect("/records")
     return "null"
@@ -934,7 +934,7 @@ def create_p():
         d_bis = d_bis + delta
 
     if prev=="":
-        sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?)", (recname, sender, d_von, d_bis, aktiv, recurr))
+        sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?, '')", (recname, sender, d_von, d_bis, aktiv, recurr))
     else:
         sqlRun("UPDATE records SET recname=?, cid=?, rvon=?, rbis=?, renabled=?, rmask=? WHERE rowid=?", (recname, sender, d_von, d_bis, aktiv, recurr,  prev))
 

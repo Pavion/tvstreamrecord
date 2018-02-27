@@ -61,7 +61,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False 
-version = '1.3.2'
+version = '1.3.3'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -923,6 +923,7 @@ def deletetvb():
     else: 
         sqlRun("DELETE FROM records WHERE uniqueid = ?", (uniqueid, ))
         print ("TVB record '%s' has been deleted" % rows[0][0])
+        setRecords()
         return "true"
 
 @post('/create')

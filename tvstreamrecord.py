@@ -913,7 +913,18 @@ def gettvb():
     for row in rows:
         ret += row[0] + "\n"
     return ret.rstrip()
-    
+
+@post('/deletetvb')
+def deletetvb():
+    uniqueid = request.forms.uniqueid
+    rows = sqlRun("SELECT * FROM records WHERE uniqueid = ?", (uniqueid, ))
+    if len(rows) == 0:
+        return "false"
+    else: 
+        sqlRun("DELETE FROM records WHERE uniqueid = ?", (uniqueid, ))
+        print ("TVB record '%s' has been deleted" % rows[0][0])
+        return "true"
+
 @post('/create')
 def create_p():
     prev = request.forms.prev

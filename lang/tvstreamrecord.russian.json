@@ -62,6 +62,7 @@
     "Reset the log file": "Очистить лог",
     "Reset log": "Очистить",
     "Retry count for failed records": "Количество повторов при ошибке записи",
+    "Do not restart ffmpeg if that much seconds remains": "Не перезапускать ffmpeg, если только столько секунд осталось",
     "Do you want to delete all of your EPG data?": "Вы хотите удалить все данные EPG?",
     "Record name/path mask (default: '%date% - %title%')": "Маска/путь файла записи (по умолчанию: '%date% - %title%')", 
     "Record name mask must have at least one placeholder": "Маска для имени записи должна содержать как минимум один шаблон",

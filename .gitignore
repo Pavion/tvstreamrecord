@@ -1,5 +1,6 @@
 log.txt
 settings*.db*
+channels.m3u
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -51,3 +52,4 @@ docs/_build/channels.m3u
 /nbproject/
 !/cherrypy/lib/
 /live.m3u
+channels.m3u

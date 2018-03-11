@@ -1135,7 +1135,7 @@ $(function() {
         $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
         $( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
-        $("#cfg_purgedelta,#cfg_delta_for_epg,#cfg_grab_max_duration").spinner();
+        $("#cfg_purgedelta,#cfg_delta_for_epg,#cfg_grab_max_duration,#cfg_retry_count,#cfg_failsafe_delta,#cfg_xmltvtimeshift").spinner();
         $("#cfg_grab_zoom").spinner( { step: 0.1 } );
         $("#cfg_epg_max_events").spinner( { step: 1000 } );
 
@@ -1249,6 +1249,11 @@ $(function() {
                     }
                 } else if ($(this).attr('id')=="cfg_retry_count") {
                     if ( !checkRegexp( "cfg_retry_count", /^\d+$/, "" ) ) {
+                        alert( $(this).attr('alert') );
+                        myalert = true;
+                    }
+                } else if ($(this).attr('id')=="cfg_failsafe_delta") {
+                    if ( !checkRegexp( "cfg_failsafe_delta", /^\d+$/, "" ) ) {
                         alert( $(this).attr('alert') );
                         myalert = true;
                     }

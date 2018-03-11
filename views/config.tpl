@@ -66,7 +66,7 @@
 <tr><td>§Lenghten an EPG-record (delta before and after), [minutes]§</td><td><input id="cfg_delta_for_epg" /></td></tr>
 <tr><td>§Enable XMLTV import§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_xmltv_auto" /></td></tr>
 <tr><td>§Initial path for an XMLTV import§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_xmltvinitpath" value="" autocomplete="off" /></td></tr>
-<tr><td>§Time shift for XMLTV data (in hours)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_xmltvtimeshift" value="" autocomplete="off" /></td></tr>
+<tr><td>§Time shift for XMLTV data (in hours)§</td><td><input id="cfg_xmltvtimeshift" /></td></tr>
 <tr><td>§mc2xml full command line (x86 CPUs only, default: empty)§ <sup>*</sup></td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_xmltv_mc2xml" value="" autocomplete="off" /></td></tr>
 <tr><td>§Enable stream scan/grab§ <sup>**</sup></td><td><input type="checkbox" class="switch icons" id="cfg_switch_grab_auto" /></td></tr>
 <tr><td>§Maximal EPG scan duration per channel, [seconds] (default: '60')§ <sup>**</sup></td><td><input id="cfg_grab_max_duration" /></td></tr>
@@ -114,7 +114,8 @@
 <tr><td>§Server port (restart needed)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_server_port" value="" autocomplete="off" alert="§Invalid port, please check your settings§"/></td></tr>
 <tr><td>§Record name/path mask (default: '%date% - %title%')§<sup>*</sup></td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_record_mask" value="" autocomplete="off" alert="§Record name mask must have at least one placeholder§"/></td></tr>
 <tr><td>§Reset the log file§</td><td><button id="button_resetlog">§Reset log§</button></td></tr>
-<tr><td>§Retry count for failed records§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_retry_count" value="" autocomplete="off" alert="§Invalid value, please enter a positive number or a zero§"/></td></tr>
+<tr><td>§Retry count for failed records§</td><td><input id="cfg_retry_count" alert="§Invalid value, please enter a positive number or a zero§"/></td></tr>
+<tr><td>§Do not restart ffmpeg if that much seconds remains§</td><td><input id="cfg_failsafe_delta" alert="§Invalid value, please enter a positive number or a zero§"/></td></tr>
 <tr><td>§Enable postprocessing§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_postprocess" /></td></tr>
 <tr><td>§Postprocessing command (use %file% for full filename)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_postprocess" value="" autocomplete="off" /></td></tr>
 <tr><td>§Alternative URL (host:port only) for FFMPEG (if using two similar devices)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ffmpeg_alternate_url" value="" autocomplete="off" /></td></tr>

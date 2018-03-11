@@ -1156,7 +1156,7 @@ class record(Thread):
                     print ("Exception calling postprocessing, please check your command line")                    
         
         # 2015-01-21 Fail & recurrency check
-        if datetime.now() < self.bis - timedelta(seconds=10) and self.stopflag==0:
+        if datetime.now() < self.bis - timedelta(seconds=int(config.cfg_failsafe_delta)) and self.stopflag==0:
             delta = total(tDiff(self.bis, datetime.now()))
             if self.retry_count == 0:
                 print ("Something went wrong with '%s'. No retries configured, aborting..." % (self.name))

@@ -198,6 +198,12 @@ configuration = [
 'cfg_ip_filter',
 "IP Filter",
 '10.,127.,192.,localhost'
+],
+
+[
+'cfg_failsafe_delta',
+'Do not restart ffmpeg if that much seconds remains',
+10
 ]
 
 ]

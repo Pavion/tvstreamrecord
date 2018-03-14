@@ -33,6 +33,7 @@ import grabber
 import xmltv
 import json
 import sys
+import shlex
 if sys.version_info[0] == 2: 
     # Python 2.x
     import urllib as urllib32
@@ -1144,7 +1145,7 @@ class record(Thread):
         if config.cfg_switch_postprocess == "1" and config.cfg_postprocess != "":
             if fileexists(fn):
                 attr = []
-                attr = config.cfg_postprocess.split(" ")                 
+                attr = shlex.split(config.cfg_postprocess)
                 for i in range(0, len(attr)):
                     attr[i] = attr[i].replace("%file%", fn)
                 print ("Postprocessing will be called with following parameters:")

@@ -33,8 +33,14 @@ configuration = [
 ],
 
 [
-'cfg_delta_for_epg',
-'Lenghten an EPG-record (delta before and after), [minutes]',
+'cfg_delta_before_epg',
+'Lenghten an EPG-record (delta before), [minutes]',
+3
+],
+
+[
+'cfg_delta_after_epg',
+'Lenghten an EPG-record (delta after), [minutes]',
 3
 ],
 

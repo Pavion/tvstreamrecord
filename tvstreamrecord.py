@@ -62,7 +62,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False 
-version = '1.3.4b'
+version = '1.3.5'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -696,7 +696,7 @@ def epg_s():
     for row in rows:
         cid=row[1]
         rtemp = list()
-        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=? AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE (date(g_start)=date(?) OR date(g_stop)=date(?)) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id=? ORDER BY g_start" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg), (cid, todaysql, todaysql, row[0]))
+        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=? AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE (date(g_start)=date(?) OR date(g_stop)=date(?)) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id=? ORDER BY g_start" % (config.cfg_delta_before_epg, config.cfg_delta_after_epg), (cid, todaysql, todaysql, row[0]))
         for event in c_rows:
 
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
@@ -716,12 +716,12 @@ def epg_s():
             if x >= 0 and w > 0:
                 rtemp.append ([cid, x/totalwidth*100.0*widthq, w/totalwidth*100.0*widthq, event[0], d_von, d_bis, event[3], event[4], row[2], event[5]])
         ret.append(rtemp)
-    return internationalize(template('epgchart', curr=datetime.strftime(d_von, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), delta=config.cfg_delta_for_epg))
+    return internationalize(template('epgchart', curr=datetime.strftime(d_von, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), deltab=config.cfg_delta_before_epg, deltaa=config.cfg_delta_after_epg))
 
 @route('/epglist')
 @route('/epglist&<keyword>')
 def epglist_s(keyword=''):
-    return internationalize(template('epglist', keyword_for_epg=keyword, listmode=config.cfg_switch_epglist_mode, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), delta=config.cfg_delta_for_epg))
+    return internationalize(template('epglist', keyword_for_epg=keyword, listmode=config.cfg_switch_epglist_mode, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), deltab=config.cfg_delta_before_epg, deltaa=config.cfg_delta_after_epg))
 
 @route('/epglist_getter')
 def epglist_getter():
@@ -745,15 +745,15 @@ def epglist_getter():
         if iSearch and iSearch!="":
             sWhere = "AND (guide_chan.g_name LIKE '%" + iSearch + "%' OR guide.g_title LIKE '%" + iSearch + "%' OR guide.g_desc LIKE '%" + iSearch + "%')"
 
-        query = "SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s %s %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere, sOrder, sLimit)
-        countquery = "SELECT COUNT(guide.g_start) FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, sWhere)
+        query = "SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s %s %s" % (config.cfg_delta_before_epg, config.cfg_delta_after_epg, sWhere, sOrder, sLimit)
+        countquery = "SELECT COUNT(guide.g_start) FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s" % (config.cfg_delta_before_epg, config.cfg_delta_after_epg, sWhere)
         count = sqlRun(countquery)
         if count:
             totalrows = count[0][0]
 
         rows=sqlRun(query)
     else: # Client-side processing
-        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_epg_max_events))
+        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, (records.renabled is not null and records.renabled  = 1), guide.rowid FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.cid=channels.cid AND datetime(guide.g_start, '-%s minutes')=records.rvon and datetime(guide.g_stop, '+%s minutes')=records.rbis WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_delta_before_epg, config.cfg_delta_after_epg, config.cfg_epg_max_events))
 
     for row in rows:
         retlist.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
@@ -870,7 +870,7 @@ def records_p():
 
 @post('/createepg')
 def createepg():
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0, '' FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=? GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_for_epg, config.cfg_delta_for_epg, config.cfg_delta_for_epg), (request.forms.ret, ))
+    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0, '' FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=? GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_before_epg, config.cfg_delta_after_epg, config.cfg_delta_before_epg), (request.forms.ret, ))
     setRecords()
     redirect("/records")
     return "null"
@@ -897,9 +897,10 @@ def create_tvb():
     if rows:
         cid = rows[0][0]
         print ("Channel %s was found with CID %s, creating record" % (sender, cid))
-        deltaepg = timedelta(minutes=int(config.cfg_delta_for_epg))
-        d_von = d_von - deltaepg
-        d_bis = d_bis + deltaepg        
+        deltaepgbefore = timedelta(minutes=int(config.cfg_delta_before_epg))
+        deltaepgafter = timedelta(minutes=int(config.cfg_delta_after_epg))
+        d_von = d_von - deltaepgbefore
+        d_bis = d_bis + deltaepgafter
         sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, 1, 0, ?)", (recname, cid, d_von, d_bis, uniqueid))
         setRecords()
         return "true"

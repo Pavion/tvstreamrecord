@@ -111,6 +111,9 @@ def sqlCreateAll(version):
                     sql += "UPDATE config SET value='-loglevel fatal ' || value WHERE param = 'cfg_ffmpeg_params' and not lower(value) LIKE '%loglevel%';"
                 if oldver < '1.3.2':
                     sql += "ALTER TABLE records ADD COLUMN uniqueid TEXT;"
+                if oldver < '1.3.5':
+                    sql += "INSERT OR IGNORE INTO config VALUES ('cfg_delta_before_epg', '', (SELECT value FROM config WHERE param='cfg_delta_for_epg'));"
+                    sql += "UPDATE config SET param='cfg_delta_after_epg' WHERE param='cfg_delta_for_epg';"
 
                 if oldver > version:
                     print ("Critical error: Version mismatch!!!")

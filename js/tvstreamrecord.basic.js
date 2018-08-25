@@ -236,13 +236,14 @@ function initIcons() {
 //                    $("#dialog_content").html (data[i][7]);
                     var dat_v = data[i][3].split(" ")[1].substr(0,5);
                     var dat_b = data[i][4].split(" ")[1].substr(0,5);
-                    var delta = $("#delta_for_epg").attr("delta");
+                    var delta_before = $("#delta_before_epg").attr("delta");
+                    var delta_after = $("#delta_after_epg").attr("delta");
                     $( "#dialog_content" ).html ("<b>" + data[i][1] + ": "+dat_v + " - " + dat_b + "</b><BR><BR>" + data[i][2].replace(/\n/g, '<BR>'));
                     recName = data[i][1];
                     recChannel = data[i][0];
                     recDate = data[i][3].split(" ")[0];
-                    recStart = new Date( parseDate(data[i][3]).valueOf() - delta*60000 ).toTimeString().substring(0, 5);
-                    recEnd = new Date( parseDate(data[i][4]).valueOf() + delta*60000 ).toTimeString().substring(0, 5);
+                    recStart = new Date( parseDate(data[i][3]).valueOf() - delta_before*60000 ).toTimeString().substring(0, 5);
+                    recEnd = new Date( parseDate(data[i][4]).valueOf() + delta_after*60000 ).toTimeString().substring(0, 5);
 
                     $( "#dialog_record_from_epg" ).dialog( "open" );
                     event.preventDefault();
@@ -1058,9 +1059,10 @@ $(function() {
                     recName = $(this).text();
                     recChannel = $(this).attr("cid");
                     recDate = $(this).attr("at").split(" ")[0];
-                    var delta = $("#delta_for_epg").attr("delta");
-                    recStart = new Date( parseDate($(this).attr("at")).valueOf() - delta*60000 ).toTimeString().substring(0, 5);
-                    recEnd = new Date( parseDate($(this).attr("till")).valueOf() + delta*60000 ).toTimeString().substring(0, 5);
+                    var delta_before = $("#delta_before_epg").attr("delta");
+                    var delta_after = $("#delta_after_epg").attr("delta");
+                    recStart = new Date( parseDate($(this).attr("at")).valueOf() - delta_before*60000 ).toTimeString().substring(0, 5);
+                    recEnd = new Date( parseDate($(this).attr("till")).valueOf() + delta_after*60000 ).toTimeString().substring(0, 5);
                     $( "#dialog_record_from_epg" ).dialog( "open" );
                     $(this).removeClass("ui-selected");
                 }
@@ -1135,7 +1137,7 @@ $(function() {
         $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
         $( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
-        $("#cfg_purgedelta,#cfg_delta_for_epg,#cfg_grab_max_duration,#cfg_retry_count,#cfg_failsafe_delta,#cfg_xmltvtimeshift").spinner();
+        $("#cfg_purgedelta,#cfg_delta_before_epg,#cfg_delta_after_epg,#cfg_grab_max_duration,#cfg_retry_count,#cfg_failsafe_delta,#cfg_xmltvtimeshift").spinner();
         $("#cfg_grab_zoom").spinner( { step: 0.1 } );
         $("#cfg_epg_max_events").spinner( { step: 1000 } );
 

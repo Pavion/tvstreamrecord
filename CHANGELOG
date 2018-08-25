@@ -1,3 +1,5 @@
+2018-08-25 1.3.5 Adding more placeholders, delta before and after an EPG record
+
 2018-03-11 1.3.4 Failsafe delta for ffmpeg: do not restart if but X seconds remain
 
 2018-02-27 1.3.3 Extending TV Browser support (plugin v.1.0.3 required)

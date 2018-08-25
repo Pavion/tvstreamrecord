@@ -63,7 +63,8 @@
 </tr>
 </thead>
 <tbody>
-<tr><td>§Lenghten an EPG-record (delta before and after), [minutes]§</td><td><input id="cfg_delta_for_epg" /></td></tr>
+<tr><td>§Lenghten an EPG-record (delta before), [minutes]§</td><td><input id="cfg_delta_before_epg" /></td></tr>
+<tr><td>§Lenghten an EPG-record (delta after), [minutes]§</td><td><input id="cfg_delta_after_epg" /></td></tr>
 <tr><td>§Enable XMLTV import§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_xmltv_auto" /></td></tr>
 <tr><td>§Initial path for an XMLTV import§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_xmltvinitpath" value="" autocomplete="off" /></td></tr>
 <tr><td>§Time shift for XMLTV data (in hours)§</td><td><input id="cfg_xmltvtimeshift" /></td></tr>

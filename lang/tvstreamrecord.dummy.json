@@ -35,7 +35,8 @@
     "Interface language (default='english')": "",
     "Date/time locale (default='default')": "",
     
-    "Lenghten an EPG-record (delta before and after), [minutes]": "",
+    "Lenghten an EPG-record (delta before), [minutes]": "",
+    "Lenghten an EPG-record (delta after), [minutes]": "",
     "Enable XMLTV import": "",
     "Initial path for an XMLTV import": "",
     "Time shift for XMLTV data (in hours)": "",

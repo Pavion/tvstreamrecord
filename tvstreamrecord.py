@@ -20,7 +20,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
 
-from bottle import CherryPyServer, TEMPLATES
+from bottle import CherryPyServer # , TEMPLATES
 from bottle import route, run, template, post, request, response
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
@@ -62,7 +62,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False 
-version = '1.3.4'
+version = '1.3.4b'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -1028,16 +1028,16 @@ class record(Thread):
         
         fn = config.cfg_record_mask
         # Placeholders
-        fn = fn.replace("%date%", dateholder)
-        fn = fn.replace("%title%", titleholder)
-        fn = fn.replace("%month%", datetime.now().strftime("%m"))
-        fn = fn.replace("%year%", datetime.now().strftime("%Y"))
-        fn = fn.replace("%day%", datetime.now().strftime("%d"))
-        fn = fn.replace("%channelid%", idholder)
-        fn = fn.replace("%channel%", self.myrow[9])
+        fn = fn.replace("%date%", dateholder).replace("%title%", titleholder)
+        fn = fn.replace("%month%", datetime.now().strftime("%m")).replace("%year%", datetime.now().strftime("%Y")).replace("%day%", datetime.now().strftime("%d"))
+        fn = fn.replace("%hour%", datetime.now().strftime("%H")).replace("%minute%", datetime.now().strftime("%M")).replace("%second%", datetime.now().strftime("%S"))
+        fn = fn.replace("%channelid%", idholder).replace("%channel%", self.myrow[9])
         # Placeholders end
         for i in range(0, len(ffargs)):
-            ffargs[i] = ffargs[i].replace("%date%", dateholder).replace("%title%", titleholder).replace("%month%", datetime.now().strftime("%m")).replace("%year%", datetime.now().strftime("%Y")).replace("%day%", datetime.now().strftime("%d")).replace("%channelid%", idholder).replace("%channel%", self.myrow[9])
+            ffargs[i] = ffargs[i].replace("%date%", dateholder).replace("%title%", titleholder)
+            ffargs[i] = ffargs[i].replace("%month%", datetime.now().strftime("%m")).replace("%year%", datetime.now().strftime("%Y")).replace("%day%", datetime.now().strftime("%d"))
+            ffargs[i] = ffargs[i].replace("%hour%", datetime.now().strftime("%H")).replace("%minute%", datetime.now().strftime("%M")).replace("%second%", datetime.now().strftime("%S"))
+            ffargs[i] = ffargs[i].replace("%channelid%", idholder).replace("%channel%", self.myrow[9])
 
         if "/" in fn or "\\" in fn:
             try:

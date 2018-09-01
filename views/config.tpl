@@ -98,7 +98,7 @@
 </tbody>
 </table>
 <font size="0.6em"><sup>*</sup> §For more information regarding ffmpeg and its command line parameters please visit its homepage at§: <a href="http://ffmpeg.org">ffmpeg.org</a></font><br>
-<font size="0.6em"><sup>**</sup> §Valid placeholders§: %date%, %title%, %year%, %month%, %day%, %hour%, %minute%, %second%, %channel%, %channelid%. </font>
+<font size="0.6em"><sup>**</sup> §Valid placeholders§: %date%, %fulltitle%, %title%, %year%, %month%, %day%, %hour%, %minute%, %second%, %channel%, %channelid%. </font>
 </div>
 <div id="configtabs-4">
 <!--Advanced configuration-->
@@ -123,7 +123,7 @@
 <tr><td>§Password-free IPs start with (comma separated, default§: '10.,127.,192.,localhost')</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ip_filter" value="" autocomplete="off" /></td></tr>
 </tbody>
 </table>
-<font size="0.6em"><sup>*</sup> §Valid placeholders§: %date%, %title%, %year%, %month%, %day%, %hour%, %minute%, %second%, %channel%, %channelid%. </font>
+<font size="0.6em"><sup>*</sup> §Valid placeholders§: %date%, %fulltitle%, %title%, %year%, %month%, %day%, %hour%, %minute%, %second%, %channel%, %channelid%. </font>
 </div>
 </div>
 <!--</form>-->

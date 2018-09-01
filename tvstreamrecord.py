@@ -34,6 +34,7 @@ import xmltv
 import json
 import sys
 import shlex
+import re
 if sys.version_info[0] == 2: 
     # Python 2.x
     import urllib as urllib32
@@ -1027,18 +1028,27 @@ class record(Thread):
             titleholder = "".join([x if ord(x) < 128 else "_" for x in titleholder])
         idholder = "%04d" % (self.myrow[8], )
         
+        fulltitle = self.name
+        safetitle = re.sub(r"[\"\~\#\%\&\*\{\}\\\:\<\>\?\/\+\|]", "_", fulltitle.rstrip())
+                
         fn = config.cfg_record_mask
         # Placeholders
         fn = fn.replace("%date%", dateholder).replace("%title%", titleholder)
         fn = fn.replace("%month%", datetime.now().strftime("%m")).replace("%year%", datetime.now().strftime("%Y")).replace("%day%", datetime.now().strftime("%d"))
         fn = fn.replace("%hour%", datetime.now().strftime("%H")).replace("%minute%", datetime.now().strftime("%M")).replace("%second%", datetime.now().strftime("%S"))
         fn = fn.replace("%channelid%", idholder).replace("%channel%", self.myrow[9])
+        if "%fulltitle%" in fn and sys.version_info[0] == 2 and os.name == "nt": 
+            print ("Usage of %fulltitle% is not possible on Python 2.7 and Windows. Please consider upgrading your Python.")
+            fn = fn.replace("%fulltitle%", titleholder)
+        else:
+            fn = fn.replace("%fulltitle%", safetitle)
         # Placeholders end
         for i in range(0, len(ffargs)):
             ffargs[i] = ffargs[i].replace("%date%", dateholder).replace("%title%", titleholder)
             ffargs[i] = ffargs[i].replace("%month%", datetime.now().strftime("%m")).replace("%year%", datetime.now().strftime("%Y")).replace("%day%", datetime.now().strftime("%d"))
             ffargs[i] = ffargs[i].replace("%hour%", datetime.now().strftime("%H")).replace("%minute%", datetime.now().strftime("%M")).replace("%second%", datetime.now().strftime("%S"))
             ffargs[i] = ffargs[i].replace("%channelid%", idholder).replace("%channel%", self.myrow[9])
+            ffargs[i] = ffargs[i].replace("%fulltitle%", fulltitle)
 
         if "/" in fn or "\\" in fn:
             try:
@@ -1096,8 +1106,8 @@ class record(Thread):
                     print ("FFMPEG record '%s' ended with an error:\n%s" % (self.name, err))
                 else:
                     print ("FFMPEG record '%s' ended" % self.name)
-            except:
-                print ("FFMPEG could not be started")
+            except Exception as ex:
+                print ("FFMPEG could not be started. Error: %s" % (ex))
         else:
             block_sz = 8192
             print ("Record: '%s' started" % (self.name))

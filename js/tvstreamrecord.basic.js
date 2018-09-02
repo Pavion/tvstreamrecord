@@ -1141,6 +1141,7 @@ $(function() {
         $("#cfg_grab_zoom").spinner( { step: 0.1 } );
         $("#cfg_epg_max_events").spinner( { step: 1000 } );
 
+        $("#cfg_switch_epg_overlay").slickswitch();
         $("#cfg_switch_epglist_mode").slickswitch();
         $("#cfg_switch_xmltv_auto").slickswitch({
             toggledOn: function() {

@@ -111,6 +111,12 @@ configuration = [
 ],
 
 [
+'cfg_switch_epg_overlay',
+"Toggle EPG overlay for recordings",
+'1'
+],
+
+[
 'cfg_switch_xmltv_auto',
 "Automatic XMLTV-Import (default off)",
 '0'

@@ -56,6 +56,11 @@ div#changelog {
     cursor: pointer;
 }
 
+[id^=event][rid="-2"] {
+    background: rgba(79, 155, 238, 0.1);
+    pointer-events: none;
+}
+
 [id^=icons-], [id^=iconsEPG-], [id^=iconsRec-] , [id^=iconsERec-]  {
     position: relative;
     cursor: pointer;

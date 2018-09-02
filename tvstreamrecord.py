@@ -694,12 +694,16 @@ def epg_s():
     ret.append(rtemp)
 
     rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date(?) OR date(g_stop)=date(?)) GROUP BY channels.cid ORDER BY channels.cid", (todaysql, todaysql))
+    if config.cfg_switch_epg_overlay == "1":
+        rows+=sqlRun("SELECT 0, channels.cid, channels.cname FROM channels JOIN records ON records.cid=channels.cid LEFT JOIN guide_chan ON channels.cname = guide_chan.g_name WHERE records.renabled=1 AND channels.cenabled=1 AND guide_chan.g_name IS NULL GROUP BY channels.cid, channels.cname")
     for row in rows:
         cid=row[1]
-        rtemp = list()
+        rtemp = list()         
         c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=? AND guide.g_start>=records.rvon and guide.g_stop<=records.rbis WHERE (date(g_start)=date(?) OR date(g_stop)=date(?)) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id=? ORDER BY g_start", (cid, todaysql, todaysql, row[0]))
+        if config.cfg_switch_epg_overlay == "1":
+            c_rows += sqlRun("SELECT '', records.rvon, records.rbis, '', -2, 0 FROM records WHERE records.cid=%s AND renabled=1 ORDER BY rvon" % (cid))
         for event in c_rows:
-
+        
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
 

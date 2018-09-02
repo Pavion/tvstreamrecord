@@ -697,7 +697,7 @@ def epg_s():
     rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date(?) OR date(g_stop)=date(?)) GROUP BY channels.cid ORDER BY channels.cid", (todaysql, todaysql))
     if config.cfg_switch_epg_overlay == "1":
         # insert only channels with records but without guide data for using with overlay
-        ol_rows = sqlRun("SELECT 'tvstreamrecord.service', channels.cid, channels.cname FROM channels JOIN records ON records.cid=channels.cid WHERE records.renabled=1 AND (date(records.rvon)=date(?) OR date(records.rbis)=date(?) OR records.rmask & ? = ?) AND channels.cenabled=1", (todaysql, todaysql, weekbit, weekbit))
+        ol_rows = sqlRun("SELECT 'tvstreamrecord.service', channels.cid, channels.cname FROM channels JOIN records ON records.cid=channels.cid WHERE records.renabled=1 AND (date(records.rvon)=date(:1) OR date(records.rbis)=date(:1) OR records.rmask & :2 = :2) AND channels.cenabled=1", (todaysql, weekbit))
         for ol_row in ol_rows:
             found = False
             for row in rows: 
@@ -709,7 +709,10 @@ def epg_s():
     for row in rows:
         cid=row[1]
         rtemp = list()         
-        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, (records.renabled is not null and records.renabled  = 1) FROM guide LEFT JOIN records ON records.cid=? AND guide.g_start>=records.rvon and guide.g_stop<=records.rbis WHERE (date(g_start)=date(?) OR date(g_stop)=date(?)) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id=? ORDER BY g_start", (cid, todaysql, todaysql, row[0]))
+        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, ((records.renabled is not null and records.renabled  = 1) OR (recurr.renabled is not null and recurr.renabled  = 1)) FROM guide LEFT JOIN records ON records.cid=:1 AND guide.g_start>=records.rvon and guide.g_stop<=records.rbis " +
+        "LEFT JOIN (" +
+          "SELECT recname,cid, datetime(rvon, '+' || (julianday(:2) - julianday(date(rvon))) || ' day') as rvon, datetime(rbis, '+' || (julianday(:2) - julianday(date(rbis))) || ' day') as rbis, renabled, rmask, uniqueid FROM records WHERE records.rmask & :3 = :3 AND date(records.rvon)<date(:2)" +
+        ") AS recurr ON recurr.cid=:1 AND guide.g_start>=recurr.rvon and guide.g_stop<=recurr.rbis WHERE (date(g_start)=date(:2) OR date(g_stop)=date(:2)) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id=:4 ORDER BY g_start", (cid, todaysql, weekbit, row[0]))
         if config.cfg_switch_epg_overlay == "1":
             # adding today records for overlay
             c_rows += sqlRun("SELECT '', records.rvon, records.rbis, '', -2, 0 FROM records WHERE records.cid=%s AND (date(records.rvon)=date(?) OR date(records.rbis)=date(?)) AND renabled=1 ORDER BY rvon" % (cid), (todaysql, todaysql))

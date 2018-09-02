@@ -1049,13 +1049,21 @@ class record(Thread):
         idholder = "%04d" % (self.myrow[8], )
         
         fulltitle = self.name
-        safetitle = re.sub(r"[\"\~\#\%\&\*\{\}\\\:\<\>\?\/\+\|]", "_", fulltitle.rstrip())
-                
+        # remove some chars
+        safetitle = re.sub(r"[\?\:\{\}]", "", fulltitle)
+        # replace " with '
+        safetitle = re.sub(r"["]", "'", safetitle)
+        # replace '&' with space
+        safetitle = re.sub(r"[\&]", " ", safetitle)
+        # replace all other illegal chars with '_'
+        safetitle = re.sub(r"[\~\#\%\*\\\<\>\/\+\|]", "_", safetitle.rstrip())
+               
         fn = config.cfg_record_mask
         # Placeholders
         fn = fn.replace("%date%", dateholder).replace("%title%", titleholder)
         fn = fn.replace("%month%", datetime.now().strftime("%m")).replace("%year%", datetime.now().strftime("%Y")).replace("%day%", datetime.now().strftime("%d"))
         fn = fn.replace("%hour%", datetime.now().strftime("%H")).replace("%minute%", datetime.now().strftime("%M")).replace("%second%", datetime.now().strftime("%S"))
+        fn = fn.replace("%year2%", datetime.now().strftime("%y"))
         fn = fn.replace("%channelid%", idholder).replace("%channel%", self.myrow[9])
         if "%fulltitle%" in fn and sys.version_info[0] == 2 and os.name == "nt": 
             print ("Usage of %fulltitle% is not possible on Python 2.7 and Windows. Please consider upgrading your Python.")
@@ -1067,6 +1075,7 @@ class record(Thread):
             ffargs[i] = ffargs[i].replace("%date%", dateholder).replace("%title%", titleholder)
             ffargs[i] = ffargs[i].replace("%month%", datetime.now().strftime("%m")).replace("%year%", datetime.now().strftime("%Y")).replace("%day%", datetime.now().strftime("%d"))
             ffargs[i] = ffargs[i].replace("%hour%", datetime.now().strftime("%H")).replace("%minute%", datetime.now().strftime("%M")).replace("%second%", datetime.now().strftime("%S"))
+            ffargs[i] = ffargs[i].replace("%year2%", datetime.now().strftime("%y"))
             ffargs[i] = ffargs[i].replace("%channelid%", idholder).replace("%channel%", self.myrow[9])
             ffargs[i] = ffargs[i].replace("%fulltitle%", fulltitle)
 

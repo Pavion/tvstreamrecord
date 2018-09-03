@@ -1049,13 +1049,10 @@ class record(Thread):
         idholder = "%04d" % (self.myrow[8], )
         
         fulltitle = self.name
-        # remove some chars
+        # remove/replace illegal chars
         safetitle = re.sub(r"[\?\:\{\}]", "", fulltitle)
-        # replace " with '
-        safetitle = re.sub(r"["]", "'", safetitle)
-        # replace '&' with space
+        safetitle = re.sub(r"[\"]", "'", safetitle)
         safetitle = re.sub(r"[\&]", " ", safetitle)
-        # replace all other illegal chars with '_'
         safetitle = re.sub(r"[\~\#\%\*\\\<\>\/\+\|]", "_", safetitle.rstrip())
                
         fn = config.cfg_record_mask

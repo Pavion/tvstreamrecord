@@ -252,16 +252,17 @@ function getTableData() {
                 }
             }
             row += "<td>" + recurr + "</td>";
-            chk = "";
-            if (data[i][5] == 1) chk = ' checked="checked"';
-            row += '<td><div id="flt"><input type="checkbox" id="chk-' + data[i][7] + '" data-mini="true" data-role="flipswitch"' + chk + '>';
+            row += '<td><div id="flt"><input type="checkbox" id="chk-' + data[i][7] + '" data-mini="true" data-role="flipswitch" >';
             row += '<a href="#" id="del-' + data[i][7] + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-delete ui-nodisc-icon ui-alt-icon"></a>';
             row += '</div></td></tr>';
             $("#recbody").append($(row));
             $("#chk-" + data[i][7]).flipswitch();
+            if (data[i][5] == 1) {
+                $("#chk-" + data[i][7]).prop( "checked", true ).flipswitch( "refresh" );
+            }
             $("#chk-" + data[i][7]).change(function(event) {
                 event.stopPropagation();
-                var what = (typeof $(this).attr("checked") === 'undefined')?0:1;
+                var what = $(this).prop( "checked" )?1:0;
                 var myid = $(this).attr("id").replace("chk-","");
                 $.post("/records", { "what": what, "myid":myid }, function() {}, "json");
             });

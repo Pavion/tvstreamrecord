@@ -75,7 +75,7 @@
     <!-- Day selection -->
     <div data-role="page" id="day" class="tsr-mobile jqm-home">
         <h6>§Start date§</h6>
-        <div><div><input type="text" autocomplete="off" data-role="datebox" data-options='{"mode":"flipbox","afterToday":true,"useInline":true,"hideInput":true,"enablePopup":true,"popupPosition":false,"useSetButton":false,"useHeader":false,"calHighToday":false}' id="datebox1"></div></div>
+        <div><div><input type="text" autocomplete="off" data-role="datebox" data-options='{"mode":"flipbox","useInline":true,"hideInput":true,"enablePopup":true,"popupPosition":false,"useSetButton":false,"useHeader":false,"calHighToday":false}' id="datebox1"></div></div>
         <a href="#" data-role="button" id="btn_day_ok">§Next§</a> 
         <a href="#" data-role="button" id="btn_cancel">§Cancel§</a> 
 	</div>
@@ -93,7 +93,6 @@
         <h6>§Start time§</h6>
         <div><div><input type="text" autocomplete="off" data-role="datebox" data-options='{"mode":"timeflipbox","useInline":true,"hideInput":true,"useSetButton":false,"useHeader":true}' id="timebox_v"  class="tmp_timebox"></div></div>
         <h6>§End time§</h6>
-<!--        <div><div><input type="text" autocomplete="off" data-role="datebox" data-options='{"mode":"durationflipbox","useInline":true,"hideInput":true,"overrideDurationOrder":["h","i"],"useSetButton":false}' id="durabox" class="tmp_durabox"></div></div>-->
         <div><div><input type="text" autocomplete="off" data-role="datebox" data-options='{"mode":"timeflipbox","useInline":true,"hideInput":true,"useSetButton":false,"useHeader":true}' id="timebox_b"  class="tmp_timebox"></div></div>
         <a href="#" data-role="button" id="btn_time_ok">§Next§</a> 
         <a href="#" data-role="button" id="btn_cancel">§Cancel§</a> 

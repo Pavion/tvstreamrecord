@@ -878,7 +878,7 @@ def getrecordlist():
     rows=sqlRun("SELECT recname, cname, rvon, rbis, rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")
     for row in rows:
         m3u = "<a href=\"live/" + str(row[10]) + ".m3u\">" + row[1] + "</a>"
-        l.append([row[0], m3u, row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]])
+        l.append([row[0], m3u, row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]])
     return json.dumps({"aaData": l} )
 
 @route('/records')

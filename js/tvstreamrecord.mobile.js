@@ -20,30 +20,24 @@ var weekdays = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 var firstday = 1;
 var dateformat = "mm/dd/yy";
 
-//
+// Varlist
+var prev = ""; // No edit support as of now, use standard version instead
+var recname = ""; // Record name
+var sender = ""; // Channel ID
+var cname = "";// Channel name
+var rday = ""; // Record date as JS object
+var am = "";  // Text date
+var von = ""; // Start time
+var bis = ""; // End time
+var akt = 1; // Active only for now
+var mask = 0; // Recurrent records
+var title = ""; //  Record title
+
 $(function() {
     // Localization
     getLocale();
 
-    // Varlist
-    var prev = ""; // No edit support as of now, use standard version instead
-    var recname = ""; // Record name
-    var sender = ""; // Channel ID
-    var cname = "";// Channel name
-    var rday = ""; // Record date as JS object
-    var am = "";  // Text date
-    var von = ""; // Start time
-    var bis = ""; // End time
-    var akt = 1; // Active only for now
-    var mask = 0; // Recurrent records
-    var title = ""; //  Record title
-
-    // Add new record button
-    $("#btn_add").click(function(event) {
-        event.preventDefault();
-        $("body").pagecontainer("change", "#channel");
-        title = "";
-
+    function showChannels() {
         $.get( "/getchannelgroups", function( data )  {
             var data = data.aaData;
             if (data.length==0) {
@@ -84,10 +78,28 @@ $(function() {
 
             }).bind('collapsiblecollapse', function () {
                 // Data can be released here but why? It's already there.
-                // console.log('collapse');
             });
 
         },"json");
+        
+    }   
+    
+    // Add new record button
+    $("#btn_add").click(function(event) {
+        event.preventDefault();
+        $("body").pagecontainer("change", "#channel");
+        title = "";
+        prev = ""; 
+        recname = ""; 
+        sender = ""; 
+        cname = "";
+        rday = "";
+        am = "";  
+        von = "";
+        bis = "";
+        akt = 1; 
+        mask = 0; 
+        showChannels();
     });
 
     // Day confirmation button
@@ -99,44 +111,45 @@ $(function() {
         var d = rday.getDate();     var dt = d<10?"0"+d:d;
         am = rday.getFullYear() + "-" + mt + "-" + dt;
 
-        $.post( "/getepgday", {"cname": cname, "rdate": am}, function( data )  {
-            if (data) {
-                var data = data.aaData;
-                $("body").pagecontainer("change", "#epg");
-                $("#epglist").empty();
-                $("#epglist").append($('<li start="" stop=""><a href="#"><h2>' + $("#epglist").attr('skip') + ' EPG</h2></a></li>'));
+        if (von != "" && bis != "") {
+            $("body").pagecontainer("change", "#time");
+            $("#timebox_v").datebox("setTheDate",new Date(von));
+            $("#timebox_b").datebox("setTheDate",new Date(bis));                    
+        } else {
+            $.post( "/getepgday", {"cname": cname, "rdate": am}, function( data )  {
+                if (data) {
+                    var data = data.aaData;
+                    $("body").pagecontainer("change", "#epg");
+                    $("#epglist").empty();
+                    $("#epglist").append($('<li start="" stop=""><a href="#"><h2>' + $("#epglist").attr('skip') + ' EPG</h2></a></li>'));
 
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i][0].length===50) data[i][0] += "...";
-                    if (data[i][2].length===100) data[i][2] += "...";
-                    $("#epglist").append($('<li start="' + data[i][1].substr(11,5) + '" stop="' + data[i][3].substr(11,5) + '"><a href="#"><h2>' + data[i][0] + '</h2><p>' + data[i][2] + '</p><p class="ui-li-aside"><strong>' + data[i][1].substr(11,5) + '</strong></p></a></li>'));
-                }
-                $("#epglist").listview().children().click(function() {
-                    $("body").pagecontainer("change", "#time");
-                    if ($(this).attr("start")=="") {
-                        $("#timebox_v").datebox("setTheDate",new Date((new Date()).getTime()));
-                        $("#timebox_b").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
-//                        $("#durabox").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
-                    } else {
-                        // Use EPG delta? Dunno...
-                        $("#timebox_v").datebox("setTheDate",new Date(1970,0,1,parseInt($(this).attr("start").substr(0,2)),parseInt($(this).attr("start").substr(3,2)),0,0) );
-                        //$("#durabox").datebox("setTheDate",new Date((new Date()).getTime() + parseInt($(this).attr("dur"))*60*1000 ));
-                        $("#timebox_b").datebox("setTheDate",new Date(1970,0,1,parseInt($(this).attr("stop").substr(0,2)),parseInt($(this).attr("stop").substr(3,2)),0,0) );
-//                        $("#durabox_b").datebox("setTheDate",new Date((new Date()).getTime() + parseInt($(this).attr("dur"))*60*1000 ));
-                        title = $(this).children('a').children('h2').text();
-                        console.log(title);
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i][0].length===50) data[i][0] += "...";
+                        if (data[i][2].length===100) data[i][2] += "...";
+                        $("#epglist").append($('<li start="' + data[i][1].substr(11,5) + '" stop="' + data[i][3].substr(11,5) + '"><a href="#"><h2>' + data[i][0] + '</h2><p>' + data[i][2] + '</p><p class="ui-li-aside"><strong>' + data[i][1].substr(11,5) + '</strong></p></a></li>'));
                     }
-                });
-                $("#epglist").listview( "refresh" );
+                    $("#epglist").listview().children().click(function() {
+                        $("body").pagecontainer("change", "#time");
+                        if ($(this).attr("start")=="") {
+                            $("#timebox_v").datebox("setTheDate",new Date((new Date()).getTime()));
+                            $("#timebox_b").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
+                        } else {
+                            // Use EPG delta? Dunno...
+                            $("#timebox_v").datebox("setTheDate",new Date(1970,0,1,parseInt($(this).attr("start").substr(0,2)),parseInt($(this).attr("start").substr(3,2)),0,0) );
+                            $("#timebox_b").datebox("setTheDate",new Date(1970,0,1,parseInt($(this).attr("stop").substr(0,2)),parseInt($(this).attr("stop").substr(3,2)),0,0) );
+                            title = $(this).children('a').children('h2').text();
+                        }
+                    });
+                    $("#epglist").listview( "refresh" );
 
-            } else {
-                $("body").pagecontainer("change", "#time");
-                $("#timebox_v").datebox("setTheDate",new Date((new Date()).getTime()));
-                $("#timebox_b").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
-//                $("#durabox").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
-            }
+                } else {
+                    $("body").pagecontainer("change", "#time");
+                    $("#timebox_v").datebox("setTheDate",new Date((new Date()).getTime()));
+                    $("#timebox_b").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
+                }
 
-        },"json");
+            },"json");
+        }
     });
 
     // Time confirmation button
@@ -144,13 +157,8 @@ $(function() {
         event.preventDefault();
         var time_v =  $("#timebox_v").datebox('getTheDate');
         var time_b =  $("#timebox_b").datebox('getTheDate');
-        //am = rday.getFullYear() + "-" + (rday.getMonth()+1) + "-" + rday.getDate();
-//        var dtime = new Date(rday.getFullYear(), rday.getMonth(), rday.getDate(), time_v.getHours(), time_v.getMinutes(), 0, 0);
         von = time_v.getHours() + ":" + time_v.getMinutes()
         bis = time_b.getHours() + ":" + time_b.getMinutes()
-//        var dur = $("#durabox").datebox('getLastDur');
-//        var dtime = new Date( dtime.getTime() + dur * 1000);
-//        bis = dtime.getHours() + ":" + dtime.getMinutes()
 
         $("body").pagecontainer("change", "#rname");
         if (title === "") {
@@ -161,10 +169,17 @@ $(function() {
 
         for(var i=0;i<7;i++) {
             $("#wwd"+i).text(weekdays[i]);
-            $("#wday"+i).attr("checked",false).checkboxradio("refresh");
         }
         for(var i=0;i<firstday;i++) {
             $( "#wwd"+i ).parent().insertAfter( $( "#wday" + (i===0?6:i-1) ).parent());
+        }
+        if (mask == "") mask = 0;
+        for(var i=0;i<7;i++) {
+            if ( (mask & Math.pow(2,i)) == Math.pow(2,i)) {
+                $("#wday"+i).prop("checked",true).checkboxradio("refresh");
+            } else {
+                $("#wday"+i).prop("checked",false).checkboxradio("refresh");
+            }
         }
         $("#recurr").controlgroup( "refresh" );
 
@@ -176,7 +191,6 @@ $(function() {
         rn = $("#recname").val().trim();
         if (rn!="") {
             $("#recname").val("");
-            //console.log(rn);
             recname = rn;
 
             mask = 0;
@@ -253,6 +267,7 @@ function getTableData() {
             }
             row += "<td>" + recurr + "</td>";
             row += '<td><div id="flt"><input type="checkbox" id="chk-' + data[i][7] + '" data-mini="true" data-role="flipswitch" >';
+            row += '<a href="#" id="edt-' + data[i][7] + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-gear ui-nodisc-icon ui-alt-icon"></a>';
             row += '<a href="#" id="del-' + data[i][7] + '" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-delete ui-nodisc-icon ui-alt-icon"></a>';
             row += '</div></td></tr>';
             $("#recbody").append($(row));
@@ -265,6 +280,31 @@ function getTableData() {
                 var what = $(this).prop( "checked" )?1:0;
                 var myid = $(this).attr("id").replace("chk-","");
                 $.post("/records", { "what": what, "myid":myid }, function() {}, "json");
+            });
+            $("#edt-" + data[i][7]).click(function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                var myid = $(this).attr("id").replace("edt-","");
+                var mydata;
+                for (var j=0;j<data.length;j++) {
+                    if(data[j][7] == myid) {
+                        mydata = data[j];
+                        break;
+                    }
+                }
+                     
+                prev = mydata[7]; 
+                title = mydata[0]; 
+                recname = mydata[0]; 
+                sender = mydata[10]; 
+                cname = mydata[1];
+                von = mydata[8];
+                bis = mydata[9];
+                akt = mydata[5]; 
+                mask = mydata[4]; 
+
+                $("body").pagecontainer("change", "#day");
+                $("#datebox1").datebox('setTheDate', new Date(von));
             });
             $("#del-" + data[i][7]).click(function(event) {
                 event.preventDefault();

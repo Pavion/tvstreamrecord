@@ -44,6 +44,7 @@
     "Enable stream scan/grab": "",
     "Maximal EPG scan duration per channel, [seconds] (default: '60')": "",
     "Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)": "",
+    "Keywords for creating automatic records on EPG import (comma separated, case ignored)": "",
     "Display additional overlay with real record duration": "",
     "EPG list mode. Disable for client-side processing (more network load), enable for server-side processing (more server load)": "",
     "Client-side only: maximal number of events to request from server (earlier first), solves some perfomance issues": "",

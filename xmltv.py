@@ -91,6 +91,14 @@ def checkType(typ):
 
 def getProgList(ver=''):
     print ("tvstreamrecord v.%s / XMLTV import started" % ver)
+
+    keylist = []
+    if config.cfg_epg_autorecord.strip() != "":
+        rec_keys = config.cfg_epg_autorecord.strip().split(",")
+        for key in rec_keys:
+            keylist.append(key.strip().lower())
+    max_records = 50
+    reclist = []
     totalentries = 0
     initpath = config.cfg_xmltvinitpath
     if not ("http:" in initpath or "https:" in initpath or "www." in initpath or "ftp:" in initpath) or initpath[0]=="/" or initpath[1]==":" or "file://" in initpath:
@@ -133,7 +141,9 @@ def getProgList(ver=''):
                         dt = datetime.strptime(getAttr(t_attr, "lastmodified")[0:14],"%Y%m%d%H%M%S")
                         if dt>lastdate and dtepg>=datetime.now()-timedelta(days=1):
                             source = url+g_id+"_"+dttext+".xml.gz"
-                            totalentries = getProg(getFile(source,0,ver))
+                            entries,rec = getProg(getFile(source,0,ver),[],keylist)
+                            totalentries += entries
+                            reclist += rec
                         if dt>dtmax:
                             dtmax = dt
                 if not timerows:
@@ -143,23 +153,35 @@ def getProgList(ver=''):
                 break
 
     if (checkType(typ)==2) and len(channellist)>0:
-        totalentries = getProg(stri, channellist)
+        totalentries,reclist = getProg(stri, channellist, keylist)
 
+    totalrecords = len(reclist)
+    if totalrecords > max_records:
+        print("XMLTV: too many matches found (found: %s, max: %s), please narrow down your keywords, automatic creation aborted" % (totalrecords, max_records))
+    elif totalrecords>0:
+        sqlRun("INSERT INTO records SELECT ?, channels.cid, ?, ?, 1, 0, '' FROM guide_chan, channels WHERE channels.cname = guide_chan.g_name AND guide_chan.g_id=?", reclist, 1)
+        print("XMLTV: total %s records autocreated" % (totalrecords, ))
     del (stri)
 
     print ("XMLTV import completed with %s entries" % totalentries)
-    return
+    return totalrecords
 
 
-def getProg(strp, channellist=[]):
+def getProg(strp, channellist=[], keylist=[]):
     deltaxmltv_txt = config.cfg_xmltvtimeshift
     try:
         deltaxmltv = timedelta(hours=float(config.cfg_xmltvtimeshift))
     except:
         deltaxmltv = timedelta(hours=0)
 
+    #2018-12-31 automatic recording
+    delta_b = timedelta(minutes=float(config.cfg_delta_after_epg))
+    delta_a = timedelta(minutes=float(config.cfg_delta_before_epg))
+    
+    reclist = [] 
+    
     sqllist = []
-
+    
     for attr,innertxt in getList(strp, 'programme'):
         dt1 = datetime.strptime(getAttr(attr, "start")[0:14],"%Y%m%d%H%M%S") + deltaxmltv
         try:
@@ -182,8 +204,13 @@ def getProg(strp, channellist=[]):
             tmpdesc = getFirst(innertxt, 'desc')
             desc = desc + tmpdesc
             sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
+            for key in keylist:
+                if key in title.lower():
+                    print("XMLTV: Record '%s' is queued for autocreation" % (title, ))
+                    reclist.append([title, datetime.strftime(dt1-delta_b, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2+delta_a, "%Y-%m-%d %H:%M:%S"), p_id])
+                    break        
     sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
-    return len(sqllist)
+    return len(sqllist), reclist
 
 def getLocalFile(file_in):
     print ("Trying to open a local XMLTV file: %s" % (file_in))

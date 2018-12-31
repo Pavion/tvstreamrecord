@@ -44,6 +44,7 @@
     "Enable stream scan/grab": "Включить импорт из потокового видео",
     "Maximal EPG scan duration per channel, [seconds] (default: '60')": "Максимальная длительность импортирования одного канала [сек.] (по умолчанию '60')",
     "Time to perform daily EPG/XMLTV grab (hh:mm format, 24h based, default '0' for manual only)": "Время для ежедневного импорта из выбранных источников (формат hh:mm, 24 часа, по умолчанию '0' для ручного импорта)",
+    "Keywords for creating automatic records on EPG import (comma separated, case ignored)": "Ключевые слова для создания автоматических записей при импорте EPG (через запятую, без прописных/строчных)",
     "Display additional overlay with real record duration": "Показывать дополнительный оверлей с реальной длительностью записей",
     "EPG list mode. Disable for client-side processing (more network load), enable for server-side processing (more server load)": "Режим для EPG таблицы. Отключить для обработки данных клиентом (большая нагрузка на сеть), включить для обработки сервером (большая нагрузка на сервер)",
     "Client-side only: maximal number of events to request from server (earlier first), solves some perfomance issues": "Для обработки данных клиентом: максимальное количество записей, требуемых с сервера (сортировка по времени), помогает при медленной обработке таблицы",

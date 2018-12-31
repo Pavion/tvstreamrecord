@@ -570,11 +570,12 @@ class epggrabthread(Thread):
                 pass
 
         try:
-            xmltv.getProgList(version)
+            if xmltv.getProgList(version)>0:
+                setRecords()
         except Exception as ex:
             print ("XMLTV import could not be completed, please try again later (%s)" % ex)
         self.epggrabberstate[0] += 1
-
+        
     def grabStream(self):
         rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
         for row in rows:

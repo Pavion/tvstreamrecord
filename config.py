@@ -177,6 +177,12 @@ configuration = [
 ],
 
 [
+'cfg_epg_autorecord',
+'Keywords for autorecord (comma separated)',
+''
+],
+
+[
 'cfg_retry_count',
 'Retry count for failed records',
 99

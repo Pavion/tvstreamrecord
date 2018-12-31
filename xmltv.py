@@ -196,9 +196,18 @@ def getProg(strp, channellist=[], keylist=[]):
             if not "http://" in sub_title and len(sub_title)>0: # fix for corrupted XML data
                 if title != "": title = title + " - "
                 title = title + sub_title
-            eplist = getFirst(innertxt, 'episode-num')
-            for epatt, epin in getList(eplist, 'system'):
-                if getAttr(epatt, 'system') == 'onscreen':
+            for epatt, epin in getList(innertxt, 'episode-num'):
+                if getAttr(epatt, 'system') == 'xmltv_ns':
+                    e = epin.split(".")
+                    if len(e)>1:
+                        try:
+                            episode = "S" + format(int(e[0].strip()) + 1, '02d') + "E" + format(int(e[1].strip()) + 1, '02d')
+                            desc += episode + ". "
+                            title += " (" + episode + ")"
+                            break
+                        except:
+                            pass
+                elif getAttr(epatt, 'system') == 'onscreen':
                     desc = epin + ". "
                     break
             tmpdesc = getFirst(innertxt, 'desc')

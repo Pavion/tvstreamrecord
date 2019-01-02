@@ -35,14 +35,14 @@ import json
 import sys
 import shlex
 import re
-if sys.version_info[0] == 2: 
+if sys.version_info[0] == 2:
     # Python 2.x
     import urllib as urllib32
     import urlparse
     tvcookie = b"tvstreamrecord_user"
-else: 
+else:
     # Python 3.x
-    import urllib.request as urllib32 
+    import urllib.request as urllib32
     import urllib.parse as urlparse
     tvcookie = "tvstreamrecord_user"
 from threading import Thread, Timer
@@ -62,7 +62,7 @@ localdatetime = "%d.%m.%Y %H:%M:%S"
 localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
-shutdown = False 
+shutdown = False
 version = '1.3.9'
 
 @route('/live/<filename>')
@@ -128,11 +128,11 @@ def postLogin():
         config.clearIP(request.remote_addr)
     else:
         config.banIP(request.remote_addr)
-    if not request.forms.store_pw:        
+    if not request.forms.store_pw:
         response.set_cookie(name=tvcookie, value=hash)
     else:
-        response.set_cookie(name=tvcookie, value=hash, max_age=315360000)    
-    
+        response.set_cookie(name=tvcookie, value=hash, max_age=315360000)
+
     redirect("/")
 
 @route('/logoff')
@@ -157,7 +157,7 @@ def setPass():
         ret = 2
     return json.dumps( {"ret": ret } )
 
-def checkLogin():    
+def checkLogin():
     patterns = config.cfg_ip_filter.strip().split(',')
     localhost = False
     for pattern in patterns:
@@ -210,7 +210,7 @@ def internationalize(templ,noheader=False):
     if login != "":
         return login
     else:
-        #TEMPLATES.clear() # debug only, should be turned off! 
+        #TEMPLATES.clear() # debug only, should be turned off!
         if not noheader:
             header = template('header', style=config.cfg_theme, version=version, language=config.cfg_language, locale=config.cfg_locale, logout=(not credentials=="") )
             footer = template('footer')
@@ -388,7 +388,7 @@ def createchannel():
         if exists:
             sqlRun("UPDATE channels SET cid = cid+1 WHERE cid >= ?", (cid, ))
             sqlRun("UPDATE records SET cid = cid+1 WHERE cid >= ?", (cid, ))
-        sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid, epggrab))    
+        sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid, epggrab))
     return "null"
 
 @post('/upload')
@@ -399,7 +399,7 @@ def upload_p():
     if not upfile:
         print ("No file specified, please try again")
     else:
-        content = upfile.file.read()        
+        content = upfile.file.read()
         try:
             content = content.decode("UTF-8")
         except:
@@ -575,7 +575,7 @@ class epggrabthread(Thread):
         except Exception as ex:
             print ("XMLTV import could not be completed, please try again later (%s)" % ex)
         self.epggrabberstate[0] += 1
-        
+
     def grabStream(self):
         rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
         for row in rows:
@@ -675,7 +675,7 @@ def epg_s():
     yesterday = dayshown - timedelta(days=1)
     weekbit_y = pow(2, int(datetime.strftime(yesterday, "%w")))
     yestersql = datetime.strftime(yesterday, "%Y-%m-%d %H:%M:%S")
-    
+
     if dayshown == datetime.combine(date.today(), time.min): # really today
         sthour = datetime.now().time().hour
         daystart = datetime.combine(date.today(), time(sthour,0,0))
@@ -705,7 +705,7 @@ def epg_s():
         ol_rows = sqlRun("SELECT 'tvstreamrecord.service', channels.cid, channels.cname FROM channels JOIN records ON records.cid=channels.cid WHERE records.renabled=1 AND (date(records.rvon)=date(:1) OR date(records.rbis)=date(:1) OR records.rmask & :2 = :2 OR records.rmask & :3 = :3) AND channels.cenabled=1", (todaysql, weekbit, weekbit_y))
         for ol_row in ol_rows:
             found = False
-            for row in rows: 
+            for row in rows:
                 if row[1] == ol_row[1]:
                     found = True
                     break
@@ -713,7 +713,7 @@ def epg_s():
                 rows.append(ol_row)
     for row in rows:
         cid=row[1]
-        rtemp = list()         
+        rtemp = list()
         c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, ((records.renabled is not null and records.renabled  = 1) OR (recurr.renabled is not null and recurr.renabled  = 1) OR (recurry.renabled is not null and recurry.renabled  = 1)) FROM guide " +
         "LEFT JOIN records ON records.cid=:1 AND guide.g_start>=records.rvon and guide.g_stop<=records.rbis " +
         "LEFT JOIN (" +
@@ -728,10 +728,10 @@ def epg_s():
             c_rows += sqlRun("SELECT '', records.rvon, records.rbis, '', -2, 0 FROM records WHERE records.cid=:1 AND (date(records.rvon)=date(:2) OR date(records.rbis)=date(:2)) AND renabled=1 ORDER BY rvon", (cid, todaysql))
             # adding recurrent records not yet scheduled
             c_rows += sqlRun("SELECT '', datetime(rvon, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), datetime(rbis, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), '', -2, 0 FROM records WHERE records.cid=:2 AND records.rmask & :3 = :3 AND records.renabled=1 AND date(records.rvon)<date(:1)", (todaysql, cid, weekbit))
-            # adding overnight recurrent records 
+            # adding overnight recurrent records
             c_rows += sqlRun("SELECT '', datetime(rvon, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), datetime(rbis, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), '', -2, 0 FROM records WHERE records.cid=:2 AND records.rmask & :3 = :3 AND records.renabled=1 AND date(rbis, '+' || (julianday(:1) - julianday(date(rvon))) || ' day')=date(:4)", (yestersql, cid, weekbit_y, todaysql))
         for event in c_rows:
-        
+
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")
             d_bis = datetime.strptime(event[2],"%Y-%m-%d %H:%M:%S")
 
@@ -903,27 +903,27 @@ def records_p():
 
 @post('/createepg')
 def createepg():
-    sqlRun("INSERT INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0, '' FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=? GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_before_epg, config.cfg_delta_after_epg, config.cfg_delta_before_epg), (request.forms.ret, ))
+    sqlRun("INSERT OR IGNORE INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0, '' FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=? GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_before_epg, config.cfg_delta_after_epg, config.cfg_delta_before_epg), (request.forms.ret, ))
     setRecords()
     redirect("/records")
     return "null"
 
 @post('/createtvb')
 def create_tvb():
-    
+
     recname = request.forms.recname
     sender = request.forms.sender
     von = request.forms.von
     bis = request.forms.bis
-    am = request.forms.am    
+    am = request.forms.am
     uniqueid = request.forms.uniqueid
 
     d_von = datetime.strptime(am + " " + von, "%Y-%m-%d %H:%M")
     d_bis = datetime.strptime(am + " " + bis, "%Y-%m-%d %H:%M")
-    delta = timedelta(days=1)    
+    delta = timedelta(days=1)
     if d_bis < d_von:
         d_bis = d_bis + delta
-    
+
     print ("POST request received from TV-Browser plugin")
     print ("Name: %s, channel: %s, start: %s, stop: %s" % (recname, sender, d_von, d_bis))
     rows=sqlRun("SELECT cid FROM channels WHERE cname=? AND cenabled=1", (sender, ))
@@ -934,7 +934,7 @@ def create_tvb():
         deltaepgafter = timedelta(minutes=int(config.cfg_delta_after_epg))
         d_von = d_von - deltaepgbefore
         d_bis = d_bis + deltaepgafter
-        sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, 1, 0, ?)", (recname, cid, d_von, d_bis, uniqueid))
+        sqlRun("INSERT OR IGNORE INTO records VALUES (?, ?, ?, ?, 1, 0, ?)", (recname, cid, d_von, d_bis, uniqueid))
         setRecords()
         return "true"
     else:
@@ -955,7 +955,7 @@ def deletetvb():
     rows = sqlRun("SELECT * FROM records WHERE uniqueid = ?", (uniqueid, ))
     if len(rows) == 0:
         return "false"
-    else: 
+    else:
         sqlRun("DELETE FROM records WHERE uniqueid = ?", (uniqueid, ))
         print ("TVB record '%s' has been deleted" % rows[0][0])
         setRecords()
@@ -981,7 +981,7 @@ def create_p():
         d_bis = d_bis + delta
 
     if prev=="":
-        sqlRun("INSERT INTO records VALUES (?, ?, ?, ?, ?, ?, '')", (recname, sender, d_von, d_bis, aktiv, recurr))
+        sqlRun("INSERT OR IGNORE INTO records VALUES (?, ?, ?, ?, ?, ?, '')", (recname, sender, d_von, d_bis, aktiv, recurr))
     else:
         sqlRun("UPDATE records SET recname=?, cid=?, rvon=?, rbis=?, renabled=?, rmask=? WHERE rowid=?", (recname, sender, d_von, d_bis, aktiv, recurr,  prev))
 
@@ -1020,7 +1020,7 @@ class record(Thread):
         self.mask = row[6]
         self.myrow = row
         if config.cfg_retry_count.isdigit():
-            self.retry_count = int(config.cfg_retry_count)        
+            self.retry_count = int(config.cfg_retry_count)
         if row[7]=='':
             self.ext = config.cfg_file_extension
         else:
@@ -1046,7 +1046,7 @@ class record(Thread):
 
     def doRecord(self):
         self.running = 1
-        
+
         fftypes = config.cfg_ffmpeg_types
         fftypes = fftypes.lower().split()
         streamtype = self.url.lower().split(':', 1)[0]
@@ -1059,14 +1059,14 @@ class record(Thread):
             # workaround for unicode, damn me if I ever get it working with 2.x
             titleholder = "".join([x if ord(x) < 128 else "_" for x in titleholder])
         idholder = "%04d" % (self.myrow[8], )
-        
+
         fulltitle = self.name
         # remove/replace illegal chars
         safetitle = re.sub(r"[\?\:\{\}]", "", fulltitle)
         safetitle = re.sub(r"[\"]", "'", safetitle)
         safetitle = re.sub(r"[\&]", " ", safetitle)
         safetitle = re.sub(r"[\~\#\%\*\\\<\>\/\+\|]", "_", safetitle.rstrip())
-               
+
         fn = config.cfg_record_mask
         # Placeholders
         fn = fn.replace("%date%", dateholder).replace("%title%", titleholder)
@@ -1074,7 +1074,7 @@ class record(Thread):
         fn = fn.replace("%hour%", datetime.now().strftime("%H")).replace("%minute%", datetime.now().strftime("%M")).replace("%second%", datetime.now().strftime("%S"))
         fn = fn.replace("%year2%", datetime.now().strftime("%y"))
         fn = fn.replace("%channelid%", idholder).replace("%channel%", self.myrow[9])
-        if "%fulltitle%" in fn and sys.version_info[0] == 2 and os.name == "nt": 
+        if "%fulltitle%" in fn and sys.version_info[0] == 2 and os.name == "nt":
             print ("Usage of %fulltitle% is not possible on Python 2.7 and Windows. Please consider upgrading your Python.")
             fn = fn.replace("%fulltitle%", titleholder)
         else:
@@ -1096,8 +1096,8 @@ class record(Thread):
                 path = config.cfg_recordpath + path
                 os.makedirs (path)
             except Exception as ex:
-                pass            
-        
+                pass
+
         fn = config.cfg_recordpath + fn
         # Check, if destination file already exists
         fn_check = fn + self.ext
@@ -1110,11 +1110,11 @@ class record(Thread):
         if streamtype in fftypes:
             delta = total(tDiff(self.bis, datetime.now()))
             deltasec = '%d' % delta
-            
+
             try:
                 if config.cfg_ffmpeg_alternate_url != "":
                     for t in records:
-                        if t.isRunning() == 1 and t.isFfmpeg() == 1: 
+                        if t.isRunning() == 1 and t.isFfmpeg() == 1:
                             parser = urlparse.urlsplit(self.url)
                             self.url = urlparse.urlunsplit([parser.scheme, config.cfg_ffmpeg_alternate_url, parser.path, parser.query, parser.fragment])
                             print ("FFMPEG record already in progress, substituting URL...")
@@ -1125,7 +1125,7 @@ class record(Thread):
 
             if self.ffmpeg == 0:
                 self.ffmpeg = 1
-            
+
             attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-t', deltasec] + ffargs + [fn]
             print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
             print (attr)
@@ -1166,12 +1166,12 @@ class record(Thread):
                 maxRetryCount = 100
                 mybuffer = None
                 while self.bis > datetime.now() and self.stopflag==0:
-                    try: 
+                    try:
                         mybuffer = u.read(block_sz)
-                        doInternalRetry = False 
+                        doInternalRetry = False
                     except:
                         doInternalRetry = True
-                    if (not mybuffer or doInternalRetry) and internalRetryCount < maxRetryCount: # connection lost? 
+                    if (not mybuffer or doInternalRetry) and internalRetryCount < maxRetryCount: # connection lost?
                         internalRetryCount += 1
                         try:
                             u = urllib32.urlopen(self.url)
@@ -1184,13 +1184,13 @@ class record(Thread):
                         break
                     else:
                         f.write(mybuffer)
-                    
+
                 f.close()
                 if internalRetryCount > 0:
                     print ("Record: '%s' ended with %s internal retries, please check your connection stability" % (self.name, internalRetryCount))
                 else:
                     print ("Record: '%s' ended" % (self.name))
-        
+
         if config.cfg_switch_postprocess == "1" and config.cfg_postprocess != "":
             if fileexists(fn):
                 attr = []
@@ -1203,8 +1203,8 @@ class record(Thread):
                     postprocess = subprocess.Popen(attr, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     out, err = postprocess.communicate()
                 except:
-                    print ("Exception calling postprocessing, please check your command line")                    
-        
+                    print ("Exception calling postprocessing, please check your command line")
+
         # 2015-01-21 Fail & recurrency check
         if datetime.now() < self.bis - timedelta(seconds=int(config.cfg_failsafe_delta)) and self.stopflag==0:
             delta = total(tDiff(self.bis, datetime.now()))
@@ -1220,7 +1220,7 @@ class record(Thread):
                 sleep(10)
                 self.run()
                 return
-        
+
         self.clean()
         rectimer = Timer(10, setRecords)
         rectimer.start()
@@ -1238,7 +1238,7 @@ class record(Thread):
     def clean(self):
         self.running = 0
         if self in records: records.remove(self)
-        
+
     def cleanProcess(self):
         try:
             if not self.process==None:
@@ -1250,19 +1250,19 @@ class record(Thread):
             else:
                 print ("FFMPEG Record '%s' had to be terminated." % self.name)
         except:
-            print ("FFMPEG Record '%s' termination error, process might be running" % self.name)            
+            print ("FFMPEG Record '%s' termination error, process might be running" % self.name)
         if not self.process==None:
             print ("FFMPEG Record '%s': termination may have failed" % self.name)
         self.running = 0
 
     def isFfmpeg(self):
         return self.ffmpeg
-    
+
     def isRunning(self):
         return self.running
 
 def setRecords():
-    if shutdown: 
+    if shutdown:
         return
     rows=sqlRun("SELECT records.rowid, cpath, rvon, rbis, cname, records.recname, records.rmask, channels.cext, channels.cid, channels.cname FROM channels, records where channels.cid=records.cid AND (datetime(rbis)>=datetime('now', 'localtime') OR rmask>0) AND renabled = 1 ORDER BY datetime(rvon)")
     for row in rows:
@@ -1311,9 +1311,9 @@ except Exception as ex:
     print ("Server exception. Default network settings will be used this time. Please log in using port 8030 and check your network settings.")
     print ("Starting server on: 0.0.0.0:8030")
     run(host="0.0.0.0", port=8030, server=CherryPyServer, quiet=True)
-    
+
 # Server is shutting down, all threads should be eliminated
-shutdown = True 
+shutdown = True
 print ("Server aborted. Stopping all records before exiting...")
 while len(records)>0:
     records[0].stop()

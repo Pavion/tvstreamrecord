@@ -159,7 +159,7 @@ def getProgList(ver=''):
     if totalrecords > max_records:
         print("XMLTV: too many matches found (found: %s, max: %s), please narrow down your keywords, automatic creation aborted" % (totalrecords, max_records))
     elif totalrecords>0:
-        sqlRun("INSERT INTO records SELECT ?, channels.cid, ?, ?, 1, 0, '' FROM guide_chan, channels WHERE channels.cname = guide_chan.g_name AND guide_chan.g_id=?", reclist, 1)
+        sqlRun("INSERT OR IGNORE INTO records SELECT ?, channels.cid, ?, ?, 1, 0, '' FROM guide_chan, channels WHERE channels.cname = guide_chan.g_name AND guide_chan.g_id=?", reclist, 1)
         print("XMLTV: total %s records autocreated" % (totalrecords, ))
     del (stri)
 
@@ -177,16 +177,16 @@ def getProg(strp, channellist=[], keylist=[]):
     #2018-12-31 automatic recording
     delta_b = timedelta(minutes=float(config.cfg_delta_after_epg))
     delta_a = timedelta(minutes=float(config.cfg_delta_before_epg))
-    
-    reclist = [] 
-    
+
+    reclist = []
+
     sqllist = []
-    
+
     for attr,innertxt in getList(strp, 'programme'):
         dt1 = datetime.strptime(getAttr(attr, "start")[0:14],"%Y%m%d%H%M%S") + deltaxmltv
         try:
             dt2 = datetime.strptime(getAttr(attr, "stop")[0:14],"%Y%m%d%H%M%S") + deltaxmltv
-        except: 
+        except:
             dt2 = datetime.strptime(getAttr(attr, "end")[0:14],"%Y%m%d%H%M%S") + deltaxmltv
         p_id = getAttr(attr, "channel")
         if len(channellist)==0 or p_id in channellist:
@@ -217,7 +217,7 @@ def getProg(strp, channellist=[], keylist=[]):
                 if key in title.lower():
                     print("XMLTV: Record '%s' is queued for autocreation" % (title, ))
                     reclist.append([title, datetime.strftime(dt1-delta_b, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2+delta_a, "%Y-%m-%d %H:%M:%S"), p_id])
-                    break        
+                    break
     sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
     return len(sqllist), reclist
 
@@ -230,7 +230,7 @@ def getLocalFile(file_in):
             d = zlib.decompressobj(16+zlib.MAX_WBITS)
             out = d.decompress(out)
         except:
-            pass       
+            pass
     try:
         out = out.decode("UTF-8")
     except Exception as ex:

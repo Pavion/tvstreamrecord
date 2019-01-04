@@ -134,9 +134,11 @@ $(function() {
                             $("#timebox_v").datebox("setTheDate",new Date((new Date()).getTime()));
                             $("#timebox_b").datebox("setTheDate",new Date((new Date()).getTime() + 1*60*60*1000));
                         } else {
-                            // Use EPG delta? Dunno...
-                            $("#timebox_v").datebox("setTheDate",new Date(1970,0,1,parseInt($(this).attr("start").substr(0,2)),parseInt($(this).attr("start").substr(3,2)),0,0) );
-                            $("#timebox_b").datebox("setTheDate",new Date(1970,0,1,parseInt($(this).attr("stop").substr(0,2)),parseInt($(this).attr("stop").substr(3,2)),0,0) );
+                            // Use EPG delta? Yes!
+                            var delta_before = $("#delta_before_epg").attr("delta");
+                            var delta_after = $("#delta_after_epg").attr("delta");
+                            $("#timebox_v").datebox("setTheDate",new Date(new Date(1970,0,1,parseInt($(this).attr("start").substr(0,2)),parseInt($(this).attr("start").substr(3,2)),0,0).getTime() - delta_before*60000 ));
+                            $("#timebox_b").datebox("setTheDate",new Date(new Date(1970,0,1,parseInt($(this).attr("stop").substr(0,2)),parseInt($(this).attr("stop").substr(3,2)),0,0).getTime() + delta_after*60000 ));
                             title = $(this).children('a').children('h2').text();
                         }
                     });

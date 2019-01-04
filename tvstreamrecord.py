@@ -829,7 +829,7 @@ def getLocale():
 
 @route('/mobile')
 def records_s():
-    return internationalize(template('mobile',locale=getLocale()),True)
+    return internationalize(template('mobile',locale=getLocale(), deltab=config.cfg_delta_before_epg, deltaa=config.cfg_delta_after_epg),True)
 
 @route('/getchannelgroups')
 def getchannelgroups():

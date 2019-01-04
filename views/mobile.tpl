@@ -22,6 +22,8 @@
     
 </head>
 <body>
+    <div id="delta_before_epg" delta="{{deltab}}"></div>
+    <div id="delta_after_epg" delta="{{deltaa}}"></div>
     <data id="locale" loc="{{locale}}"></data>
     <!-- Main page -->
     <div data-role="page" id="hdr" class="tsr-mobile jqm-home">

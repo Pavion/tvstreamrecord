@@ -72,6 +72,7 @@
     "Enable postprocessing": "Разрешить дополнительную обработку записей",
     "Postprocessing command (use %file% for full filename)": "Командная строка дополнительной обработки (шаблон %file% для полного имени файла)",
     "Alternative URL (host:port only) for FFMPEG (if using two similar devices)": "Альтернативный URL (только host:port) для FFMPEG (при использовании двух схожих устройств)",
+    "Enable concurrent recording": "Включить одновременную запись",
     "Password-free IPs start with (comma separated, default": "Беспарольные IP-адреса начинаются с (через запятую, по умолчанию",
     "Valid placeholders": "Допустимые шаблоны",
 

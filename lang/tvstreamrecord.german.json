@@ -72,6 +72,7 @@
     "Enable postprocessing": "Nachbearbeitung aktivieren",
     "Postprocessing command (use %file% for full filename)": "Befehl für die Nachbearbeitung (Platzhalter %file% für vollständigen Dateinamen)",
     "Alternative URL (host:port only) for FFMPEG (if using two similar devices)": "Alternative URL (nur host/port) für FFMPEG (beim Nutzen von zwei ähnlichen Geräten)",
+    "Enable concurrent recording": "Gleichzeitige Aufnahmen zulassen",
     "Password-free IPs start with (comma separated, default": "Keine Passwortabfrage für IPs beginnend mit (kommagetrennt, Vorgabe",
     "Valid placeholders": "Zulässige Platzhalter",
 

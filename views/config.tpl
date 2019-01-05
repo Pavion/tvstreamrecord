@@ -121,6 +121,7 @@
 <tr><td>§Do not restart ffmpeg if that much seconds remains§</td><td><input id="cfg_failsafe_delta" alert="§Invalid value, please enter a positive number or a zero§"/></td></tr>
 <tr><td>§Enable postprocessing§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_postprocess" /></td></tr>
 <tr><td>§Postprocessing command (use %file% for full filename)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_postprocess" value="" autocomplete="off" /></td></tr>
+<tr><td>§Enable concurrent recording§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_concurrent" /></td></tr>
 <tr><td>§Alternative URL (host:port only) for FFMPEG (if using two similar devices)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ffmpeg_alternate_url" value="" autocomplete="off" /></td></tr>
 <tr><td>§Password-free IPs start with (comma separated, default§: '10.,127.,192.,localhost')</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ip_filter" value="" autocomplete="off" /></td></tr>
 </tbody>

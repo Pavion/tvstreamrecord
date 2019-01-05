@@ -69,6 +69,12 @@ configuration = [
 ],
 
 [
+'cfg_switch_concurrent',
+"Enable concurrent records",
+'1'
+],
+
+[
 'cfg_ffmpeg_path',
 'Full path to ffmpeg for other streams support',
 'ffmpeg'

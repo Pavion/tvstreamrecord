@@ -1277,6 +1277,10 @@ def setRecords():
                 break
         if chk == False:
             thread = record(row)
+            if config.cfg_switch_concurrent == "0":
+                for t in records:
+                    t.stop()
+                sleep(1)
             thread.start()
             records.append(thread)
 

@@ -595,7 +595,8 @@ $(function() {
             text: $( "#dialog_record_from_epg" ).attr("record"),
             click: function() {
                 $( this ).dialog( "close" );
-                document.returnform.submit();
+                post("/createepg", { ret:$("#ret").val() }, 
+                    here('epglist')?0:1 );                
             }
         },
         {

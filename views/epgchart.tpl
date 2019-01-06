@@ -60,7 +60,7 @@
         <!-- Empty -->
     </div>
 </div>
-<form method='POST' enctype='multipart/form-data' action='/createepg' name='returnform'>
+<form>
     <input type="text" style="display: none;" name="ret" id="ret" value="X"/>
 </form>
 <div id="dialog_channel_disable" title="§Channel disable§" disable="§Disable§" cancel="§Cancel§">

@@ -64,7 +64,7 @@ def sqlCreateAll(version):
     rows = sqlRun("select * from config")
     if not rows:
         sql += 'CREATE TABLE IF NOT EXISTS channels (cname TEXT collate nocase UNIQUE, cpath TEXT, cenabled INTEGER, cext TEXT, cid INTEGER, epgscan INTEGER);'
-        sql += 'CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER, rmask INTEGER, uniqueid TEXT);'
+        sql += 'CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER, rmask INTEGER, uniqueid TEXT, PRIMARY KEY (recname, cid, rvon, rbis, renabled, rmask));'
         sql += 'CREATE TABLE IF NOT EXISTS caching (crTime TEXT, url TEXT, Last_Modified TEXT, ETag TEXT);'
         sql += 'CREATE TABLE IF NOT EXISTS guide_chan (g_id TEXT UNIQUE, g_name TEXT collate nocase UNIQUE, g_lasttime TEXT);'
         sql += 'CREATE TABLE IF NOT EXISTS guide (g_id TEXT, g_title TEXT, g_start TEXT, g_stop TEXT, g_desc TEXT, PRIMARY KEY (g_id, g_start, g_stop));'

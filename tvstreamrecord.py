@@ -778,7 +778,7 @@ def epglist_getter():
         if iSearch and iSearch!="":
             sWhere = "AND (guide_chan.g_name LIKE '%" + iSearch + "%' OR guide.g_title LIKE '%" + iSearch + "%' OR guide.g_desc LIKE '%" + iSearch + "%')"
 
-        query = "SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, null, guide.rowid FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s %s %s" % (sWhere, sOrder, sLimit)
+        query = "SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, null, guide.rowid, records.rowid, records.renabled FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.rvon <= guide.g_start AND records.rbis >= guide.g_stop AND records.cid = channels.cid WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s %s %s" % (sWhere, sOrder, sLimit)
         countquery = "SELECT COUNT(guide.g_start) FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 %s" % (sWhere)
         count = sqlRun(countquery)
         if count:
@@ -786,10 +786,10 @@ def epglist_getter():
 
         rows=sqlRun(query)
     else: # Client-side processing
-        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, null, guide.rowid FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_epg_max_events))
+        rows=sqlRun("SELECT guide_chan.g_name, guide.g_title, guide.g_desc, guide.g_start, guide.g_stop, null, guide.rowid, records.rowid, records.renabled FROM guide INNER JOIN guide_chan ON guide.g_id = guide_chan.g_id INNER JOIN channels ON channels.cname=guide_chan.g_name LEFT JOIN records ON records.rvon <= guide.g_start AND records.rbis >= guide.g_stop AND records.cid = channels.cid WHERE datetime(guide.g_stop)>datetime('now', 'localtime') AND channels.cenabled<>0 ORDER BY g_start LIMIT %s;" % (config.cfg_epg_max_events))
 
     for row in rows:
-        retlist.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6]])
+        retlist.append([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]])
 
     return json.dumps(
                       {"aaData": retlist,

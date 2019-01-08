@@ -190,7 +190,7 @@ function initProgressbar() {
  */
 var dialognr = -1;
 function initIcons() {
-    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsERec-], [id^=iconsDisable-]" ).hover(
+    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsEPause-], [id^=iconsEStp-], [id^=iconsDisable-], [id^=iconsDisable-], [id^=iconsResume-]" ).hover(
         function() {
             $( this ).addClass( "ui-state-hover" );
         },
@@ -232,8 +232,6 @@ function initIcons() {
             for(var i=0;i<len;i++) {
                 if(data[i][6]==dialognr) {
                     $("#ret").val(dialognr);
-//                    $("#dialog_content").html ("<b>" + data[i][1] + "<br>"+data[i][3]+" - " + data[i][4] + "</b><br><br>" + data[i][2]);
-//                    $("#dialog_content").html (data[i][7]);
                     var dat_v = data[i][3].split(" ")[1].substr(0,5);
                     var dat_b = data[i][4].split(" ")[1].substr(0,5);
                     var delta_before = $("#delta_before_epg").attr("delta");
@@ -251,10 +249,16 @@ function initIcons() {
                 }
             }
         }
+    });
 
+    $( "[id^=iconsEPause-]" ).click(function( event ) {
+        switchnr = parseInt($(this).attr('id').replace("iconsEPause-",""));
+        post("/records", { myid:switchnr, what:"0" }, 2);
+    });
 
-        //$( "#dialog_create_record" ).dialog( "open" );
-        //event.preventDefault();
+    $( "[id^=iconsEResume-]" ).click(function( event ) {
+        switchnr = parseInt($(this).attr('id').replace("iconsEResume-",""));
+        post("/records", { myid:switchnr, what:"1" }, 2);
     });
 
     $( "[id^=icons-]" ).click(function( event ) {
@@ -303,6 +307,9 @@ function post(dest1, data1, rel) {
         success: function() {
             if(rel==1) {
                 window.location.reload(false);
+            } else if (rel==2) {
+                oTable = $('#table_epglist').DataTable();
+                oTable.ajax.reload();
             }
         }
     });
@@ -504,7 +511,7 @@ $(function() {
                             aktiv:akt,
                             recurr:mask
                         },
-                            (here('list') || here('epglist'))?0:1
+                            here('list') ? 0 : ( here('epglist') ? 2 : 1 )
                         );
                     }
                 }
@@ -596,7 +603,7 @@ $(function() {
             click: function() {
                 $( this ).dialog( "close" );
                 post("/createepg", { ret:$("#ret").val() }, 
-                    here('epglist')?0:1 );                
+                    here('epglist')?2:1 );
             }
         },
         {
@@ -1123,7 +1130,13 @@ $(function() {
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                 $('td:eq(3)', nRow).html( localDateTime( aData[3] ) );
                 $('td:eq(4)', nRow).html( localDateTime( aData[4] ) );
-                $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
+                if (aData[7]===null) { 
+                    $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
+                } else if (aData[8] === 0) {
+                    $('td:eq(5)', nRow).html('<label id="iconsEResume-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
+                } else {
+                    $('td:eq(5)', nRow).html('<label id="iconsEPause-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-pause"></span></label>');
+                }
             }
         });
         

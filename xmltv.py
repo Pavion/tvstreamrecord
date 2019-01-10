@@ -201,7 +201,9 @@ def getProg(strp, channellist=[], keylist=[]):
                     e = epin.split(".")
                     if len(e)>1:
                         try:
-                            episode = "S" + format(int(e[0].strip()) + 1, '02d') + "E" + format(int(e[1].strip()) + 1, '02d')
+                            episode = "E" + format(int(e[1].strip()) + 1, '02d')
+                            if e[0].strip() != "":
+                                episode = "S" + format(int(e[0].strip()) + 1, '02d') + episode
                             desc += episode + ". "
                             title += " (" + episode + ")"
                             break

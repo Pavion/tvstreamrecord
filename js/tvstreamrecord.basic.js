@@ -190,7 +190,7 @@ function initProgressbar() {
  */
 var dialognr = -1;
 function initIcons() {
-    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsDisable-], [id^=iconsDisable-], [id^=iconsEStop-]" ).hover(
+    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsDisable-], [id^=iconsEStop-]" ).hover(
         function() {
             $( this ).addClass( "ui-state-hover" );
         },
@@ -254,7 +254,6 @@ function initIcons() {
     $( "[id^=iconsEStop-]" ).click(function( event ) {
         dialognr = parseInt($(this).attr('id').replace("iconsEStop-",""));
         $( "#dialog_remove" ).dialog( "open" );
-        /*post("/records", { myid:switchnr, what:"0" }, 2);*/
     });
 
     $( "[id^=icons-]" ).click(function( event ) {

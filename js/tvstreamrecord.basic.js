@@ -190,7 +190,7 @@ function initProgressbar() {
  */
 var dialognr = -1;
 function initIcons() {
-    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsEPause-], [id^=iconsEStp-], [id^=iconsDisable-], [id^=iconsDisable-], [id^=iconsResume-]" ).hover(
+    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsDisable-], [id^=iconsDisable-], [id^=iconsEStop-]" ).hover(
         function() {
             $( this ).addClass( "ui-state-hover" );
         },
@@ -251,14 +251,10 @@ function initIcons() {
         }
     });
 
-    $( "[id^=iconsEPause-]" ).click(function( event ) {
-        switchnr = parseInt($(this).attr('id').replace("iconsEPause-",""));
-        post("/records", { myid:switchnr, what:"0" }, 2);
-    });
-
-    $( "[id^=iconsEResume-]" ).click(function( event ) {
-        switchnr = parseInt($(this).attr('id').replace("iconsEResume-",""));
-        post("/records", { myid:switchnr, what:"1" }, 2);
+    $( "[id^=iconsEStop-]" ).click(function( event ) {
+        dialognr = parseInt($(this).attr('id').replace("iconsEStop-",""));
+        $( "#dialog_remove" ).dialog( "open" );
+        /*post("/records", { myid:switchnr, what:"0" }, 2);*/
     });
 
     $( "[id^=icons-]" ).click(function( event ) {
@@ -413,6 +409,8 @@ $(function() {
             click: function() {
                 if (here("config")) {
                     post("/removeepg", {}, 1);
+                } else if (here("epglist")) {
+                    post("/records", { myid:dialognr, what:"-1" }, 2);
                 } else {
                     post(where(), { myid:dialognr, what:"-1" }, 1);
                 }
@@ -1132,10 +1130,8 @@ $(function() {
                 $('td:eq(4)', nRow).html( localDateTime( aData[4] ) );
                 if (aData[7]===null) { 
                     $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
-                } else if (aData[8] === 0) {
-                    $('td:eq(5)', nRow).html('<label id="iconsEResume-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
                 } else {
-                    $('td:eq(5)', nRow).html('<label id="iconsEPause-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-pause"></span></label>');
+                    $('td:eq(5)', nRow).html('<label id="iconsEStop-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-close"></span></label>');
                 }
             }
         });

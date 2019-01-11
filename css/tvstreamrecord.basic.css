@@ -61,7 +61,7 @@ div#changelog {
     pointer-events: none;
 }
 
-[id^=icons-], [id^=iconsEPG-], [id^=iconsRec-], [id^=iconsERec-], [id^=iconsEPause-], [id^=iconsEResume-]  {
+[id^=icons-], [id^=iconsEPG-], [id^=iconsRec-], [id^=iconsERec-], [id^=iconsEStop-] {
     position: relative;
     cursor: pointer;
     float: left;
@@ -70,7 +70,7 @@ div#changelog {
     margin-left: 7px;
 }
 
-[id^=iconsEPG-], [id^=iconsRec-], [id^=iconsERec-], [id^=iconsEPause-], [id^=iconsEResume-] {
+[id^=iconsEPG-], [id^=iconsRec-], [id^=iconsERec-], [id^=iconsEStop-] {
     cursor: default; 
     clear: none;
 }  
@@ -80,7 +80,7 @@ div#changelog {
     margin: -2px -2px;
 }
     
-[id^=iconsRec-] span.ui-icon, [id^=iconsERec-]  span.ui-icon, [id^=iconsEPG-] span.ui-icon, [id^=iconsDisable-] span.ui-icon, [id^=iconsEPause-] span.ui-icon, [id^=iconsEResume-] span.ui-icon {
+[id^=iconsRec-] span.ui-icon, [id^=iconsERec-]  span.ui-icon, [id^=iconsEPG-] span.ui-icon, [id^=iconsDisable-] span.ui-icon, [id^=iconsEStop-] span.ui-icon {
     float: left;
     margin-top: -1px;
     margin-left: -1px;

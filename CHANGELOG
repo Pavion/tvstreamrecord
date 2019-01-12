@@ -1,3 +1,7 @@
+2019-01-12 1.4.0 Added new switch to handle concurrent recording (if but one stream per device available)
+                 Better records handling and cancelling in EPG list view
+                 Several fixes
+
 2018-12-31 1.3.9 Keywords for creating automatic records on EPG import
 
 2018-10-31 1.3.8 Edit records from mobile view

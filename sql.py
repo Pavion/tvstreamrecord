@@ -115,10 +115,10 @@ def sqlCreateAll(version):
                     sql += "INSERT OR IGNORE INTO config VALUES ('cfg_delta_before_epg', '', (SELECT value FROM config WHERE param='cfg_delta_for_epg'));"
                     sql += "UPDATE config SET param='cfg_delta_after_epg' WHERE param='cfg_delta_for_epg';"
                 if oldver < '1.4.0':
-                    sql += "ALTER TABLE records RENAME TO records_old;";
+                    sqlRun("DROP TABLE IF EXISTS records_old;", -1, -1)
+                    sql += "ALTER TABLE records RENAME TO records_old;"
                     sql += "CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER, rmask INTEGER, uniqueid TEXT, PRIMARY KEY (recname, cid, rvon, rbis, rmask));"
                     sql += "INSERT OR IGNORE INTO records SELECT * FROM records_old;"
-                    sql += "DROP TABLE IF EXISTS records_old;"
                     
                 if oldver > version:
                     print ("Critical error: Version mismatch!!!")

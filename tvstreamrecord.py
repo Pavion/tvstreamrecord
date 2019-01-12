@@ -445,6 +445,9 @@ def config_p():
             if cfg[1]!=config.cfg_grab_time:
                 config.cfg_grab_time = cfg[1]
                 grabthread.run()
+        if cfg[0]=="cfg_server_port":
+            if cfg[1]!=config.cfg_server_port:
+                config.writeWebman(cfg[1])
     config.setConfig(configdata)
     return "null"
 

@@ -288,9 +288,6 @@ def loadConfig():
 def setConfig(attrlist = []):
     for attr in attrlist:
         if attr[0] in globals():
-            if attr[0]=="cfg_server_port":
-                if int(globals()[attr[0]]) != int(attr[1]):
-                    writeWebman(int(attr[1]))
             if attr[0]=="cfg_recordpath":
                 if attr[1][-1]!="/" and attr[1][-1]!="\\":
                     if "\\" in attr[1]:

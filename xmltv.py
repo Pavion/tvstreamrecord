@@ -97,7 +97,7 @@ def getProgList(ver=''):
         rec_keys = config.cfg_epg_autorecord.strip().split(",")
         for key in rec_keys:
             keylist.append(key.strip().lower())
-    max_records = 50
+    max_records = 100
     reclist = []
     totalentries = 0
     initpath = config.cfg_xmltvinitpath

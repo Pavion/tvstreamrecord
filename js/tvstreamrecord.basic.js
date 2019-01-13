@@ -190,12 +190,13 @@ function initProgressbar() {
  */
 var dialognr = -1;
 function initIcons() {
-    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsDisable-], [id^=iconsEStop-]" ).hover(
+    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsDisable-], [id^=iconsEStop-], [id^=iconsERec-]" ).hover(
         function() {
             $( this ).addClass( "ui-state-hover" );
         },
         function() {
             $( this ).removeClass( "ui-state-hover" );
+            $(".ui-tooltip-content").parents('div').remove();
         }
     );
 
@@ -1130,7 +1131,7 @@ $(function() {
                 if (aData[7]===null) { 
                     $('td:eq(5)', nRow).html('<label title="Create record" id="iconsERec-' + aData[6] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label>');
                 } else {
-                    $('td:eq(5)', nRow).html('<label id="iconsEStop-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-close"></span></label>');
+                    $('td:eq(5)', nRow).html('<label title="Delete record" id="iconsEStop-' + aData[7] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-close"></span></label>');
                 }
             }
         });

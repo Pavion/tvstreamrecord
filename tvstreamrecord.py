@@ -699,7 +699,7 @@ def epg_s():
         t = time(i+sthour)
         x = i * 100.0 / hours * widthq
         w =  1.0 / hours * widthq * 100.0
-        rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", "", -1, "", 0])
+        rtemp.append([-1, x, w, t.strftime("%H:%M"), "", "", "", -1, "", -1])
     ret.append(rtemp)
 
     rows=sqlRun("SELECT guide.g_id, channels.cid, channels.cname FROM guide, guide_chan, channels WHERE channels.cenabled=1 AND channels.cname=guide_chan.g_name AND guide.g_id=guide_chan.g_id AND (date(g_start)=date(?) OR date(g_stop)=date(?)) GROUP BY channels.cid ORDER BY channels.cid", (todaysql, todaysql))
@@ -717,22 +717,22 @@ def epg_s():
     for row in rows:
         cid=row[1]
         rtemp = list()
-        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, ((records.renabled is not null and records.renabled  = 1) OR (recurr.renabled is not null and recurr.renabled  = 1) OR (recurry.renabled is not null and recurry.renabled  = 1)) FROM guide " +
+        c_rows=sqlRun("SELECT g_title, g_start, g_stop, g_desc, guide.rowid, COALESCE(records.rowid, recurr.rid, recurry.rid, -1) FROM guide " +
         "LEFT JOIN records ON records.cid=:1 AND guide.g_start>=records.rvon and guide.g_stop<=records.rbis " +
         "LEFT JOIN (" +
-          "SELECT recname,cid, datetime(rvon, '+' || (julianday(date(:2)) - julianday(date(rvon))) || ' day') as rvon, datetime(rbis, '+' || (julianday(date(:2)) - julianday(date(rvon))) || ' day') as rbis, renabled, rmask, uniqueid FROM records WHERE records.rmask & :3 = :3 AND date(records.rvon)<date(:2) AND cid=:1" +
+          "SELECT recname,cid, datetime(rvon, '+' || (julianday(date(:2)) - julianday(date(rvon))) || ' day') as rvon, datetime(rbis, '+' || (julianday(date(:2)) - julianday(date(rvon))) || ' day') as rbis, renabled, rmask, uniqueid, records.rowid as RID FROM records WHERE records.rmask & :3 = :3 AND date(records.rvon)<date(:2) AND cid=:1" +
         ") AS recurr ON guide.g_start>=recurr.rvon and guide.g_stop<=recurr.rbis " +
         "LEFT JOIN (" +
-          "SELECT recname,cid, datetime(rvon, '+' || (julianday(date(:4)) - julianday(date(rvon))) || ' day') as rvon, datetime(rbis, '+' || (julianday(date(:4)) - julianday(date(rvon))) || ' day') as rbis, renabled, rmask, uniqueid FROM records WHERE records.rmask & :5 = :5 AND date(rbis, '+' || (julianday(date(:4)) - julianday(date(rvon))) || ' day')=date(:2) AND cid=:1" +
+          "SELECT recname,cid, datetime(rvon, '+' || (julianday(date(:4)) - julianday(date(rvon))) || ' day') as rvon, datetime(rbis, '+' || (julianday(date(:4)) - julianday(date(rvon))) || ' day') as rbis, renabled, rmask, uniqueid, records.rowid as RID FROM records WHERE records.rmask & :5 = :5 AND date(rbis, '+' || (julianday(date(:4)) - julianday(date(rvon))) || ' day')=date(:2) AND cid=:1" +
         ") AS recurry ON guide.g_start>=recurry.rvon and guide.g_stop<=recurry.rbis " +
         "WHERE (date(g_start)=date(:2) OR date(g_stop)=date(:2)) AND datetime(g_stop, '+60 minutes')>datetime('now', 'localtime') AND g_id=:6 ORDER BY g_start", (cid, todaysql, weekbit, yestersql, weekbit_y, row[0]))
         if config.cfg_switch_epg_overlay == "1":
             # adding today records for overlay
-            c_rows += sqlRun("SELECT '', records.rvon, records.rbis, '', -2, 0 FROM records WHERE records.cid=:1 AND (date(records.rvon)=date(:2) OR date(records.rbis)=date(:2)) AND renabled=1 ORDER BY rvon", (cid, todaysql))
+            c_rows += sqlRun("SELECT '', records.rvon, records.rbis, '', -2, -1 FROM records WHERE records.cid=:1 AND (date(records.rvon)=date(:2) OR date(records.rbis)=date(:2)) AND renabled=1 ORDER BY rvon", (cid, todaysql))
             # adding recurrent records not yet scheduled
-            c_rows += sqlRun("SELECT '', datetime(rvon, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), datetime(rbis, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), '', -2, 0 FROM records WHERE records.cid=:2 AND records.rmask & :3 = :3 AND records.renabled=1 AND date(records.rvon)<date(:1)", (todaysql, cid, weekbit))
+            c_rows += sqlRun("SELECT '', datetime(rvon, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), datetime(rbis, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), '', -2, -1 FROM records WHERE records.cid=:2 AND records.rmask & :3 = :3 AND records.renabled=1 AND date(records.rvon)<date(:1)", (todaysql, cid, weekbit))
             # adding overnight recurrent records
-            c_rows += sqlRun("SELECT '', datetime(rvon, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), datetime(rbis, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), '', -2, 0 FROM records WHERE records.cid=:2 AND records.rmask & :3 = :3 AND records.renabled=1 AND date(rbis, '+' || (julianday(:1) - julianday(date(rvon))) || ' day')=date(:4)", (yestersql, cid, weekbit_y, todaysql))
+            c_rows += sqlRun("SELECT '', datetime(rvon, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), datetime(rbis, '+' || (julianday(:1) - julianday(date(rvon))) || ' day'), '', -2, -1 FROM records WHERE records.cid=:2 AND records.rmask & :3 = :3 AND records.renabled=1 AND date(rbis, '+' || (julianday(:1) - julianday(date(rvon))) || ' day')=date(:4)", (yestersql, cid, weekbit_y, todaysql))
         for event in c_rows:
 
             d_von = datetime.strptime(event[1],"%Y-%m-%d %H:%M:%S")

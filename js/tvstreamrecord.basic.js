@@ -411,6 +411,8 @@ $(function() {
                     post("/removeepg", {}, 1);
                 } else if (here("epglist")) {
                     post("/records", { myid:dialognr, what:"-1" }, 2);
+                } else if (here("epgchart")) {
+                    post("/records", { myid:dialognr, what:"-1" }, 1);
                 } else {
                     post(where(), { myid:dialognr, what:"-1" }, 1);
                 }
@@ -959,7 +961,7 @@ $(function() {
             x = +$(this).attr('x');
             cnt = +$(this).attr('cnt');
             rec = $(this).attr('recording');
-            if(rec == 1) $(this).css({"background":"#98FB98","color":"#000"}); // thx Pavol
+            if(rec >= 0) $(this).css({"background":"#98FB98","color":"#000"}); // thx Pavol
             $(this).css("font-size", ((cnt==0?11:8)+Math.round(Math.abs(zoom*2))) + 'px');
 
             if (zoom>0) {
@@ -1050,8 +1052,11 @@ $(function() {
             });
 
         $("[id=event]").on("click", function(event) {
-            $("[id=event]").siblings().removeClass("ui-selected");
-            if ($(this).attr("cnt")!=="0") {
+            $("[id=event]").siblings().removeClass("ui-selected");            
+            if ($(this).attr("recording")>=0) { 
+                dialognr = parseInt($(this).attr("recording"));
+                $( "#dialog_remove" ).dialog( "open" );
+            } else if ($(this).attr("cnt")!=="0") {
                 $(this).addClass("ui-selected");
 
                 var ft = "<b>" + $(this).text() + ": " + localDateTime($(this).attr("at")) + " - "

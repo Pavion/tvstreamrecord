@@ -60,6 +60,9 @@
         <!-- Empty -->
     </div>
 </div>
+<div id="dialog_remove" title="§Confirmation request§" cancel="§Cancel§" delete="§Delete§"> 
+	<p>§Shall I delete this record?§</p>
+</div>
 <form>
     <input type="text" style="display: none;" name="ret" id="ret" value="X"/>
 </form>

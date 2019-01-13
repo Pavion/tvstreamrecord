@@ -1,3 +1,5 @@
+2019-01-13 1.4.1 Records can now be deleted from EPG chart view
+
 2019-01-12 1.4.0 Added new switch to handle concurrent recording (if but one stream per device available)
                  Better records handling and cancelling in EPG list view
                  Several fixes

@@ -1052,12 +1052,10 @@ $(function() {
             });
 
         $("[id=event]").on("click", function(event) {
-            $("[id=event]").siblings().removeClass("ui-selected");            
             if ($(this).attr("recording")>=0) { 
                 dialognr = parseInt($(this).attr("recording"));
                 $( "#dialog_remove" ).dialog( "open" );
             } else if ($(this).attr("cnt")!=="0") {
-                $(this).addClass("ui-selected");
 
                 var ft = "<b>" + $(this).text() + ": " + localDateTime($(this).attr("at")) + " - "
                        + localDateTime($(this).attr("till")) + "</b><BR><BR>" + $(this).attr("fulltext");
@@ -1075,7 +1073,6 @@ $(function() {
                     recStart = new Date( parseDate($(this).attr("at")).valueOf() - delta_before*60000 ).toTimeString().substring(0, 5);
                     recEnd = new Date( parseDate($(this).attr("till")).valueOf() + delta_after*60000 ).toTimeString().substring(0, 5);
                     $( "#dialog_record_from_epg" ).dialog( "open" );
-                    $(this).removeClass("ui-selected");
                 }
             }
         });

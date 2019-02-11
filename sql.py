@@ -38,7 +38,10 @@ def sqlRun(sql, t=-1, many=0):
                 rows = c.executescript(sql)
             else:
                 rows = c.execute(sql)
-        fa=rows.fetchall()
+        if "INSERT" in sql and many==0:
+            fa = rows.lastrowid
+        else:
+            fa=rows.fetchall()
         conn.commit()
         conn.close()
     except Exception as ex:

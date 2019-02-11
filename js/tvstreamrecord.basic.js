@@ -1030,8 +1030,11 @@ $(function() {
             }
         }
 
-        $( "#searchepg" ).change(function() {
+        $( "#searchepg" ).change(function(param) {
             var tofind = $(this).val().toLowerCase().trim();
+            if(!param.hasOwnProperty("isTrigger")) {
+                post("/setsearch", { search:tofind }, 0);
+            }
             $( "[id=event]" ).each(function(i) {
                 if ($(this).attr("cnt")!=="0") {
                     var text = $(this).text().toLowerCase() + " " + $(this).attr('fulltext').toLowerCase();
@@ -1047,7 +1050,6 @@ $(function() {
         $( "#searchepgbutton" )
             .button()
             .click(function(event ) {
-                $( "#searchepg" ).change();
                 event.preventDefault();
             });
 
@@ -1096,7 +1098,12 @@ $(function() {
 
         initIcons();
         initEpgState();
-
+        
+        var keyword_for_epg = $('#keyword_for_epg').attr('keyword_for_epg');
+        if (keyword_for_epg!=="") {
+            $( "#searchepg" ).val(keyword_for_epg);
+            $( "#searchepg" ).change();            
+        }
     } else if (here("epglist")) {
 // ------------------------------------ EPG list tab only
         var serverSide = ($("#listmode").attr("value") == "1");

@@ -663,8 +663,14 @@ def zoom_p():
     config.saveConfig()
     return "null"
 
+@post('/setsearch')
+def setsearch_p():
+    search = request.forms.search
+    sqlRun("REPLACE INTO config(param, value) VALUES('cfg_epgchart_search', ?);", (search, ))
+
+@route('/epgchart&<keyword>')
 @route('/epgchart')
-def epg_s():
+def epg_s(keyword=''):
     grabthread.setChannelCount()
 
     global dayshown
@@ -752,7 +758,12 @@ def epg_s():
             if x >= 0 and w > 0:
                 rtemp.append ([cid, x/totalwidth*100.0*widthq, w/totalwidth*100.0*widthq, event[0], d_von, d_bis, event[3], event[4], row[2], event[5]])
         ret.append(rtemp)
-    return internationalize(template('epgchart', curr=datetime.strftime(dayshown, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), deltab=config.cfg_delta_before_epg, deltaa=config.cfg_delta_after_epg))
+        if keyword is '':
+            try:
+                keyword = sqlRun("SELECT value FROM config WHERE param='cfg_epgchart_search'")[0][0]
+            except:
+                pass
+    return internationalize(template('epgchart', keyword_for_epg=keyword, curr=datetime.strftime(dayshown, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), deltab=config.cfg_delta_before_epg, deltaa=config.cfg_delta_after_epg))
 
 @route('/epglist')
 @route('/epglist&<keyword>')

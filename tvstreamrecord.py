@@ -763,11 +763,23 @@ def epg_s(keyword=''):
                 keyword = sqlRun("SELECT value FROM config WHERE param='cfg_epgchart_search'")[0][0]
             except:
                 pass
+        else:
+            try:
+                keyword = keyword.decode("utf-8")
+            except:
+                pass
+            keyword = keyword.replace('%20',' ')
     return internationalize(template('epgchart', keyword_for_epg=keyword, curr=datetime.strftime(dayshown, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), deltab=config.cfg_delta_before_epg, deltaa=config.cfg_delta_after_epg))
 
 @route('/epglist')
 @route('/epglist&<keyword>')
 def epglist_s(keyword=''):
+    if not keyword is '':
+        try:
+            keyword = keyword.decode("utf-8")
+        except:
+            pass
+        keyword = keyword.replace('%20',' ')
     return internationalize(template('epglist', keyword_for_epg=keyword, listmode=config.cfg_switch_epglist_mode, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), deltab=config.cfg_delta_before_epg, deltaa=config.cfg_delta_after_epg))
 
 @route('/epglist_getter')

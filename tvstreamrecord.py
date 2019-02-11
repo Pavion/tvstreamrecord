@@ -1133,7 +1133,7 @@ class record(Thread):
             if self.ffmpeg == 0:
                 self.ffmpeg = 1
 
-            attr = [config.cfg_ffmpeg_path,"-i", self.url, '-y', '-t', deltasec] + ffargs + [fn]
+            attr = shlex.split(config.cfg_ffmpeg_path) + ["-i", self.url, '-y', '-t', deltasec] + ffargs + [fn]
             print ("FFMPEG (%s) record '%s' called with:" % (streamtype, self.name))
             print (attr)
             try:

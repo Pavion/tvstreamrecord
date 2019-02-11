@@ -304,7 +304,7 @@ function post(dest1, data1, rel) {
             if(rel==1) {
                 window.location.reload(false);
             } else if (rel==2) {
-                oTable = $('#table_epglist').DataTable();
+                oTable = $('table:visible').DataTable();
                 oTable.ajax.reload();
             }
         }
@@ -409,7 +409,7 @@ $(function() {
             click: function() {
                 if (here("config")) {
                     post("/removeepg", {}, 1);
-                } else if (here("epglist")) {
+                } else if (here("epglist") || here("records")) {
                     post("/records", { myid:dialognr, what:"-1" }, 2);
                 } else if (here("epgchart")) {
                     post("/records", { myid:dialognr, what:"-1" }, 1);

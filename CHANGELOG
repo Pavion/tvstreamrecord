@@ -1,3 +1,6 @@
+2019-02-12 1.4.2 Fixed search in EPG chart view
+                 Query support in EPG chart view (/epgchart&spiegel%20tv will highlight corresponding events)
+
 2019-01-13 1.4.1 Records can now be deleted from EPG chart view
 
 2019-01-12 1.4.0 Added new switch to handle concurrent recording (if but one stream per device available)

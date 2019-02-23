@@ -1240,9 +1240,11 @@ class record(Thread):
             delta = total(tDiff(self.bis, datetime.now()))
             if self.retry_count == 0:
                 print ("Something went wrong with '%s'. No retries configured, aborting..." % (self.name))
+                sqlRun("UPDATE records SET renabled=0 WHERE rowid=?", (self.id, ))
                 sleep(delta)
             elif self.retries == self.retry_count:
                 print ("Something went wrong with '%s'. Last retry reached, aborting..." % (self.name))
+                sqlRun("UPDATE records SET renabled=0 WHERE rowid=?", (self.id, ))
                 sleep(delta)
             elif self.retries < self.retry_count:
                 self.retries += 1

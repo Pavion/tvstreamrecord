@@ -82,7 +82,7 @@ def getList(stri, attr):
         p1 = stri.find('<'+attr, p3)
 
 def checkType(typ):
-    if typ == "nonametv": # separate files
+    if typ == "nonametv" or typ == "Vind": # separate files
         return 1
     elif typ[:4] == "TVxb" or typ[:5] == "TVH_W" or typ=="SS" or typ=="mc2xml" or typ=="dummy": # same file
         return 2
@@ -116,6 +116,8 @@ def getProgList(ver=''):
         names = getAll(innertxt, 'display-name')
         if checkType(typ) == 1:
             url = getFirst(innertxt, 'base-url')
+            if url[-1] != "/":
+                url += "/"
         elif checkType(typ) == 2:
             pass
         else:

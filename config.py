@@ -90,7 +90,7 @@ configuration = [
 [
 'cfg_ffmpeg_params',
 "Additional output arguments for ffmpeg (default: '-acodec copy -vcodec copy')",
-'-loglevel fatal -acodec copy -vcodec copy'
+'-loglevel fatal -map 0 -c copy'
 ],
 
 [

@@ -63,7 +63,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False
-version = '1.4.3'
+version = '1.4.3a'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -1236,22 +1236,28 @@ class record(Thread):
                     print ("Exception calling postprocessing, please check your command line")
 
         # 2015-01-21 Fail & recurrency check
-        if datetime.now() < self.bis - timedelta(seconds=int(config.cfg_failsafe_delta)) and self.stopflag==0:
+        if self.stopflag==0:
             delta = total(tDiff(self.bis, datetime.now()))
-            if self.retry_count == 0:
-                print ("Something went wrong with '%s'. No retries configured, aborting..." % (self.name))
+            failsafe_delta=int(config.cfg_failsafe_delta)
+            if delta > failsafe_delta:
+                if self.retry_count == 0:
+                    print ("Something went wrong with '%s'. No retries configured, aborting..." % (self.name))
+                    sqlRun("UPDATE records SET renabled=0 WHERE rowid=?", (self.id, ))
+                    sleep(delta)
+                elif self.retries == self.retry_count:
+                    print ("Something went wrong with '%s'. Last retry reached, aborting..." % (self.name))
+                    sqlRun("UPDATE records SET renabled=0 WHERE rowid=?", (self.id, ))
+                    sleep(delta)
+                elif self.retries < self.retry_count:
+                    self.retries += 1
+                    print ("Something went wrong with '%s', retry %s/%s in 10 seconds" % (self.name, self.retries, self.retry_count))
+                    sleep(10)
+                    self.run()
+                    return
+            else:
+                print ("Something went wrong with '%s'. Remaining time is less than fail-safe delta, aborting..." % (self.name))
                 sqlRun("UPDATE records SET renabled=0 WHERE rowid=?", (self.id, ))
                 sleep(delta)
-            elif self.retries == self.retry_count:
-                print ("Something went wrong with '%s'. Last retry reached, aborting..." % (self.name))
-                sqlRun("UPDATE records SET renabled=0 WHERE rowid=?", (self.id, ))
-                sleep(delta)
-            elif self.retries < self.retry_count:
-                self.retries += 1
-                print ("Something went wrong with '%s', retry %s/%s in 10 seconds" % (self.name, self.retries, self.retry_count))
-                sleep(10)
-                self.run()
-                return
 
         self.clean()
         rectimer = Timer(10, setRecords)

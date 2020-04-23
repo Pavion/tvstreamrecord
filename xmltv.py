@@ -136,7 +136,7 @@ def getProgList(ver=''):
                     lastdate = datetime.now()-timedelta(days=30)
                     if timerows:
                         lastdate = datetime.strptime(timerows[0][0], "%Y-%m-%d %H:%M:%S")
-                    dtmax = datetime.min
+                    dtmax = datetime(2000,1,1,0,0,0,0)
 
                     for t_attr, dttext in getList(innertxt, "datafor"):
                         dtepg  = datetime.strptime(dttext, "%Y-%m-%d")

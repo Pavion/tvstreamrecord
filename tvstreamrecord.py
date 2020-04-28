@@ -1254,8 +1254,8 @@ class record(Thread):
                     sleep(10)
                     self.run()
                     return
-            else:
-                print ("Something went wrong with '%s'. Remaining time is less than fail-safe delta, aborting..." % (self.name))
+            elif delta > 0:
+                print ("Something went wrong with '%s'. Remaining time is less than fail-safe delta, sleeping..." % (self.name))
                 #sqlRun("UPDATE records SET renabled=0 WHERE rowid=?", (self.id, ))
                 sleep(delta)
 

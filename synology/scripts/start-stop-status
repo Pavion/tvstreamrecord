@@ -3,9 +3,9 @@
 [ ${SYNOPKG_PKGDEST} ] || SYNOPKG_PKGDEST=`ls -l /var/packages/tvstreamrecord/target | cut -d\> -f2 | cut -d\  -f2`
 
 findpython() {
-    TVSTREAMRECORD_PYTHON='python'
+    TVSTREAMRECORD_PYTHON='python3'
     type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
-        TVSTREAMRECORD_PYTHON='python3'
+        TVSTREAMRECORD_PYTHON='python'
         type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
             TVSTREAMRECORD_PYTHON='/volume1/@appstore/python/bin/python'
             type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {

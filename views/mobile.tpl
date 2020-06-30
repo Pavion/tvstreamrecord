@@ -7,7 +7,7 @@
     <link rel="shortcut icon" href="images/favicon.ico?v=3" type="image/x-icon" /> 
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 	
-    <script src="js/jquery-1.11.3.min.js"></script>
+    <script src="js/jquery-3.5.1.min.js"></script>
 	<script src="js/jquery.mobile-1.4.5.min.js"></script>
 
     <script type="text/javascript" src="js/jquery.mousewheel.min.js"></script>

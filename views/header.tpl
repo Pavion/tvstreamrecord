@@ -13,7 +13,7 @@
     <link rel="stylesheet" type="text/css" href="css/slickswitch.css" />
     <link rel="stylesheet" type="text/css" href="css/tvstreamrecord.basic.css" type="text/css" />
 
-    <script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="js/jquery-3.5.1.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui-timepicker-addon.min.js"></script>
     <script type="text/javascript" src="js/jquery.slickswitch.js"></script>

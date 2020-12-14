@@ -38,14 +38,8 @@
             <input type="text" maxlength="512" id="cpath" class="text ui-widget-content ui-corner-all" name="cpath" value=""/> 
             <label for="channel">§File extension (i.e. .mpg)§</label>
             <input type="text" maxlength="8" id="cext" class="text ui-widget-content ui-corner-all" name="cext" value=""/> 
-            <div id="chb1">
-                <label for="lactive" id="lactive">§Enabled§</label>
-                <input type="checkbox" class="switch icons" id="switch_list_active" checked="checked" />
-            </div>  
-            <div id="chb2">
-                <label for="lepg" id="lepg">§Grab EPG§</label>
-                <input type="checkbox" class="switch icons" id="switch_list_grab"  />  
-            </div>  
+            <label for="lactive" id="lactive">§Enabled§</label>
+            <input type="checkbox" class="switch icons" id="switch_list_active" checked="checked" />
         </fieldset>
     </form>
     <p class="validateTips"></p>

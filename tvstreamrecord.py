@@ -29,7 +29,6 @@ from time import sleep
 import subprocess
 import config
 from sql import sqlRun, sqlCreateAll, purgeDB
-import grabber
 import xmltv
 import json
 import sys
@@ -322,12 +321,6 @@ def clgen_p():
         f.close()
     return "null"
 
-@post('/grab_channel')
-def grabchannel():
-    myid = request.forms.myid
-    sqlRun("UPDATE channels SET epgscan=-epgscan+1 WHERE cid = ?", (myid, ))
-    return "null"
-
 @post('/create_channel')
 def createchannel():
     prev = request.forms.cprev
@@ -335,7 +328,7 @@ def createchannel():
     cname = request.forms.cname
     cpath = request.forms.cpath
     aktiv = getBool(request.forms.aktiv)
-    epggrab = getBool(request.forms.epggrab)
+    epggrab = False
     cext = request.forms.cext
 
     if prev=="":
@@ -513,10 +506,6 @@ class epggrabthread(Thread):
 
     def setChannelCount(self):
         self.epggrabberstate[1] = 0
-        if config.cfg_switch_grab_auto == "1":
-            rows = sqlRun("SELECT count(cname) FROM channels WHERE epgscan = 1 AND cenabled = 1;")
-            if rows:
-                self.epggrabberstate[1] += rows[0][0]
         if config.cfg_switch_xmltv_auto=="1":
             self.epggrabberstate[1] += 1
 
@@ -548,7 +537,6 @@ class epggrabthread(Thread):
     def doGrab(self, override=False):
         self.kill()
         self.running = True
-        if config.cfg_switch_grab_auto=="1"  and not self.stopflag: self.grabStream()
         if config.cfg_switch_xmltv_auto=="1" and not self.stopflag: self.grabXML()
         self.epggrabberstate[0]=0
         self.running = False
@@ -578,48 +566,6 @@ class epggrabthread(Thread):
         except Exception as ex:
             print ("XMLTV import could not be completed, please try again later (%s)" % ex)
         self.epggrabberstate[0] += 1
-
-    def grabStream(self):
-        rows = sqlRun("SELECT cname, cpath FROM channels WHERE epgscan = 1 AND cenabled = 1;")
-        for row in rows:
-            if self.stopflag:
-                break
-            self.epggrabberstate[0] += 1
-            fulllist = grabber.startgrab(row)
-            sqllist = list()
-            sqlchlist = list()
-            prevname = ""
-            actname = "dummy"
-            cid = 0
-
-            for l in fulllist:
-                actname = l[0]
-                if actname!=prevname:
-                    rows2 = sqlRun("SELECT cid FROM channels WHERE cenabled = 1 AND lower(cname)=?", (actname.lower(), ))
-                    if rows2:
-                        cid = rows2[0][0]
-                        sqlchlist.append([cid, actname, datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S") ] )
-                    else:
-                        cid = -1
-                    prevname=actname
-
-                if cid!=-1:
-                    dt1 = l[1]
-                    dt2 = l[1] + l[2]
-                    pos = l[3].find("\n")
-                    if pos!=-1:
-                        title = l[3][0:pos]
-                        desc = l[3][pos+1:]
-                    else:
-                        title = l[3]
-                        desc = ""
-
-                    sqllist.append([cid, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
-
-            if len(sqllist)>0:
-                sqlRun("INSERT OR REPLACE INTO guide_chan VALUES (?, ?, ?)", sqlchlist, 1 )
-                sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
-
 
     def stop(self):
         self.stopflag = True

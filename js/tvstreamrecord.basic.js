@@ -190,7 +190,7 @@ function initProgressbar() {
  */
 var dialognr = -1;
 function initIcons() {
-    $( "[id^=iconsEPG-], [id^=icons-], [id^=iconsRec-], [id^=iconsDisable-], [id^=iconsEStop-], [id^=iconsERec-]" ).hover(
+    $( "[id^=icons-], [id^=iconsRec-], [id^=iconsDisable-], [id^=iconsEStop-], [id^=iconsERec-]" ).hover(
         function() {
             $( this ).addClass( "ui-state-hover" );
         },
@@ -204,18 +204,6 @@ function initIcons() {
         dialognr = parseInt($(this).attr('id').replace("iconsDisable-",""));
         $( "#dialog_channel_disable" ).dialog( "open" );
         event.preventDefault();
-    });
-
-    $( "[id^=iconsEPG-]" ).click(function( event ) {
-        dialognr = parseInt($(this).attr('id').replace("iconsEPG-",""));
-        post('/grab_channel', { myid:dialognr }, 0);
-        if($( this ).children().hasClass( "ui-icon-plus" )) {
-             $( this ).children().removeClass( "ui-icon-plus" );
-             $( this ).children().addClass( "ui-icon-minus" );
-        } else {
-             $( this ).children().removeClass( "ui-icon-minus" );
-             $( this ).children().addClass( "ui-icon-plus" );
-        }
     });
 
     $( "[id^=iconsRec-]" ).click(function( event ) {
@@ -726,7 +714,6 @@ $(function() {
     } else if (here("list")) {
 // ------------------------------------ Channel list tab
         $( "#switch_list_active").slickswitch();
-        $( "#switch_list_grab").slickswitch();
         $( "#switch_list_append").slickswitch();
 
         $( "#button_create_channel" )
@@ -811,9 +798,7 @@ $(function() {
                         bValid = bValid & checkRegexp(  "cpath", /^(?=\s*\S).*$/, $(this).attr("errurl") );
                         if (bValid) {
                             var akt = 0;
-                            var epggrab = 0;
                             if ($("#switch_list_active").attr("checked") == "checked") {akt = 1;}
-                            if ($("#switch_list_grab").attr("checked") == "checked") {epggrab = 1;}
 
                             post("/create_channel", {
                                 cprev: $("#cprev").val(),
@@ -821,8 +806,7 @@ $(function() {
                                 cname:$("#cname").val(),
                                 cpath:$("#cpath").val(),
                                 cext: $("#cext").val(),
-                                aktiv:akt,
-                                epggrab: epggrab
+                                aktiv:akt
                             }, 1);
                             $( this ).dialog( "close" );
                         }
@@ -847,7 +831,6 @@ $(function() {
                             if(data[i][0]==dialognr) {
 
                                 switchMe("#switch_list_active", ($("#switch-" + data[i][0]).attr("checked") == "checked") );
-                                switchMe("#switch_list_grab", ( $("#iconsEPG-" + dialognr).children().attr("class").indexOf("plus") > 0) );                                
 
                                 $("#cprev").val(data[i][0]);
                                 $("#ccid").val(data[i][0]);
@@ -863,7 +846,6 @@ $(function() {
                     $( this ).dialog( "option", "buttons", [updatebutton, cancelbutton] );
 
                     switchMe("#switch_list_active", true );
-                    switchMe("#switch_list_grab", false );
                     $("#cprev").val("");
                     $("#ccid").val("1");
                     $("#cname").val("");
@@ -901,8 +883,7 @@ $(function() {
                 if (aData[4] == 1) data4 = "plus"; else data4="minus";
                 var chk = "";
                 if (aData[5] == 1) chk = 'checked="checked"';
-                $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="EPG grab?" id="iconsEPG-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-'+data4+'"></span></label><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
-                //$('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
+                $('td:eq(4)', nRow).html('<input type="checkbox" class="switch icons" id="switch-' + aData[0] + '" ' + chk + ' /><label title="Create record" id="iconsRec-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-play"></span></label><a href="#" id="icons-' + aData[0] + '" class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-gear"></span></a>');
             }
         });
    } else if (here("epgchart")) {
@@ -1156,7 +1137,7 @@ $(function() {
         $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
         $( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
-        $("#cfg_purgedelta,#cfg_delta_before_epg,#cfg_delta_after_epg,#cfg_grab_max_duration,#cfg_retry_count,#cfg_failsafe_delta,#cfg_xmltvtimeshift").spinner();
+        $("#cfg_purgedelta,#cfg_delta_before_epg,#cfg_delta_after_epg,#cfg_retry_count,#cfg_failsafe_delta,#cfg_xmltvtimeshift").spinner();
         $("#cfg_grab_zoom").spinner( { step: 0.1 } );
         $("#cfg_epg_max_events").spinner( { step: 1000 } );
 
@@ -1179,14 +1160,6 @@ $(function() {
                 $("#cfg_xmltvtimeshift").addClass("ui-state-disabled");
                 $("#cfg_xmltv_mc2xml").prop("disabled", "true");
                 $("#cfg_xmltv_mc2xml").addClass("ui-state-disabled");
-            }
-        });
-        $("#cfg_switch_grab_auto").slickswitch({
-            toggledOn: function() {
-                $("#cfg_grab_max_duration").spinner( "enable"  );
-            },
-            toggledOff: function() {
-                $("#cfg_grab_max_duration").spinner( "disable" );
             }
         });
         $("#cfg_switch_postprocess").slickswitch({

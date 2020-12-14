@@ -75,12 +75,9 @@
 <tr><td>§EPG list mode. Disable for client-side processing (more network load), enable for server-side processing (more server load)§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_epglist_mode" /></td></tr>
 <tr><td>§Client-side only: maximal number of events to request from server (earlier first), solves some perfomance issues§</td><td><input id="cfg_epg_max_events" /></td></tr>
 <tr><td>§Delete/reset all EPG data§</td><td><button id="button_removeepg">§Delete§</button></td></tr>
-<tr><td><s>§Enable stream scan/grab§</s> <sup>**</sup></td><td><input type="checkbox" class="switch icons" id="cfg_switch_grab_auto" /></td></tr>
-<tr><td><s>§Maximal EPG scan duration per channel, [seconds] (default: '60')</s>§ <sup>**</sup></td><td><input id="cfg_grab_max_duration" /></td></tr>
 </tbody>
 </table>
 <font size="0.6em"><sup>*</sup> §For more information about installing and configuring mc2xml please visit its homepage at§: <a href="http://mc2xml.hosterbox.net/">mc2xml.hosterbox.net</a></font><br>
-<font size="0.6em"><sup>**</sup> §Deprecated and will be removed in a future version§</font>
 </div>
 <div id="configtabs-3">
 <!--FFMPEG configuration-->

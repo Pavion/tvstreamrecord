@@ -21,7 +21,7 @@ var firstday = 1;
 var dateformat = "mm/dd/yy";
 
 // Varlist
-var prev = ""; // No edit support as of now, use standard version instead
+var rprev = ""; // No edit support as of now, use standard version instead
 var recname = ""; // Record name
 var sender = ""; // Channel ID
 var cname = "";// Channel name

@@ -502,7 +502,7 @@ $(function() {
                         var akt = 0;
                         if ($("#switch_create").attr("checked") == "checked") akt = 1;
                         post("/create", {
-                            prev:$("#rprev").val(),
+                            rprev:$("#rprev").val(),
                             recname:$("#recname").val(),
                             Sender:$("#channel").val(),
                             von:$("#timepicker_inline_div1").val(),

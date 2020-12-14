@@ -220,7 +220,12 @@ th.estart { width: 200px; }
 th.estop { width: 200px; }
 th.econtrol { width: 30px; }
 
-[id^=wwd] { width: 13.3%; }
+[id^=wwd] { 
+    width: 12%;
+    float: none !important;
+    white-space: nowrap;
+}
+    
 [id^=wwd].ui-state-active { background: #accccc; }
 
 [id^=iconsDisable] { 

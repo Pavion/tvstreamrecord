@@ -144,7 +144,7 @@ configuration = [
 [
 'cfg_theme',
 "UI theme",
-'smoothness/jquery-ui.css'
+'smoothness/jquery-ui.min.css'
 ],
 
 [

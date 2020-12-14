@@ -89,7 +89,7 @@ $(function() {
         event.preventDefault();
         $("body").pagecontainer("change", "#channel");
         title = "";
-        prev = ""; 
+        rprev = ""; 
         recname = ""; 
         sender = ""; 
         cname = "";
@@ -203,7 +203,7 @@ $(function() {
             }
 
             $.post("/create", {
-                            "prev": prev,
+                            "rprev": rprev,
                             "recname":recname,
                             "Sender":sender,
                             "von":von,
@@ -295,7 +295,7 @@ function getTableData() {
                     }
                 }
                      
-                prev = mydata[7]; 
+                rprev = mydata[7]; 
                 title = mydata[0]; 
                 recname = mydata[0]; 
                 sender = mydata[10]; 

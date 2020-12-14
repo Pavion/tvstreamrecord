@@ -1,0 +1,9 @@
+./webman
+./synology
+./.gitignore
+./.git
+./cherrypy
+bottle.py
+settings.*
+log.txt
+*.m3u

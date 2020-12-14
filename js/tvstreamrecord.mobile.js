@@ -21,7 +21,7 @@ var firstday = 1;
 var dateformat = "mm/dd/yy";
 
 // Varlist
-var prev = ""; // No edit support as of now, use standard version instead
+var rprev = ""; // No edit support as of now, use standard version instead
 var recname = ""; // Record name
 var sender = ""; // Channel ID
 var cname = "";// Channel name
@@ -89,7 +89,7 @@ $(function() {
         event.preventDefault();
         $("body").pagecontainer("change", "#channel");
         title = "";
-        prev = ""; 
+        rprev = ""; 
         recname = ""; 
         sender = ""; 
         cname = "";
@@ -203,7 +203,7 @@ $(function() {
             }
 
             $.post("/create", {
-                            "prev": prev,
+                            "rprev": rprev,
                             "recname":recname,
                             "Sender":sender,
                             "von":von,
@@ -295,7 +295,7 @@ function getTableData() {
                     }
                 }
                      
-                prev = mydata[7]; 
+                rprev = mydata[7]; 
                 title = mydata[0]; 
                 recname = mydata[0]; 
                 sender = mydata[10]; 

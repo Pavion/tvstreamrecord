@@ -63,7 +63,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False
-version = '1.4.3c'
+version = '1.5.0'
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -330,7 +330,7 @@ def grabchannel():
 
 @post('/create_channel')
 def createchannel():
-    prev = request.forms.prev
+    prev = request.forms.cprev
     cid =  request.forms.ccid
     cname = request.forms.cname
     cpath = request.forms.cpath
@@ -758,7 +758,7 @@ def epg_s(keyword=''):
             if x >= 0 and w > 0:
                 rtemp.append ([cid, x/totalwidth*100.0*widthq, w/totalwidth*100.0*widthq, event[0], d_von, d_bis, event[3], event[4], row[2], event[5]])
         ret.append(rtemp)
-        if keyword is '':
+        if keyword == '':
             try:
                 keyword = sqlRun("SELECT value FROM config WHERE param='cfg_epgchart_search'")[0][0]
             except:
@@ -774,7 +774,7 @@ def epg_s(keyword=''):
 @route('/epglist')
 @route('/epglist&<keyword>')
 def epglist_s(keyword=''):
-    if not keyword is '':
+    if keyword != '':
         try:
             keyword = keyword.decode("utf-8")
         except:
@@ -988,7 +988,7 @@ def deletetvb():
 
 @post('/create')
 def create_p():
-    prev = request.forms.prev
+    prev = request.forms.rprev
     recname = request.forms.recname
     sender = request.forms.Sender
     von = request.forms.von
@@ -1344,11 +1344,14 @@ grabthread.run()
 
 print ("Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port))
 try:
+    import bottle
+    bottle.TEMPLATE_PATH.insert(0, 'views')
     run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
 except Exception as ex:
-    print ("Server exception. Default network settings will be used this time. Please log in using port 8030 and check your network settings.")
-    print ("Starting server on: 0.0.0.0:8030")
-    run(host="0.0.0.0", port=8030, server=CherryPyServer, quiet=True)
+    pass
+#    print ("Server exception. Default network settings will be used this time. Please log in using port 8030 and check your network settings.")
+#    print ("Starting server on: 0.0.0.0:8030")
+#    run(host="0.0.0.0", port=8030, server=CherryPyServer, quiet=True)
 
 # Server is shutting down, all threads should be eliminated
 shutdown = True

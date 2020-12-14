@@ -502,7 +502,7 @@ $(function() {
                         var akt = 0;
                         if ($("#switch_create").attr("checked") == "checked") akt = 1;
                         post("/create", {
-                            prev:$("#prev").val(),
+                            rprev:$("#rprev").val(),
                             recname:$("#recname").val(),
                             Sender:$("#channel").val(),
                             von:$("#timepicker_inline_div1").val(),
@@ -541,7 +541,7 @@ $(function() {
                             }
 
                             switchMe("#switch_create", ($("#switch-" + dialognr).attr("checked") == "checked") );
-                            $("#prev").val(dialognr);
+                            $("#rprev").val(dialognr);
                             $("#recname").val(data[i][0]);
                             $("#timepicker_inline_div1").val(data[i][2].slice(11,16));
                             $("#timepicker_inline_div2").val(data[i][3].slice(11,16));
@@ -578,7 +578,7 @@ $(function() {
                 switchMe("#switch_create", true);
 
                 $("#channel").val(1);
-                $("#prev").val("");
+                $("#rprev").val("");
                 $("#recname").val("");
 
                 if(here("list")) {
@@ -816,7 +816,7 @@ $(function() {
                             if ($("#switch_list_grab").attr("checked") == "checked") {epggrab = 1;}
 
                             post("/create_channel", {
-                                prev: $("#prev").val(),
+                                cprev: $("#cprev").val(),
                                 ccid: $("#ccid").val(),
                                 cname:$("#cname").val(),
                                 cpath:$("#cpath").val(),
@@ -849,7 +849,7 @@ $(function() {
                                 switchMe("#switch_list_active", ($("#switch-" + data[i][0]).attr("checked") == "checked") );
                                 switchMe("#switch_list_grab", ( $("#iconsEPG-" + dialognr).children().attr("class").indexOf("plus") > 0) );                                
 
-                                $("#prev").val(data[i][0]);
+                                $("#cprev").val(data[i][0]);
                                 $("#ccid").val(data[i][0]);
                                 $("#cname").val(data[i][1].replace(/<(?:.|\n)*?>/gm, ''));
                                 $("#cpath").val(data[i][2]);
@@ -864,7 +864,7 @@ $(function() {
 
                     switchMe("#switch_list_active", true );
                     switchMe("#switch_list_grab", false );
-                    $("#prev").val("");
+                    $("#cprev").val("");
                     $("#ccid").val("1");
                     $("#cname").val("");
                     $("#cpath").val("");

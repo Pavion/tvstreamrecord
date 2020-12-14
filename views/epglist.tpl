@@ -1,4 +1,4 @@
-%include ('create.tpl')
+%include('create.tpl')
 <div id="keyword_for_epg" keyword_for_epg="{{keyword_for_epg}}"></div>
 <div id="delta_before_epg" delta="{{deltab}}"></div>
 <div id="delta_after_epg" delta="{{deltaa}}"></div>

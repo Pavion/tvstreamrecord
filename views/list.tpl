@@ -1,4 +1,4 @@
-%include ('create.tpl')
+%include('create.tpl')
 <div id="users-contain" class="ui-widget">
     <h1>Channels:
         <button id="button_create_channel">§Create new§</button>
@@ -30,7 +30,7 @@
     <form>
         <fieldset>
             <label for="name">§Channel ID§</label>
-            <input type="hidden" maxlength="5" id="prev" value=""/> 
+            <input type="hidden" maxlength="5" id="cprev" value=""/> 
             <input type="text" maxlength="5" id="ccid" class="text ui-widget-content ui-corner-all" name="ccid" value=""/> 
             <label for="name">§Channel name§</label>
             <input type="text" maxlength="30" id="cname" class="text ui-widget-content ui-corner-all" name="cname" value=""/> 

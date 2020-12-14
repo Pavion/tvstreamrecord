@@ -1,7 +1,7 @@
 <div id="dialog_create_record" ctitle="§Create new record§" utitle="§Update record§" cancel="§Cancel§" delete="§Delete§" change="§Update§" schedule="§Create§">
 <form>
     <fieldset>
-        <input type="hidden" maxlength="5" id="prev" value=""/> 
+        <input type="hidden" maxlength="5" id="rprev" value=""/> 
         <label for="channel">§Name§</label>
         <input type="text" maxlength="255" id="recname" class="text ui-widget-content ui-corner-all" name="recname" value=""/> 
         <label for="channel">§Channel§</label>

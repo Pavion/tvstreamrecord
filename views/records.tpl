@@ -1,4 +1,4 @@
-%include ('create.tpl')
+%include('create.tpl')
 <div id="users-contain" class="ui-widget">
     <h1>§Records§:
         <button id="button_create_record">§Create new record§</button>

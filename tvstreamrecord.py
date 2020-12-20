@@ -50,6 +50,22 @@ from mylogging import logInit, logRenew, logStop
 import hashlib
 import codecs
 
+def which(program):
+    # https://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
+    import os
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+    return None
+
 def total(timedelta):
     try:
         return timedelta.total_seconds()
@@ -441,6 +457,9 @@ def config_p():
         if cfg[0]=="cfg_server_port":
             if cfg[1]!=config.cfg_server_port:
                 config.writeWebman(cfg[1])
+        if cfg[0]=="cfg_ffmpeg_path":
+            if which(cfg[1]) == None:
+                print("FFMPEG executable probably not found, please check your configuration")
     config.setConfig(configdata)
     return "null"
 

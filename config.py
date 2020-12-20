@@ -84,7 +84,7 @@ configuration = [
 [
 'cfg_ffmpeg_types',
 'Stream types, which should be forwarded to ffmpeg (space separated)',
-'rtmp rtp rtsp'
+'rtmp rtp rtsp http'
 ],
 
 [

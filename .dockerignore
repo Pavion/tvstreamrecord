@@ -4,6 +4,7 @@
 ./.git
 ./cherrypy
 bottle.py
+six.py
 settings.*
 log.txt
 db.ini

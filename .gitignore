@@ -2,6 +2,9 @@ db.ini
 log.txt
 settings*.db*
 channels.m3u
+bottle.py
+six.py
+cherrypy/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

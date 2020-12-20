@@ -1376,6 +1376,7 @@ try:
     bottle.TEMPLATE_PATH.insert(0, 'views')
     run(host=config.cfg_server_bind_address, port=config.cfg_server_port, server=CherryPyServer, quiet=True)
 except Exception as ex:
+    print ("Server exception or shutdown (%s)" % ex)
     pass
 #    print ("Server exception. Default network settings will be used this time. Please log in using port 8030 and check your network settings.")
 #    print ("Starting server on: 0.0.0.0:8030")

@@ -1,3 +1,6 @@
+2020-12-20 1.5.1 Fix mobile version, update themes
+                 Add support for portable databases (for Docker usage)
+
 2020-12-14 1.5.0 First docker release
 
 2019-09-23 1.4.3 Fix for EPG import from http://xmltv.xmltv.se

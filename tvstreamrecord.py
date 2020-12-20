@@ -28,11 +28,12 @@ from timezone import tDiff
 from time import sleep
 import subprocess
 import config
-from sql import sqlRun, sqlCreateAll, purgeDB
+from sql import sqlRun, sqlCreateAll, purgeDB, setDb
 import xmltv
 import json
 import sys
 import shlex
+import shutil
 import re
 if sys.version_info[0] == 2:
     # Python 2.x
@@ -78,7 +79,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False
-version = '1.5.0'
+version = "1.5.1"
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -490,7 +491,8 @@ def config_s():
 
 @route('/getconfig')
 def getconfig():
-    rows=sqlRun("SELECT param, '', value FROM config WHERE param<>'cfg_version' AND not param LIKE 'table_%'")
+    rows=sqlRun("SELECT param, '', value FROM config WHERE param<>'cfg_dbpath' AND param<>'cfg_version' AND not param LIKE 'table_%'")
+    rows.append(['cfg_dbpath', '', readDbFile()])
     return json.dumps({"configdata": rows } )
 
 @post('/gettree')
@@ -509,6 +511,27 @@ def gettree():
         pass
     r.append('</ul>')
     return r
+
+@post('/setdbpath')
+def setDbPath():
+    global grabthread
+    dbpath = request.forms.input_dbpath
+    if dbpath:
+        oldpath = readDbFile()
+        if dbpath!="" and dbpath != oldpath:
+            print ("Database path change requested to '%s'" % dbpath)
+            writeDbFile(dbpath)
+            newpath = checkDb(default=oldpath)
+            if (newpath != oldpath):
+                config.loadConfig()
+                credentials = config.getUser()
+                checkLang()
+                setRecords()
+                if grabthread.isRunning():
+                    grabthread.kill()
+                    grabthread = epggrabthread()
+                    grabthread.run()
+    return "null"
 
 #------------------------------- EPG Grabbing part -------------------------------
 class epggrabthread(Thread):
@@ -1293,7 +1316,47 @@ def setRecords():
         if chk == False:
             t.stop()
 
+#------------------------------- Database switching ----------------------------
+
+def checkDb(default = "settings.db"):
+    dbpath = readDbFile()
+    if dbpath != "" and dbpath != "settings.db":
+        if not fileexists(dbpath) and fileexists(default):
+            print ("Portable configuration at '%s' not found, default db '%s' will be copied" % (dbpath, default))
+            try:
+                shutil.copyfile(default, dbpath)
+            except:
+                print ("Portable database could not be copied, please check your settings and permissions")
+        if not fileexists(dbpath):
+            print ("Attempt to initialize a new database")
+            setDb(dbpath)
+            sqlCreateAll(version)
+        if not fileexists(dbpath):
+            print ("Portable database creation has failed, use default db '%s' instead" % default)
+            setDb(default)
+            writeDbFile(default)
+        else:
+            print("Using portable database at '%s'" % dbpath)
+            setDb(dbpath)
+    return dbpath
+
+def readDbFile():
+    ret = "settings.db"
+    if fileexists("db.ini"):
+        file = open("db.ini", "r")
+        ret = file.readline().rstrip()        
+        file.close()
+    return ret
+
+def writeDbFile(path):
+    file = open("db.ini", "w")
+    file.write(path + "\n")
+    file.close()
+
+#------------------------------- Main loop -------------------------------------
+
 print ("Initializing database... ")
+checkDb()
 sqlCreateAll(version)
 purgeDB()
 print ("Initializing config...")

@@ -109,6 +109,7 @@
 </tr>
 </thead>
 <tbody>
+<tr><td>§Full filename for tvstreamrecord database (recommended for Docker installation, default§: 'settings.db')</td><td><input type="text" class="text ui-widget-content ui-corner-all" disabled="true" style="width:50%" id="cfg_dbpath" value="" autocomplete="off" /><button id="button_database">§Set§</button></td></tr>
 <tr><td>§Purge database records older than [days]§</td><td><input id="cfg_purgedelta" /></td></tr>
 <tr><td>§Server bind address (restart needed)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_server_bind_address" value="" autocomplete="off" alert="§Invalid bind address, please check your settings§" /></td></tr>
 <tr><td>§Server port (restart needed)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_server_port" value="" autocomplete="off" alert="§Invalid port, please check your settings§"/></td></tr>
@@ -140,6 +141,13 @@
         <input type="password" class="text ui-widget-content ui-corner-all" id="pass_new_1" value="" autocomplete="off" /><br />
         §Repeat§<br />
         <input type="password" class="text ui-widget-content ui-corner-all" id="pass_new_2" value="" autocomplete="off" />
+    </p>
+</div>
+<div id="dialog_database" title="§Set§" cancel="§Cancel§" ok="§OK§"> 
+	<p>§Full filename for tvstreamrecord database (recommended for Docker installation, default§: 'settings.db')</p>
+    <p>
+        Please enter full filename for tvstreamrecord database. If exists, it will be opened, if not, copied from this one. If both fails, it reverts back to current.<br/><br/>Typical case would be: '/volume1/common/settings.db' for Docker or 'settings.db' for default local database.<br /><br/>Warning: this is an experimental feature, restart might be necessary.<br/><br />
+        <input class="text ui-widget-content ui-corner-all" id="input_dbpath" value="" autocomplete="off" /><br />
     </p>
 </div>
 <div id="dialog_pathchooser" title="§Path for your recordings§" cancel="§Cancel§" ok="§OK§">

@@ -52,6 +52,12 @@ configuration = [
 ],
 
 [
+'cfg_dbpath',
+'full path to settings.db (read-only)',
+'settings.db'
+],
+
+[
 'cfg_server_bind_address',
 'Server bind address (restart needed)',
 '0.0.0.0'

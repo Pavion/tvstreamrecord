@@ -1182,6 +1182,8 @@ $(function() {
                 $("#cfg_proxy").addClass("ui-state-disabled");
             }
         });
+        $("#cfg_dbpath").prop("disabled", "true");
+        $("#cfg_dbpath").addClass("ui-state-disabled");
 
         $.get( "/getconfig", function( data )  {
             var p = new Function('return ' + data + ';')();
@@ -1208,6 +1210,14 @@ $(function() {
             passFields.removeClass( "ui-state-error" );
             passFields.val("");
             $( "#dialog_password" ).dialog( "open" );
+            event.preventDefault();
+        });
+        
+        $( "#button_database" )
+        .button()
+        .click(function(event ) {            
+            $('#input_dbpath').val($('#cfg_dbpath').val());
+            $( "#dialog_database" ).dialog( "open" );
             event.preventDefault();
         });
 
@@ -1320,6 +1330,29 @@ $(function() {
             },
             {
                 text: $( "#dialog_password" ).attr("cancel"),
+                click: function() {
+                    $( this ).dialog( "close" );
+                }
+            }]
+        });
+
+        $( "#dialog_database" ).dialog({
+            autoOpen: false,
+            buttons: [{
+                text: $( "#dialog_database" ).attr("ok"),
+                click: function() {
+                    $.post("/setdbpath",
+                        {
+                            "input_dbpath": $("#input_dbpath").val()
+                        },
+                        function(data) {
+                            $( "#dialog_database" ).dialog( "close" );
+                            window.location.reload(false);
+                        }, "json");
+                }
+            },
+            {
+                text: $( "#dialog_database" ).attr("cancel"),
                 click: function() {
                     $( this ).dialog( "close" );
                 }

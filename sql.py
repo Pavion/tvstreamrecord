@@ -20,10 +20,17 @@ from __future__ import unicode_literals
 
 import sqlite3
 
+dbpath = "settings.db"
+
+def setDb(path):
+    global dbpath
+    dbpath = path
+
 def sqlRun(sql, t=-1, many=0):
     fa = []
+    global dbpath
     try:
-        conn = sqlite3.connect('settings.db', timeout=20)
+        conn = sqlite3.connect(dbpath, timeout=20)
         c = conn.cursor()
         c.execute('PRAGMA journal_mode = OFF;')
         conn.text_factory = sqlite3.OptimizedUnicode

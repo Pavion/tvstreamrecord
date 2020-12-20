@@ -59,6 +59,7 @@
     "Enable proxy for ffmpeg": "Включить использование прокси для ffmpeg",
     "Proxy URL for ffmpeg": "Адрес прокси для ffmpeg",
 
+    "Full filename for tvstreamrecord database (recommended for Docker installation, default": "Полное имя файла базы данных tvstreamrecord (рекомендуется для установки в Docker, по умолчанию",
     "Purge database records older than [days]": "Удалять записи из базы данных после [дней]",
     "Server bind address (restart needed)": "Адрес сервера (требуется перезапуск)",
     "Server port (restart needed)": "Порт сервера (требуется перезапуск)",

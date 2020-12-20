@@ -6,4 +6,5 @@
 bottle.py
 settings.*
 log.txt
+db.ini
 *.m3u

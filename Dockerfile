@@ -4,6 +4,7 @@ MAINTAINER Pavion <tvstreamrecord@gmail.com>
 # Thanks docqube/tvstreamrecord for his contribution
 
 COPY . /tsr
+RUN echo "/volume1/common/tvstreamrecord.db" > /tsr/db.ini
 
 RUN apk update
 RUN apk add --upgrade python3 py-pip ca-certificates ffmpeg tzdata

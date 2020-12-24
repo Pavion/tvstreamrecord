@@ -277,16 +277,19 @@ def getFile(file_in, override=0, ver=""):
             out = d.decompress(feeddata)
         except:
             out = feeddata
-        print ("XMLTV: reading URL %s with %s bytes" % (file_in, len(out)))
-        if not b"</tv>" in out[-1000:]:
-            print ("Possibly corrupted XML file, attempting to repair...")
-            pos = out.rfind(b"</programme>")
-            if pos != -1:
-                out = out[:pos+12]  + b"</tv>"
-            else:
-                pos = out.rfind(b"</channel>")
+        if len(out) >= 256:
+            print ("XMLTV: reading file %s with %s bytes" % (file_in, len(out)))
+            if not b"</tv>" in out[-1000:]:
+                print ("Possibly corrupted XML file, attempting to repair...")
+                pos = out.rfind(b"</programme>")
                 if pos != -1:
-                    out = out[:pos+10]  + b"</tv>"
+                    out = out[:pos+12]  + b"</tv>"
+                else:
+                    pos = out.rfind(b"</channel>")
+                    if pos != -1:
+                        out = out[:pos+10]  + b"</tv>"
+        else
+            print ("XMLTV: skipping empty file %s with %s bytes" % (file_in, len(out)))
     except Exception as ex:
         print ("XMLTV: no new data / unknown error, try again later (%s)" % file_in)
         pass

@@ -288,7 +288,7 @@ def getFile(file_in, override=0, ver=""):
                     pos = out.rfind(b"</channel>")
                     if pos != -1:
                         out = out[:pos+10]  + b"</tv>"
-        else
+        else:
             print ("XMLTV: skipping empty file %s with %s bytes" % (file_in, len(out)))
     except Exception as ex:
         print ("XMLTV: no new data / unknown error, try again later (%s)" % file_in)

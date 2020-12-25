@@ -1243,7 +1243,10 @@ class record(Thread):
                     self.retries += 1
                     print ("Something went wrong with '%s', retry %s/%s in 10 seconds" % (self.name, self.retries, self.retry_count))
                     sleep(10)
-                    self.run()
+                    if self.stopflag==0:
+                        self.run()
+                    else:
+                        print ("Retrying cancelled due to a stopflag")
                     return
             elif delta > 0:
                 print ("Something went wrong with '%s'. Remaining time is less than fail-safe delta, sleeping..." % (self.name))

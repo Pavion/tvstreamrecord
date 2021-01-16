@@ -1184,6 +1184,9 @@ $(function() {
         });
         $("#cfg_dbpath").prop("disabled", "true");
         $("#cfg_dbpath").addClass("ui-state-disabled");
+        if ($("#cfg_recordpath").prop("disabled")) {
+            $("#cfg_recordpath").addClass("ui-state-disabled");
+        }
 
         $.get( "/getconfig", function( data )  {
             var p = new Function('return ' + data + ';')();

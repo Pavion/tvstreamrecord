@@ -7,13 +7,10 @@ findpython() {
     type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
         TVSTREAMRECORD_PYTHON='python'
         type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
-            TVSTREAMRECORD_PYTHON='/volume1/@appstore/python/bin/python'
+            TVSTREAMRECORD_PYTHON='python2'
             type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
-                TVSTREAMRECORD_PYTHON='/usr/local/python26/bin/python'
-                type -P ${TVSTREAMRECORD_PYTHON} &> /dev/null || {
-                    echo `date +"%Y-%m-%d %H:%M:%S"` "ERR Python could not be found. Please install Python package from Utilities tab of the Package Center" >> ${SYNOPKG_PKGDEST}/log.txt
-                    exit 1
-                }
+                echo `date +"%Y-%m-%d %H:%M:%S"` "ERR Python could not be found. Please install Python package from Utilities tab of the Package Center" >> ${SYNOPKG_PKGDEST}/log.txt
+                exit 1
             }
         }
     }
@@ -52,4 +49,3 @@ case $1 in
 		exit 0
 	;;
 esac
-                                     

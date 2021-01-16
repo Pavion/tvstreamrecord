@@ -1,0 +1,20 @@
+[{
+        "step_title": "Output share selection",
+        "items": [{
+                "type": "textfield",
+                "desc": "Output share selection",
+                "subitems": [{
+                        "key": "tsr_output_share",
+                        "desc": "Please enter your video share name",
+                        "defaultValue": "tvstreamrecord",
+                        "validator": {
+                            "allowBlank": false,
+                            "minLength": 1,
+                            "maxLength": 64
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]

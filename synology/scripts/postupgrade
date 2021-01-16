@@ -1,3 +1,12 @@
 #!/bin/sh
 
+cp /tmp/tvstreamrecord_tmp_upgrade/db.ini ${SYNOPKG_PKGDEST}/
+cp /tmp/tvstreamrecord_tmp_upgrade/share.ini ${SYNOPKG_PKGDEST}/
+rm -r /tmp/tvstreamrecord_tmp_upgrade
+
+tsr_output_share=$(cat "${SYNOPKG_PKGDEST}/share.ini")
+sed -i 's/common/${tsr_output_share}/' ${SYNOPKG_PKGDEST}/config.py
+sed -i 's/\"cfg_recordpath\"/\"cfg_recordpath\" disabled=\"true\"/' ${SYNOPKG_PKGDEST}/views/config.tpl
+sed -i 's/\"button_pathchooser\"/\"button_pathchooser\" disabled=\"true\"/' ${SYNOPKG_PKGDEST}/views/config.tpl
+sed -i 's/\"button_database\"/\"button_database\" disabled=\"true\"/' ${SYNOPKG_PKGDEST}/views/config.tpl
 exit 0

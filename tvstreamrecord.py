@@ -1068,15 +1068,13 @@ class record(Thread):
                     t.stop()
         self.running = 1
 
-        fftypes = config.cfg_ffmpeg_types
-        fftypes = fftypes.lower().split()
         streamtype = self.url.lower().split(':', 1)[0]
         ffargs = config.cfg_ffmpeg_params
         ffargs = ffargs.split()
 
         dateholder = datetime.now().strftime("%Y%m%d%H%M%S")
         titleholder = "".join([x if x.isalnum() else "_" for x in self.name])
-        if sys.version_info[0] < 3 and streamtype in fftypes:
+        if sys.version_info[0] < 3 and not (streamtype == "http" and config.cfg_switch_legacy == "1"):
             # workaround for unicode, damn me if I ever get it working with 2.x
             titleholder = "".join([x if ord(x) < 128 else "_" for x in titleholder])
         idholder = "%04d" % (self.myrow[8], )
@@ -1128,7 +1126,7 @@ class record(Thread):
             num += 1
         fn = fn_check
         # End check
-        if streamtype in fftypes:
+        if not (streamtype == "http" and config.cfg_switch_legacy == "1"):
             delta = total(tDiff(self.bis, datetime.now()))
             deltasec = '%d' % delta
 
@@ -1169,7 +1167,7 @@ class record(Thread):
                 print ("FFMPEG could not be started. Error: %s" % (ex))
         else:
             block_sz = 8192
-            print ("Record: '%s' started" % (self.name))
+            print ("Record: '%s' started using legacy method" % (self.name))
             try:
                 u = urllib32.urlopen(self.url)
                 try:

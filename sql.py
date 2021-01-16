@@ -129,6 +129,9 @@ def sqlCreateAll(version):
                     sql += "ALTER TABLE records RENAME TO records_old;"
                     sql += "CREATE TABLE IF NOT EXISTS records (recname TEXT, cid INTEGER, rvon TEXT, rbis TEXT, renabled INTEGER, rmask INTEGER, uniqueid TEXT, PRIMARY KEY (recname, cid, rvon, rbis, rmask));"
                     sql += "INSERT OR IGNORE INTO records SELECT * FROM records_old;"
+                if oldver < '1.6.0':
+                    sql += "DELETE FROM config WHERE param = 'cfg_ffmpeg_types';"
+                    sql += "INSERT OR IGNORE INTO config VALUES ('cfg_switch_legacy', 'Use legacy recording method for http streams', '0');"
                     
                 if oldver > version:
                     print ("Critical error: Version mismatch!!!")

@@ -88,9 +88,9 @@ configuration = [
 ],
 
 [
-'cfg_ffmpeg_types',
-'Stream types, which should be forwarded to ffmpeg (space separated)',
-'rtmp rtp rtsp http'
+'cfg_switch_legacy',
+"Use legacy recording method for http streams",
+'0'
 ],
 
 [

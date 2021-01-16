@@ -52,8 +52,8 @@
     "For more information about installing and configuring mc2xml please visit its homepage at": "Дополнительную информацию по установке и конфигурации mc2xml Вы можете получить на его странице",
     "Deprecated and will be removed in a future version": "Устарело и будет в будущем удалено",
 
-    "Stream types, which should be forwarded to ffmpeg (space separated)": "Потоковые протоколы, передающиеся ffmpeg (разделение пробелом)",
-    "Full path to ffmpeg for other streams support": "Полный путь к ffmpeg для поддержки дополнительных протоколов",
+    "Use legacy recording method for http streams": "Использовать устаревший метод записи для http протоколов",
+    "Full path for ffmpeg": "Полный путь для ffmpeg",
     "Additional output arguments for ffmpeg (default: '-loglevel fatal -acodec copy -vcodec copy')": "Дополнительные параметры для ffmpeg (по умолчанию: '-loglevel fatal -acodec copy -vcodec copy')",
     "For more information regarding ffmpeg and its command line parameters please visit its homepage at": "Дополнительную информацию, касающуюся ffmpeg и его параметров, Вы можете получить на его странице",
     "Enable proxy for ffmpeg": "Включить использование прокси для ffmpeg",

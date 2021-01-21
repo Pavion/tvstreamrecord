@@ -1,0 +1,12 @@
+{
+    "data-share": {
+        "shares": [{
+                "name": "{{tsr_output_share}}",
+                "permission": {
+                    "rw": ["tvstreamrecord"]
+                }
+            }
+        ]
+    }
+}
+

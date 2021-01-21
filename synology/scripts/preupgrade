@@ -1,8 +1,7 @@
 #!/bin/sh
 
-[ -e /var/packages/tvstreamrecord/enabled ] && /var/packages/tvstreamrecord/scripts/start-stop-status stop
-mkdir ${SYNOPKG_PKGDEST}/../tvstreamrecord_tmp_upgrade
-mv ${SYNOPKG_PKGDEST}/settings.db ${SYNOPKG_PKGDEST}/../tvstreamrecord_tmp_upgrade
+mkdir /tmp/tvstreamrecord_tmp_upgrade
+cp ${SYNOPKG_PKGDEST}/db.ini /tmp/tvstreamrecord_tmp_upgrade
+cp ${SYNOPKG_PKGDEST}/share.ini /tmp/tvstreamrecord_tmp_upgrade
 
 exit 0
-

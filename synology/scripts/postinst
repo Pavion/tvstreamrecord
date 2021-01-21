@@ -1,8 +1,10 @@
 #!/bin/sh
 
-[ ${SYNOPKG_PKGDEST} ] || SYNOPKG_PKGDEST=`ls -l /var/packages/tvstreamrecord/target | cut -d\> -f2 | cut -d\  -f2`
+echo "/volume1/${tsr_output_share}/tvstreamrecord.db"> "${SYNOPKG_PKGDEST}/db.ini"
+echo ${tsr_output_share}> "${SYNOPKG_PKGDEST}/share.ini"
 
-eval $(env | grep "^SYNOPKG_PKGDEST=")
-ret=`ln -s "${SYNOPKG_PKGDEST}/webman" /usr/syno/synoman/webman/3rdparty/tvstreamrecord`
-ret=`chown -R admin.users $SYNOPKG_PKGDEST`
+sed -i 's/common/${tsr_output_share}/' ${SYNOPKG_PKGDEST}/config.py
+sed -i 's/\"cfg_recordpath\"/\"cfg_recordpath\" disabled=\"true\"/' ${SYNOPKG_PKGDEST}/views/config.tpl
+sed -i 's/\"button_pathchooser\"/\"button_pathchooser\" disabled=\"true\"/' ${SYNOPKG_PKGDEST}/views/config.tpl
+sed -i 's/\"button_database\"/\"button_database\" disabled=\"true\"/' ${SYNOPKG_PKGDEST}/views/config.tpl
 exit 0

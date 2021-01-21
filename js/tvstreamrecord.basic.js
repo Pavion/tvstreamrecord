@@ -1141,6 +1141,7 @@ $(function() {
         $("#cfg_grab_zoom").spinner( { step: 0.1 } );
         $("#cfg_epg_max_events").spinner( { step: 1000 } );
 
+        $("#cfg_switch_legacy").slickswitch();
         $("#cfg_switch_concurrent").slickswitch();
         $("#cfg_switch_epg_overlay").slickswitch();
         $("#cfg_switch_epglist_mode").slickswitch();
@@ -1184,6 +1185,9 @@ $(function() {
         });
         $("#cfg_dbpath").prop("disabled", "true");
         $("#cfg_dbpath").addClass("ui-state-disabled");
+        if ($("#cfg_recordpath").prop("disabled")) {
+            $("#cfg_recordpath").addClass("ui-state-disabled");
+        }
 
         $.get( "/getconfig", function( data )  {
             var p = new Function('return ' + data + ';')();

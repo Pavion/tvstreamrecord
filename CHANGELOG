@@ -1,4 +1,7 @@
+2021-01-24 1.6.1 Update install scripts
+
 2021-01-16 1.6.0 DSM 7 support
+                 Use ffmpeg for everything, add switch for using legacy recording on http
 
 2020-12-20 1.5.1 Fix mobile version, update themes
                  Add support for portable databases (for Docker usage)

@@ -1,8 +1,8 @@
 package="tvstreamrecord"
-version="1.6.0"
+version="1.6.1"
 os_min_ver="7.0-40000"
 maintainer="Pavion"
-description="Program to record TV streams. Python required. Server runs at port 8030 (changeable)"
+description="A tool for recording live streams based on ffmpeg library"
 reloadui="yes"
 arch="noarch"
 distributor_url="http://pavion.github.io/tvstreamrecord/"
@@ -12,3 +12,5 @@ adminport=8030
 checkport="no"
 dsmuidir=webman
 thirdparty="yes"
+silent_install="no"
+silent_upgrade="no"

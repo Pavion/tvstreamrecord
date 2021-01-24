@@ -1,12 +1,16 @@
 #!/bin/sh
-
 cp /tmp/tvstreamrecord_tmp_upgrade/db.ini ${SYNOPKG_PKGDEST}/
-cp /tmp/tvstreamrecord_tmp_upgrade/share.ini ${SYNOPKG_PKGDEST}/
+cp /tmp/tvstreamrecord_tmp_upgrade/config ${SYNOPKG_PKGDEST}/webman/
+port=$(jq -r ".\".url\".\"com.cphub.packages.tvstreamrecord\" | .port" "/tmp/tvstreamrecord_tmp_upgrade/config")
+case ${port} in
+    ''|*[!0-9]*) ;;
+    *) sed "s/adminport=\"8030\"/adminport=\"${port}\"/" /var/packages/tvstreamrecord/INFO > /tmp/tvstreamrecord_tmp_upgrade/INFO
+       cp /tmp/tvstreamrecord_tmp_upgrade/INFO /var/packages/tvstreamrecord/INFO ;;
+esac 
+if [ -f "/tmp/tvstreamrecord_tmp_upgrade/tvstreamrecord.db" ] && [ ! -f "/volume1/${tsr_output_share}/tvstreamrecord.db"]; then
+    cp /tmp/tvstreamrecord_tmp_upgrade/tvstreamrecord.db "/volume1/${tsr_output_share}/tvstreamrecord.db"
+fi
 rm -r /tmp/tvstreamrecord_tmp_upgrade
 
-tsr_output_share=$(cat "${SYNOPKG_PKGDEST}/share.ini")
-sed -i 's/common/${tsr_output_share}/' ${SYNOPKG_PKGDEST}/config.py
-sed -i 's/\"cfg_recordpath\"/\"cfg_recordpath\" disabled=\"true\"/' ${SYNOPKG_PKGDEST}/views/config.tpl
-sed -i 's/\"button_pathchooser\"/\"button_pathchooser\" disabled=\"true\"/' ${SYNOPKG_PKGDEST}/views/config.tpl
-sed -i 's/\"button_database\"/\"button_database\" disabled=\"true\"/' ${SYNOPKG_PKGDEST}/views/config.tpl
+sed -i "s/common/${tsr_output_share}/" ${SYNOPKG_PKGDEST}/config.py
 exit 0

@@ -1,7 +1,8 @@
 #!/bin/sh
-
 mkdir /tmp/tvstreamrecord_tmp_upgrade
-cp ${SYNOPKG_PKGDEST}/db.ini /tmp/tvstreamrecord_tmp_upgrade
-cp ${SYNOPKG_PKGDEST}/share.ini /tmp/tvstreamrecord_tmp_upgrade
-
+cp ${SYNOPKG_PKGDEST}/db.ini /tmp/tvstreamrecord_tmp_upgrade/
+cp ${SYNOPKG_PKGDEST}/webman/config /tmp/tvstreamrecord_tmp_upgrade/
+if [ ! -f "${SYNOPKG_PKGDEST}/db.ini" ] && [ -f "${SYNOPKG_PKGDEST}/settings.db" ]; then
+    cp "${SYNOPKG_PKGDEST}/settings.db" /tmp/tvstreamrecord_tmp_upgrade/tvstreamrecord.db
+fi
 exit 0

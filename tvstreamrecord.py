@@ -460,7 +460,9 @@ def config_p():
                 grabthread.run()
         if cfg[0]=="cfg_server_port":
             if cfg[1]!=config.cfg_server_port:
-                config.writeWebman(cfg[1])
+                if fileexists("/var/packages/tvstreamrecord/INFO"): 
+                    # Synology only 
+                    config.writeWebman(cfg[1])
         if cfg[0]=="cfg_ffmpeg_path":
             if which(cfg[1]) == None:
                 print("FFMPEG executable probably not found, please check your configuration")

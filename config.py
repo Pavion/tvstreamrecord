@@ -300,20 +300,36 @@ def saveConfig():
 
 # Port changes should also be written in the Synology Webman configuration
 def writeWebman(port):
-    webman = list()
-    lfile = open("webman/config", "rb")
-    for lline in lfile:
-        webman.append(lline)
-    lfile.close()
-    lfile = open("webman/config", "wb")
-    for lline in webman:        
-        pos = lline.find(b'"port":')
-        if pos>0:
-            lfile.write( lline[:pos+8] + b'"' + str(port).encode() + b'"\n')
-        else:
+    try:
+        webman = list()
+        lfile = open("webman/config", "rb")
+        for lline in lfile:
+            webman.append(lline)
+        lfile.close()
+        lfile = open("webman/config", "wb")
+        for lline in webman:
+            pos = lline.find(b'"port":')
+            if pos>0:
+                lfile.write( lline[:pos+8] + b'"' + str(port).encode() + b'"\n')
+            else:
+                lfile.write(lline)
+        lfile.close()
+    except:
+        pass
+    try:
+        webman = list()
+        lfile = open("/var/packages/tvstreamrecord/INFO", "rt")
+        for lline in lfile:
+            webman.append(lline)
+        lfile.close()
+        lfile = open("/var/packages/tvstreamrecord/INFO", "wt")
+        for lline in webman:
+            if lline[:9] == "adminport":
+                lline = "adminport=%s\n" % (port)
             lfile.write(lline)
-    lfile.close()
+        lfile.close()        
+    except:
+        pass
     print ("Port changes saved, new port: %s, please restart the software" % str(port))
     return
-
 

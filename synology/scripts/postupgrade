@@ -7,8 +7,8 @@ case ${port} in
     *) sed "s/adminport=\"8030\"/adminport=\"${port}\"/" /var/packages/tvstreamrecord/INFO > /tmp/tvstreamrecord_tmp_upgrade/INFO
        cp /tmp/tvstreamrecord_tmp_upgrade/INFO /var/packages/tvstreamrecord/INFO ;;
 esac 
-if [ -f "/tmp/tvstreamrecord_tmp_upgrade/tvstreamrecord.db" ] && [ ! -f "/volume1/${tsr_output_share}/tvstreamrecord.db"]; then
-    cp /tmp/tvstreamrecord_tmp_upgrade/tvstreamrecord.db "/volume1/${tsr_output_share}/tvstreamrecord.db"
+if [ -f "/tmp/tvstreamrecord_tmp_upgrade/tvstreamrecord.db" ] && [ ! -f "${SYNOPKG_PKGDEST_VOL}/${tsr_output_share}/tvstreamrecord.db"]; then
+    cp /tmp/tvstreamrecord_tmp_upgrade/tvstreamrecord.db "${SYNOPKG_PKGDEST_VOL}/${tsr_output_share}/tvstreamrecord.db"
 fi
 rm -r /tmp/tvstreamrecord_tmp_upgrade
 

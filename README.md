@@ -4,10 +4,11 @@
 ## Table of contents
 
 - [Introduction](introduction)
-- [External links ](external-links-)
-- [Installation on Synology NAS](installation-on-synology-nas)
-- [Installation in Docker](installation-in-docker)
-  - [using Docker on Synology ](using-docker-on-synology-)
+- [External links](external-links)
+- [Installation](installation)
+  - [Installation on Synology NAS](installation-on-synology-nas)
+  - [Installation in Docker](installation-in-docker)
+  - [using Docker on Synology](using-docker-on-synology)
 - [Configuring this package](configuring-this-package)
   - [General configuration tab](general-configuration-tab)
   - [EPG configuration tab](epg-configuration-tab)
@@ -34,7 +35,7 @@ This software is useful for setting recurrent recordings with your favorite stre
 
 ![Image](https://raw.githubusercontent.com/Pavion/tvstreamrecord/gh-pages/readme/image002.jpg)
 
-## External links 
+## External links
 
 Following links are provided for companies and projects mentioned in this readme:
 
@@ -45,7 +46,10 @@ Following links are provided for companies and projects mentioned in this readme
 - TV-Browser: https://tvbrowser.org/
 - mc2xml: http://mc2xml.awardspace.info/
 
-## Installation on Synology NAS 
+
+## Installation
+
+### Installation on Synology NAS 
 
 This package requires Python (preferably Python3), which is preinstalled with DSM7 and can be installed from your Package Center on DSM6 and below. 
 
@@ -65,7 +69,7 @@ You will now be prompted for creating a new share where your settings database a
 
 Please start the package if it's not running. You should now see a corresponding icon in your Main Menu.  Click it and you are ready to move on and start configuring the package.  Please note, that you can also bookmark any package page to have a quick access to it. 
 
-## Installation in Docker
+### Installation in Docker
 
 This tool now moves towards Docker, which will offer images based on master branch. 
 Settings:
@@ -85,7 +89,7 @@ or run with all required arguments:
 docker run --daemon -v /videos:/volume1/common --publish 8030:8030 --name tvstreamrecord pavion/tvstreamrecord
 ```
 
-### using Docker on Synology 
+### using Docker on Synology
 
 - Install official Docker package from Package Center and open it
 - Go to Image and select Add > Image from URL

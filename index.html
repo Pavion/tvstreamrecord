@@ -44,19 +44,24 @@
 
             <p><em>Please note, that the recording or distribution of some streams may be forbidden by the law of your country or your local content provider. Author takes no responsibility for any records taken or used.</em></p>
 
-            <p>This software allows you to record TV streams. HTTP streams will be recorded direct and any other streams will be forwarded to external software <a href="http://www.ffmpeg.org/">ffmpeg</a>.</p>
-            <p>The server runs at port 8030 (http://YourIP:8030), which can be altered in the configuration. </p>
+            <p>This software allows you to record live TV streams using popular library <a href="http://ffmpeg.org/">ffmpeg</a>. Legacy recording für http protocols can be turned on for older devices.</p>
+            <p>The server runs at port 8030 (http://YourIP:8030) and can be changed in the configuration. </p>
+            <div style="font-weight: bold">
+              <p>Note on <a href="http://ffmpeg.org/">ffmpeg</a>. Even if your system has ffmpeg installed (as Synology NAS does), it may not support your stream type or protocol. If you want to be sure, please visit http://ffmpeg.org/, download and extract the corresponding release and provide its full path in the configuration. Thus you can be sure to have the latest and fullest release available. For example, for x64 based Synology and other NAS you can use the file ffmpeg-release-amd64-static.tar.xz from https://johnvansickle.com/ffmpeg/.</p>
+            </div>
+
             <p><img src="https://raw.github.com/Pavion/tvstreamrecord/gh-pages/images/tvstreamrecord.png" alt="Logo"></p>
 
             <div style="font-weight: bold">
                 <p>For latest Synology version please add the community hub <a href="http://www.cphub.net">http://www.cphub.net</a> in your package center. Python must be installed in order to run this software.<br>
-                For direct downloads please check my <a href="https://github.com/Pavion/tvstreamrecord/releases">release section</a>.</p>
+                Whether you've downloaded the source code, installed the Docker or Synology version, please check my <a href="https://github.com/Pavion/tvstreamrecord/releases">release section</a> for release notes for your corresponding release.</p>
                 <p>You can also use this software on any other operation system with <a href="http://python.org">Python</a> installed. Just <a href="https://github.com/Pavion/tvstreamrecord/releases/latest">download</a> the source code of the latest release, extract it in any folder you like, navigate to this folder and execute <i>python tvstreamrecord.py</i>. Now you can start using this software.</p>
-                <p>Suggestions or problems? Check the <a href="https://raw.github.com/Pavion/tvstreamrecord/master/manual.pdf">software manual</a>, visit the german <a href="http://www.synology-forum.de/showthread.html?37898">community forum</a>, create an <a href="https://github.com/Pavion/tvstreamrecord/issues">issue</a> or contact me <a href="mailto:tvstreamrecord@gmail.com">directly</a>.<br />
+                <p>Suggestions or problems? Check my <a href="https://github.com/Pavion/tvstreamrecord#tvstreamrecord">readme</a> on GitHub, the <a href="https://raw.github.com/Pavion/tvstreamrecord/master/manual.pdf">software manual</a>, visit the german <a href="http://www.synology-forum.de/showthread.html?37898">community forum</a>, create an <a href="https://github.com/Pavion/tvstreamrecord/issues">issue</a> or contact me <a href="mailto:tvstreamrecord@gmail.com">directly</a>.<br />
                 Support languages: English, German, Russian.</p>
                     
+                <p>If you like this package, please consider a donation and be sure to include your feedback.</p>
                 <div style="text-align: center">
-                    <p>If you like this package, please consider a donation and be sure to include your feedback.<br>
+                    <p>
                         <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
                             <input type="hidden" name="cmd" value="_s-xclick">
                             <input type="hidden" name="hosted_button_id" value="6CCT8N7AVKMC6">

@@ -351,7 +351,7 @@ If you are using XMLTV source for your EPG guide, please make sure, that your so
 
 Following packages and modules are licensed under their respective licenses. 
 
-- Python
+- [Python](https://www.python.org/)
 - [Bottle: Python Web Framework](https://bottlepy.org/)
 - [CherryPy - A Minimalist Python Web Framework](https://cherrypy.org/)
 - [Six](https://github.com/benjaminp/six)

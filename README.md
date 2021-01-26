@@ -109,9 +109,9 @@ This section covers the general configuration. Press Submit changes to accept or
 
 ![Image](https://raw.githubusercontent.com/Pavion/tvstreamrecord/gh-pages/readme/image006.jpg)
 
-**Path for your recordings** is a vital setting and should be set. If you're using a Docker or Synology DSM7 you should not change the default share. With other systems you can use any shared folder, which can be accessed with the root user (default: `/volume1/common/`). You can type your desired path in the corresponding box or use the Browse button to select one from the list. 
+**Path for your recordings** is a vital setting and should be set. If you're using a Docker or Synology DSM7 you should not change the default value. With other systems you can use any shared folder, which can be accessed with the root user (default: `/volume1/common/`). You can type your desired path in the corresponding box or use the Browse button to select one from the list. 
 
-**File extension for the recorded stream** will be added as a suffix to the filename. It can be vital for [ffmpeg](ffmpeg.org) to detect your stream type. 
+**File extension for the recorded stream** will be added as a suffix to the filename. It can be vital for ffmpeg to detect your stream type. 
 
 **Interface theme** specifies the theme for the web interface to be used. Please select your favorite look and feel from the provided list. 
 
@@ -123,7 +123,7 @@ This section covers the general configuration. Press Submit changes to accept or
 
 ### EPG configuration tab
 
-This section hosts all settings regarding an Electronic Program Guide (EPG). If you don't have an EPG content provider and your streams don't transport any EPG information, you can't use this feature and also don't need to setup anything at this page. 
+This section hosts all settings regarding an Electronic Program Guide (EPG). You'll need a valid data source to use this feature if the default one won't work for you. Please check the corresponding section of this readme for more details.
 
 ![Image](https://raw.githubusercontent.com/Pavion/tvstreamrecord/gh-pages/readme/image007.jpg)
 
@@ -149,7 +149,7 @@ This section hosts all settings regarding an Electronic Program Guide (EPG). If 
 
 ### FFMPEG support tab
 
-This part offers a few settings regarding ffmpeg support. For advanced information and some usage examples please check the corresponding section of this manual. 
+This part offers a few settings regarding ffmpeg support. For advanced information and some usage examples please check the corresponding section of this readme. 
  
 ![Image](https://raw.githubusercontent.com/Pavion/tvstreamrecord/gh-pages/readme/image008.jpg)
 

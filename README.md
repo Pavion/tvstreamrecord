@@ -105,7 +105,7 @@ docker run --daemon -v /videos:/volume1/common --publish 8030:8030 --name tvstre
 
 ### General configuration tab
 
-This section covers the general configuration, which is enough to start recording plain streams. Please open the package's web interface and navigate to the Config page. You are now seeing some general options you should consider. Press Submit changes to accept or reload this page to undo all changes.
+This section covers the general configuration. Press Submit changes to accept or reload this page to undo all changes.
 
 ![Image](https://raw.githubusercontent.com/Pavion/tvstreamrecord/gh-pages/readme/image006.jpg)
 
@@ -282,11 +282,9 @@ You will be automatically redirected to this view from the page root if you are 
 
 This section covers most issues with ffmpeg streams. I ask to understand, that ffmpeg is neither part of this package nor can ffmpeg developers provide support for this package. This package simply provides a front end for this console based tool. All the advanced settings in this section may also require advanced skills in dealing with console applications.
 
-On Synology systems ffmpeg is preinstalled and is normally called with `ffmpeg` only, which is the default setting. If it doesn't work, you may need to install the corresponding package and provide the full path for: 
-VideoStation: `/volume1/@appstore/VideoStation/bin/ffmpeg`
-MediaServer: `/volume1/@appstore/MediaServer/bin/ffmpeg`
+On Synology systems ffmpeg is preinstalled and is normally called with `ffmpeg` only, which is the default setting. If it doesn't work, you may need to install the corresponding package and provide the full path for VideoStation: `/volume1/@appstore/VideoStation/bin/ffmpeg`.
 
-Even if your system has ffmpeg installed, it may not support your stream type or protocol (e.g. Synology ffmpeg has no support for https). If you want to be sure, please visit http://ffmpeg.org/, download and extract the corresponding release and provide its full path in the configuration. Thus you can be sure to have the latest and fullest release available. For example, for x64 based Synology and other NAS you can use the file `ffmpeg-release-amd64-static.tar.xz` from https://johnvansickle.com/ffmpeg/.
+**Even if your system has ffmpeg installed, it may not support your stream type or protocol (e.g. Synology ffmpeg has no support for https). If you want to be sure, please visit http://ffmpeg.org/, download and extract the corresponding release and provide its full path in the configuration. Thus you can be sure to have the latest and fullest release available. For example, on x64 based Synology and other Linux systems you can use the file `ffmpeg-release-amd64-static.tar.xz` from https://johnvansickle.com/ffmpeg/.**
 
 Global rule is: if you can play your stream with your favorite media player, you should be able to record it with ffmpeg. If you have a terminal access to your system, you can do following steps in your terminal. Make sure that you have ffmpeg properly installed by typing and running: 
 
@@ -358,6 +356,7 @@ Following packages and modules are licensed under their respective licenses.
 - [SQLite](https://www.sqlite.org/)
 - [jQuery](https://jquery.com/) and further based-on themes, modules and locales:
   - [jQueryUI](https://jqueryui.com/)
+  - [jQueryUI themes](http://jqueryui.com/themeroller/)
   - [jQuery Mobile](https://jquerymobile.com/)
   - [jQuery Mobile DateBox](http://dev.jtsage.com/DateBox/)
   - [SlickSwitch](https://github.com/LukeKirby/jQuery-slickswitch)
@@ -378,7 +377,7 @@ Although this package is open sourced, author takes no responsibility for any da
 
 The best way to get this package altered is to contact author and provide your solution or addition. If you have a shell access to your DiskStation and you know what you do, you can still customize this package:
 
-- You can add further [jQueryUI themes](http://jqueryui.com/themeroller/) by copying them into the css folder of this package 
+- You can add further jQueryUI themes by copying them into the css folder of this package 
 - You can add or change locales in the js\i18n folder 
 - You can add or change languages in the lang folder (see supplied dummy for more details)
 

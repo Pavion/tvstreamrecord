@@ -269,7 +269,7 @@ def fileexists(file):
 @route('/login')
 def root_s():
     agent = request.headers.get('User-Agent')
-    try: 
+    try:
         if ("Android" in agent and "Mobile" in agent) or "berry" in agent or "Symbian" in agent or "Nokia" in agent or "iPhone" in agent:
             count = sqlRun("select count(cid) from channels where cenabled=1")[0][0]
             if count > 0:

@@ -51,7 +51,6 @@ class Logger(object):
     def flush(self):
         pass
 
-
 def logInit(filemode):
     global log
     log = codecs.open("log.txt", encoding='utf-8', mode=filemode, buffering=0)

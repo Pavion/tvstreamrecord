@@ -160,13 +160,23 @@ def postLogout():
 @post('/setpass')
 def setPass():
     global credentials
-    pass_old = hashlib.sha224(request.forms.pass_old).hexdigest() if request.forms.pass_old else ""
-    pass_new_1 = hashlib.sha224(request.forms.pass_new_1).hexdigest() if request.forms.pass_new_1 else ""
-    pass_new_2 = hashlib.sha224(request.forms.pass_new_2).hexdigest() if request.forms.pass_new_2 else ""
+    po  = request.forms.pass_old
+    pn1 = request.forms.pass_new_1
+    pn2 = request.forms.pass_new_2
+    try:
+        po  = po.encode('utf-8')
+        pn1 = pn1.encode('utf-8')
+        pn2 = pn2.encode('utf-8')
+    except:
+        pass
+    pass_old = hashlib.sha224(po).hexdigest() if po else ""
+    pass_new_1 = hashlib.sha224(pn1).hexdigest() if pn1 else ""
+    pass_new_2 = hashlib.sha224(pn2).hexdigest() if pn2 else ""
     if pass_old == credentials and pass_new_1 == pass_new_2:
         response.delete_cookie(tvcookie)
         credentials = config.setUser(pass_new_1)
         ret = 0
+        print ("Password changed successfully")
     elif pass_old != credentials:
         ret = 1
     else:

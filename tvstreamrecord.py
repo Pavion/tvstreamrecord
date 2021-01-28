@@ -1363,7 +1363,7 @@ def readDbFile():
     ret = "settings.db"
     if fileexists("db.ini"):
         file = open("db.ini", "r")
-        ret = file.readline().rstrip()        
+        ret = file.readline().rstrip()
         file.close()
     return ret
 

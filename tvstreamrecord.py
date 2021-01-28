@@ -176,7 +176,10 @@ def setPass():
         response.delete_cookie(tvcookie)
         credentials = config.setUser(pass_new_1)
         ret = 0
-        print ("Password changed successfully")
+        if pass_new_1 == "":
+            print ("Password protection removed")
+        else:
+            print ("Password changed successfully")
     elif pass_old != credentials:
         ret = 1
     else:

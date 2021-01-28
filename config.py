@@ -199,7 +199,7 @@ configuration = [
 'cfg_postprocess',
 "Postprocessing",
 'synoindex -a %file%'
-], 
+],
 
 [
 'cfg_switch_proxy',

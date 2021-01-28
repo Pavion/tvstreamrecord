@@ -327,7 +327,7 @@ def writeWebman(port):
             if lline[:9] == "adminport":
                 lline = "adminport=%s\n" % (port)
             lfile.write(lline)
-        lfile.close()        
+        lfile.close()
     except:
         pass
     print ("Port changes saved, new port: %s, please restart the software" % str(port))

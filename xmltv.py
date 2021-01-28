@@ -167,7 +167,6 @@ def getProgList(ver=''):
     print ("XMLTV import completed with %s entries" % totalentries)
     return totalrecords
 
-
 def getProg(strp, channellist=[], keylist=[]):
     deltaxmltv_txt = config.cfg_xmltvtimeshift
     try:

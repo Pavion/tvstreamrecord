@@ -31,7 +31,7 @@
 
 ## Introduction
 
-This software is useful for setting recurrent recordings with your favorite streaming device (e.g. Fritz!Box Cable) or provider (e.g. MagentaTV). This software uses ffmpeg as a recording library and supports TV-Browser with corresponding plugin.
+This software is useful for setting recurrent recordings with your favorite streaming device (e.g. Fritz!Box Cable) or provider (e.g. MagentaTV). This software uses ffmpeg as a recording library and supports TV-Browser with the corresponding plugin.
 
 ![Image](https://raw.githubusercontent.com/Pavion/tvstreamrecord/gh-pages/readme/image002.jpg)
 
@@ -314,10 +314,10 @@ You can now create a channel with some name, your stream address and your file e
 
 Common parameter and their meaning:
 
-`-f fmt` forces ffmpeg to use specified format (e.g. h264, mpg, mkv, avi)
-`-loglevel quiet/fatal/error` can be used to provide (or restrict) additional log output
-`-map 0:v -map 0:a` can be used to force all tracks (video and audio) of a stream to be recorded. Per default only one audio track might be recorded. 
-`-ignore_unknown` ignores invalid stream parts (reported to be required for Fritz Box 6490 Cable) 
+- `-f fmt` forces ffmpeg to use specified format (e.g. h264, mpg, mkv, avi)
+- `-loglevel quiet/fatal/error` can be used to provide (or restrict) additional log output
+- `-map 0:v -map 0:a` can be used to force all tracks (video and audio) of a stream to be recorded. Per default only one audio track might be recorded. 
+- `-ignore_unknown` ignores invalid stream parts (reported to be required for Fritz Box 6490 Cable) 
 
 ### EPG import
 

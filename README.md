@@ -44,8 +44,6 @@ Following links are provided for companies and projects mentioned in this readme
 - Docker: https://www.docker.com/
 - ffmpeg: https://ffmpeg.org
 - TV-Browser: https://tvbrowser.org/
-- mc2xml: http://mc2xml.awardspace.info/
-
 
 ## Installation
 
@@ -135,7 +133,7 @@ This section hosts all settings regarding an Electronic Program Guide (EPG). You
 
 **Time shift for XMLTV data** can be used to shift all imported EPG data by some hours (positive or negative value). That can be useful if importing EPG data from another time zone.
 
-**mc2xml full command line** is for using a third party tool mc2xml). Please consult its page for more information regarding installation and configuration of this tool. If properly configured, corresponding output should be redirected into a local file, which is to be specified under Initial path for an XMLTV-Import. Please read the corresponding section for more information. 
+**mc2xml full command line** is for triggering a third party EPG generator/downloader tool. **Note**: mc2xml project is offline, this feature is deprecated. Please contact me if other tools can be used.
 
 **Time to perform daily EPG/XMLTV grab** can be used to automatically refresh your EPG guide using your streams and/or your XMLTV provider. Please read the corresponding sections for more details.
 
@@ -321,23 +319,22 @@ Common parameter and their meaning:
 
 ### EPG import
 
-There are two ways to get EPG information. Please read this section carefully to avoid issues. 
+You can use most of third party sources providing EPG data in XML format (XMLTV). 
+If you have a free XMLTV provider from your region, add its address in Config > EPG. Now you should be able to import EPG by pressing the corresponding button or by enabling the automatic synchronization. 
+Full synchronization takes some time, please check the log file for the progress or error status.
 
-**The first way** is to use third party EPG data, which is provided in XML format (XMLTV). 
-If you have a free XMLTV provider from your region, you should add its address in Config > EPG. Now you should be able to import EPG by pressing the corresponding button or by enabling the automatic synchronization. As of now there is no direct feedback for this feature and full synchronization takes some time, so please check the log file for the progress or error status. 
-If you are using their data, please consider to support them and their respective communities and to spread the word.  
+You can use XML files generated with other software. Just use full file path (e.g. `/tmp/epgdata.xml`) instead.
 
-If you don't have any free XMLTV provider and an x86 CPU, you may want to try using a third party tool mc2xml). For Synology you must download a latest Linux version in any public accessible folder. Browse the homepage of mc2xml) for more information regarding setup, accessing and running this tool. You must run it once manually to create a configuration file. Once properly configured, you can change following settings in Config > EPG to match your setup. For example:
-- mc2xml full command line: `/volume1/public/mc2xml -D /volume1/public/mc2xml.dat -o /volume1/public/xmltv.xml -U`
-- Initial path for an XMLTV import: `/volume1/public/xmltv.xml`
-Note: use absolute paths everywhere to avoid path issues.
+You can use a third party EPG desktop software TV-Browser. With a [corresponding plug-in](https://www.tvbrowser.org/index.php?id=remotesoft) this package can be controlled remotely. Please visit [TSRPlugin page](https://pavion.github.io/TsrPlugin/index.html) for more information.
 
-mc2xml) is a fully separate tool and so no further integration or support can be provided here. If you are using this tool, you should also consider to support and/or donate to its respectful author. 
+In any case your channel names should match with those provided by your EPG provider (e.g. please use 'CNN' and not '1 - CNN' or 'epg.cnn.com' or 'My favorite news channel'). 
+In TV-Browser you can see the channel names directly. When using XMLTV data you can find them by opening your provider's URL in a common web browser and searching for corresponding `<display-name>` tag, for example:
 
-In both cases  channel names you're using should match with those provided by your XMLTV provider (e.g. please use 'CNN' and not '1 - CNN' or 'epg.cnn.com' or 'My favorite news channel'). You can see those, if you open your provider's URL in a common web browser and search for corresponding `<display-name>` tag, for example:
-`<display-name lang="en">CNN</display-name>`
+```
+<display-name lang="en">CNN</display-name>
+```
 
-The second way is to use a third-party EPG desktop software TV-Browser. With a [corresponding plug-in](https://www.tvbrowser.org/index.php?id=remotesoft) this package can be controlled remotely. Please visit [TSRPlugin page](https://pavion.github.io/TsrPlugin/index.html) for more information.
+If you are using third party data, please consider to support them and their respective communities and to spread the word.
 
 ### License and disclaimer
 

@@ -306,11 +306,11 @@ This tells ffmpeg to save your stream (`-i streamaddress`) for a duration of (`-
  
 Otherwise you should check for any errors in console output. Make sure that you've provided a correct extension for your stream (.ts, .mpg, .avi, .mk4, .mkv and such): ffmpeg uses this to determine output file type. Look into ffmpeg documentation and experiment with your stream until you get your file.
 
-If you want to provide additional output arguments for ffmpeg (`-f` for stream format or other codecs parameters), you can also do it at the Config page. First arguments are always `-i inputstreamname`, `-t recordduration`and last argument is `outputstreamname.extension` (you will see all arguments used at the Log page after each ffmpeg trigger).
+If it works fine in your console, you can now create a channel with some name, your stream address and your file extension and schedule some records.
 
-You can now create a channel with some name, your stream address and your file extension and schedule some records.
+If you want to provide additional output arguments for ffmpeg, you can enter them at the Config page. First arguments are always `-i inputstreamname`, `-t recordduration`and last argument is `outputstreamname.extension` (you will see all used arguments at the Log page after each ffmpeg start).
 
-Common parameter and their meaning:
+Common parameters and their meaning:
 
 - `-f fmt` forces ffmpeg to use specified format (e.g. h264, mpg, mkv, avi)
 - `-loglevel quiet/fatal/error` can be used to provide (or restrict) additional log output

@@ -8,7 +8,8 @@
 - [Installation](#installation)
   - [Installation on Synology NAS](#installation-on-synology-nas)
   - [Installation in Docker](#installation-in-docker)
-  - [using Docker on Synology](#using-docker-on-synology)
+  - [Running multiple instances with Docker](#running-multiple-instances-with-docker)
+  - [Using Docker on Synology](#using-docker-on-synology)
 - [Configuring this package](#configuring-this-package)
   - [General configuration tab](#general-configuration-tab)
   - [EPG configuration tab](#epg-configuration-tab)
@@ -87,7 +88,20 @@ or run with all required arguments:
 docker run --daemon -v /videos:/volume1/common --publish 8030:8030 --name tvstreamrecord pavion/tvstreamrecord
 ```
 
-### using Docker on Synology
+### Running multiple instances with Docker
+
+Some source devices provide but one stream per IP. In this case you can create multiple instances of tvstreamrecord with dedicated IPs.
+Assuming your LAN is 192.168.0.x with a gateway 192.168.0.1: 
+
+```
+docker network create -d macvlan -o parent=eth0 --subnet 192.168.0.0/24 --gateway 192.168.0.1 mynet
+docker run --daemon -v /videos/videos76:/volume1/common --publish 8030:8030 --network=mynet --ip=192.168.0.76 --name tsr76 pavion/tvstreamrecord
+docker run --daemon -v /videos/videos77:/volume1/common --publish 8030:8030 --network=mynet --ip=192.168.0.77 --name tsr77 pavion/tvstreamrecord
+```
+
+**As of now using the same database is not supported. You can use the same output path but should then rename your databases (see [Advanced tab](#advanced-tab) for more details).**
+
+### Using Docker on Synology
 
 - Install official Docker package from Package Center and open it
 - Go to Image and select Add > Image from URL

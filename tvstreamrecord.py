@@ -455,6 +455,7 @@ def upload_p():
                         rowid = rowid + 1
                         name = ""
             sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?, 0)", retl, 1)
+            sqlRun("UPDATE channels SET cpath=?2 WHERE cname=?1 AND ?3=?3", retl, 1)
             print("M3U parsing completed with %d entries" % len(retl))
         else:
             print("Bad M3U format detected (missing #EXTM3U tag)")

@@ -17,7 +17,7 @@ RUN cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} > /etc
 EXPOSE 8030/tcp
 
 RUN mkdir -p /volume1/common
-VOLUME [/volume1/common]
+VOLUME ["/volume1/common"]
 
 WORKDIR /tsr
 ENTRYPOINT ["/usr/bin/python3" , "tvstreamrecord.py"]

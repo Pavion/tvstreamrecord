@@ -13,4 +13,5 @@ fi
 rm -r /tmp/tvstreamrecord_tmp_upgrade
 
 sed -i "s/common/${tsr_output_share}/" ${SYNOPKG_PKGDEST}/config.py
+echo "${tsr_python_exec}" > "${SYNOPKG_PKGDEST}/python.ini"
 exit 0

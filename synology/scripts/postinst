@@ -1,5 +1,6 @@
 #!/bin/sh
 echo "/volume1/${tsr_output_share}/tvstreamrecord.db"> "${SYNOPKG_PKGDEST}/db.ini"
+echo "${tsr_python_exec}" > "${SYNOPKG_PKGDEST}/python.ini"
 
 sed -i 's/common/${tsr_output_share}/' ${SYNOPKG_PKGDEST}/config.py
 exit 0

@@ -1,5 +1,5 @@
 [{
-        "step_title": "Output share selection",
+        "step_title": "Package configuration",
         "items": [{
                 "type": "textfield",
                 "desc": "Output share selection",
@@ -7,10 +7,26 @@
                         "key": "tsr_output_share",
                         "desc": "Please enter your video share name",
                         "defaultValue": "tvstreamrecord",
+                        "width": 180,
                         "validator": {
                             "allowBlank": false,
                             "minLength": 1,
                             "maxLength": 64
+                        }
+                    }
+                ]
+            }, {
+                "type": "textfield",
+                "desc": "Default Python executable",
+                "subitems": [{
+                        "key": "tsr_python_exec",
+                        "desc": "Python executable (python, python2, python3 or full path)",
+                        "defaultValue": "python",
+                        "width": 180,
+                        "validator": {
+                            "allowBlank": false,
+                            "minLength": 1,
+                            "maxLength": 128
                         }
                     }
                 ]

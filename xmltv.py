@@ -175,8 +175,8 @@ def getProg(strp, channellist=[], keylist=[]):
         deltaxmltv = timedelta(hours=0)
 
     #2018-12-31 automatic recording
-    delta_b = timedelta(minutes=float(config.cfg_delta_after_epg))
-    delta_a = timedelta(minutes=float(config.cfg_delta_before_epg))
+    delta_a = timedelta(minutes=float(config.cfg_delta_after_epg))
+    delta_b = timedelta(minutes=float(config.cfg_delta_before_epg))
 
     reclist = []
 

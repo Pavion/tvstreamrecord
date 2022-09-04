@@ -217,8 +217,12 @@ def getProg(strp, channellist=[], keylist=[]):
             sqllist.append([p_id, title, datetime.strftime(dt1, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2, "%Y-%m-%d %H:%M:%S"), desc])
             for key in keylist:
                 if key in title.lower():
-                    print("XMLTV: Record '%s' is queued for autocreation" % (title, ))
-                    reclist.append([title, datetime.strftime(dt1-delta_b, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2+delta_a, "%Y-%m-%d %H:%M:%S"), p_id])
+                    rows = sqlRun("SELECT recname FROM records r JOIN channels c ON c.cid = r.cid JOIN guide_chan g ON c.cname = g.g_name WHERE g.g_id = ? AND ABS(JULIANDAY(rvon) - JULIANDAY(?))*24*60 < ? AND ABS(JULIANDAY(rbis) - JULIANDAY(?))*24*60 < ?", (p_id, datetime.strftime(dt1-delta_b, "%Y-%m-%d %H:%M:%S"), int(config.cfg_delta_before_epg), datetime.strftime(dt2+delta_a, "%Y-%m-%d %H:%M:%S"), int(config.cfg_delta_after_epg)))
+                    if rows:
+                        print("XMLTV: Similar record '%s' found, skipping autocreation" % (rows[0], ))
+                    else:     
+                        print("XMLTV: Record '%s' is queued for autocreation" % (title, ))
+                        reclist.append([title, datetime.strftime(dt1-delta_b, "%Y-%m-%d %H:%M:%S"), datetime.strftime(dt2+delta_a, "%Y-%m-%d %H:%M:%S"), p_id])
                     break
     sqlRun("INSERT OR IGNORE INTO guide VALUES (?, ?, ?, ?, ?)", sqllist, 1)
     return len(sqllist), reclist

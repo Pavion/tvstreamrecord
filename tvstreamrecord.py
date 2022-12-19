@@ -1186,7 +1186,6 @@ class record(Thread):
             print ("Record: '%s' started using legacy method" % (self.name))
             try:
                 if sys.version_info[0] == 3:
-                    print ("hi")
                     req = urllib32.Request(self.url, data=None, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
                     u = urllib32.urlopen(req)
                 else:

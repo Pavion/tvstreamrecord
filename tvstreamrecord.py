@@ -1213,7 +1213,11 @@ class record(Thread):
                     if (not mybuffer or doInternalRetry) and internalRetryCount < maxRetryCount: # connection lost?
                         internalRetryCount += 1
                         try:
-                            u = urllib32.urlopen(self.url)
+                            if sys.version_info[0] == 3:
+                                req = urllib32.Request(self.url, data=None, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
+                                u = urllib32.urlopen(req)
+                            else:
+                                u = urllib32.urlopen(self.url)
                             mybuffer = u.read(block_sz)
                             f.write(mybuffer)
                         except:

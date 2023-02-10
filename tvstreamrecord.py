@@ -229,7 +229,7 @@ def checkLang():
         ret_loc = True
     ret_style = ( fileexists("css/" + config.cfg_theme) )
     if not ret_style:
-        config.cfg_theme = "smoothness/jquery-ui-1.10.4.custom.min.css"
+        config.cfg_theme = "smoothness/theme.css"
         print ("Theme not found, reverting to default theme")
     if not (ret_loc and ret_lng and ret_style):
         config.saveConfig()

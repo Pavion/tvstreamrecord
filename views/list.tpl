@@ -44,13 +44,15 @@
     </form>
     <p class="validateTips"></p>
 </div>
-<div id="dialog_import_clist" title="§Import channel list from .m3u file§" upload="§Upload file§" cancel="§Cancel§">
+<div id="dialog_import_clist" title="§Import channel list§" upload="§Import§" cancel="§Cancel§">
     <form method='POST' enctype='multipart/form-data' action='/upload' name='uploader'>
         <fieldset>
-            <label for="filenamelabel">.m3u §file name§</label>
-            <input type="file" id="upfile" width="80%" class="text ui-widget-content ui-corner-all" name="upfile" value=""/> 
+            <label for="filenamelabel">§From .m3u file§</label>
+            <input type="file" id="upfile" width="80%" class="text ui-widget-content ui-corner-all" name="upfile" value=""/>
+            <label for="filenamelabel">§From HTTP URL§</label>
+            <input type="text" id="upfileurl" class="text ui-widget-content ui-corner-all" name="upfileurl" value=""/>
             <label for="append" id="append">§Append to existing channels§:</label>
-            <input type="checkbox" class="switch icons" name="switch_list_append" id="switch_list_append" />  
+            <input type="checkbox" class="switch icons" name="switch_list_append" id="switch_list_append" />
         </fieldset>
     </form>
 </div>

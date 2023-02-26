@@ -110,7 +110,9 @@
     "Append to existing channels": "",
     "Create/edit a channel": "",
     "Channel list download": "",
-    "Import channel list from .m3u file": "",
+    "Import channel list": "",
+    "From .m3u file": "",
+    "From HTTP URL": "",
     
     "Electronic Program Guide": "",
     "Current date": "",

@@ -110,7 +110,10 @@
     "Append to existing channels": "Добавить к существующим",
     "Create/edit a channel": "Создать или редактировать канал",
     "Channel list download": "Скачать список каналов",
-    "Import channel list from .m3u file": "Импортировать каналы из .m3u файла",
+    "Import channel list": "Импортировать каналы",
+    "From .m3u file": "Из .m3u файла",
+    "From HTTP URL": "Из HTTP URL",
+
 
     "Electronic Program Guide": "Электронная телепрограмма",
     "Current date": "Текущая дата",

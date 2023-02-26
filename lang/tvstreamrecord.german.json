@@ -110,7 +110,9 @@
     "Append to existing channels": "An bestehende Sender anfügen",
     "Create/edit a channel": "Sender erstellen / bearbeiten",
     "Channel list download": "Senderliste herunterladen",
-    "Import channel list from .m3u file": "Senderliste aus einer .m3u-Datei importieren",
+    "Import channel list": "Senderliste importieren",
+    "From .m3u file": "Aus einer .m3u-Datei",
+    "From HTTP URL": "Von einer HTTP URL",
     
     "Electronic Program Guide": "Elektronische Zeitschrift",
     "Current date": "Heutiges Datum",

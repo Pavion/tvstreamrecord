@@ -35,16 +35,13 @@ import sys
 import shlex
 import shutil
 import re
-import zlib
 if sys.version_info[0] == 2:
     # Python 2.x
-    import httplib
     import urllib as urllib32
     import urlparse
     tvcookie = b"tvstreamrecord_user"
 else:
     # Python 3.x
-    import http.client as httplib
     import urllib.request as urllib32
     import urllib.parse as urlparse
     tvcookie = "tvstreamrecord_user"
@@ -428,10 +425,10 @@ def upload_p():
     upfileurl = request.forms.get("upfileurl")
 
     content = ""
-    if not upfile.filename == "empty":
+    if upfile != "" and not upfile.filename == "empty":
         content = upfile.file.read()
     elif upfileurl:
-        content = getFileFromHTTP(upfileurl, version)
+        content = xmltv.getFileFromHTTP(upfileurl, version)
     else:
         print ("No MU3 file or URL specified, please try again")
 
@@ -471,39 +468,6 @@ def upload_p():
             print("Bad M3U format detected (missing #EXTM3U tag)")
 
     redirect("/list")
-
-
-def getFileFromHTTP(file_in, ver=""):
-    out = ""
-    try:
-        httplib.HTTPConnection.debuglevel = 0
-        request = urllib32.Request(file_in)
-        request.add_header('User-Agent', 'tvstreamrecord/' + ver)
-        opener = urllib32.build_opener()
-        try:
-            hresponse = opener.open(request, timeout=10)
-        except Exception as ex:
-            print ("Import channels warning: connection timeout detected, retry in 5 seconds")
-            sleep (5)
-            hresponse = opener.open(request, timeout=20)
-        feeddata = hresponse.read()
-        hr = hresponse.info()
-        try:
-            d = zlib.decompressobj(16+zlib.MAX_WBITS)
-            out = d.decompress(feeddata)
-        except:
-            out = feeddata
-    except Exception as ex:
-        print (ex)
-        print ("Channel upload: no data or error, try again later (%s)" % file_in)
-        pass
-
-    try:
-        out = out.decode("UTF-8")
-    except:
-        pass
-
-    return out
 
 #------------------------------- Configuration -------------------------------
 

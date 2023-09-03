@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.15
 
 MAINTAINER Pavion <tvstreamrecord@gmail.com>
 # Thanks docqube/tvstreamrecord for his contribution

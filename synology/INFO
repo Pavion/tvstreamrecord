@@ -1,5 +1,5 @@
 package="tvstreamrecord"
-version="1.6.4"
+version="1.6.5"
 os_min_ver="7.0-40000"
 maintainer="Pavion"
 description="A tool for recording live streams based on ffmpeg library"

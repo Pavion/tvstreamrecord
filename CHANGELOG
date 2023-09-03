@@ -1,3 +1,6 @@
+2023-09-03 1.6.5 Add support for subdirectories 
+                 Import m3u from URL
+
 2022-02-11 1.6.4 Prompt for Python version upon install (use python2 for NetStream)
 
 2021-03-05 1.6.2 Fix broken password 

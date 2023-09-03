@@ -79,7 +79,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False
-version = "1.6.4"
+version = "1.6.5"
 
 def redirect(url):
     try:

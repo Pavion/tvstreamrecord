@@ -419,13 +419,20 @@ def createchannel():
 
 @post('/upload')
 def upload_p():
-    print ("M3U upload parsing started")
+    print ("M3U import started")
     retl = []
     upfile = request.files.upfile
-    if not upfile:
-        print ("No file specified, please try again")
-    else:
+    upfileurl = request.forms.get("upfileurl")
+
+    content = ""
+    if upfile != "" and not upfile.filename == "empty":
         content = upfile.file.read()
+    elif upfileurl:
+        content = xmltv.getFileFromHTTP(upfileurl, version)
+    else:
+        print ("No MU3 file or URL specified, please try again")
+
+    if content:
         try:
             content = content.decode("UTF-8")
         except:

@@ -303,6 +303,38 @@ def getFile(file_in, override=0, ver=""):
 
     return out
 
+def getFileFromHTTP(file_in, ver=""):
+    out = ""
+    try:
+        httplib.HTTPConnection.debuglevel = 0
+        request = urllib32.Request(file_in)
+        request.add_header('User-Agent', 'tvstreamrecord/' + ver)
+        opener = urllib32.build_opener()
+        try:
+            hresponse = opener.open(request, timeout=10)
+        except Exception as ex:
+            print ("Import channels warning: connection timeout detected, retry in 5 seconds")
+            sleep (5)
+            hresponse = opener.open(request, timeout=20)
+        feeddata = hresponse.read()
+        hr = hresponse.info()
+        try:
+            d = zlib.decompressobj(16+zlib.MAX_WBITS)
+            out = d.decompress(feeddata)
+        except:
+            out = feeddata
+    except Exception as ex:
+        print (ex)
+        print ("Channel upload: no data or error, try again later (%s)" % file_in)
+        pass
+
+    try:
+        out = out.decode("UTF-8")
+    except:
+        pass
+
+    return out
+
 def main(argv=None):
     getProgList('debug')
     return

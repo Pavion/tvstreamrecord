@@ -36,7 +36,7 @@
 %if datetime.now().month == 12:
                 <div style="margin: -60px 0 0 150px; z-index: 999;"><img src="images/mc.png"></div>
 %end
-                <a href="/records" rel="external" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-back ui-nodisc-icon ui-alt-icon ui-btn-left">Back</a>
+                <a href="records" rel="external" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-back ui-nodisc-icon ui-alt-icon ui-btn-left">Back</a>
                 <a href="#" id="btn_add" class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-plus ui-nodisc-icon ui-alt-icon ui-btn-right">Add</a>
             </div>
             <!-- Main content -->

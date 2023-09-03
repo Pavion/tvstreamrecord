@@ -37,16 +37,16 @@
     <div id="loaderImage"></div>
 <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
   <ul id="mainmenu" class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
-    <li><a id="mobipic" class="ui-tabs-anchor" href="/mobile"><img src="images/iphone-control-panel-px-png.png"></a></li>
-    <li id="menu-0" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/records">§Records§</a></li>
-    <li id="menu-1" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/list">§Channels§</a></li>
-    <li id="menu-2" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epgchart">§EPG Chart§</a></li>
-    <li id="menu-3" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/epglist">§EPG List§</a></li>
-    <li id="menu-4" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/config">§Config§</a></li>
-    <li id="menu-5" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/log">§Log§</a></li>
-    <li id="menu-6" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/about">§About§</a></li>
+    <li><a id="mobipic" class="ui-tabs-anchor" href="mobile"><img src="images/iphone-control-panel-px-png.png"></a></li>
+    <li id="menu-0" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="records">§Records§</a></li>
+    <li id="menu-1" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="list">§Channels§</a></li>
+    <li id="menu-2" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="epgchart">§EPG Chart§</a></li>
+    <li id="menu-3" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="epglist">§EPG List§</a></li>
+    <li id="menu-4" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="config">§Config§</a></li>
+    <li id="menu-5" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="log">§Log§</a></li>
+    <li id="menu-6" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="about">§About§</a></li>
 %if logout:
-    <li id="menu-7" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/logoff">X</a></li>
+    <li id="menu-7" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="logoff">X</a></li>
 %end    
   </ul>
 </div>

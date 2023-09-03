@@ -8,7 +8,7 @@ var cWidth=48;
 var cHeight=48;
 var cTotalFrames=8;
 var cFrameWidth=48;
-var cImageSrc='../images/sprites.gif';
+var cImageSrc='images/sprites.gif';
 
 var cImageTimeout=false;
 var cIndex=0;

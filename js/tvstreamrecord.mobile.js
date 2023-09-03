@@ -38,11 +38,11 @@ $(function() {
     getLocale();
 
     function showChannels() {
-        $.get( "/getchannelgroups", function( data )  {
+        $.get( "getchannelgroups", function( data )  {
             var data = data.aaData;
             if (data.length==0) {
                 alert ("This is a mobile version of tvstreamrecord.\nNo channels could be found, please configure this package in a desktop version first!\nYou will be now redirected to the channel creation page.");
-                window.location ="/list";
+                window.location ="list";
                 exit();
             }
 
@@ -59,7 +59,7 @@ $(function() {
                 var my = $(this);
                 $("#blip").remove();
 
-                $.post( "/getchannelgroup", {"id": id}, function( data )  {
+                $.post( "getchannelgroup", {"id": id}, function( data )  {
                     var data = data.aaData;
                     my.children(".ui-collapsible-content").empty().append($("<ul data-role='listview' id='blip'></ul>"));
 
@@ -116,7 +116,7 @@ $(function() {
             $("#timebox_v").datebox("setTheDate",new Date(von));
             $("#timebox_b").datebox("setTheDate",new Date(bis));                    
         } else {
-            $.post( "/getepgday", {"cname": cname, "rdate": am}, function( data )  {
+            $.post( "getepgday", {"cname": cname, "rdate": am}, function( data )  {
                 if (data) {
                     var data = data.aaData;
                     $("body").pagecontainer("change", "#epg");
@@ -202,7 +202,7 @@ $(function() {
                 }
             }
 
-            $.post("/create", {
+            $.post("create", {
                             "rprev": rprev,
                             "recname":recname,
                             "Sender":sender,
@@ -228,7 +228,7 @@ $(function() {
     $("#dia_del").click(function(event) {
         if (act_rid!=-1) {
             event.preventDefault();
-            $.post("/records", { "what": -1, "myid":act_rid }, function() {
+            $.post("records", { "what": -1, "myid":act_rid }, function() {
                 $.mobile.navigate("#");
                 getTableData();
             }, "json");
@@ -251,7 +251,7 @@ var act_rid = -1;
 
 function getTableData() {
     $("#recbody").empty();
-    $.get( "/getrecordlist", function( data )  {
+    $.get( "getrecordlist", function( data )  {
         var data = data.aaData;
         for (var i = 0; i < data.length; i++) {
             var row = "<tr><th>" + data[i][0] + "</th>";
@@ -281,7 +281,7 @@ function getTableData() {
                 event.stopPropagation();
                 var what = $(this).prop( "checked" )?1:0;
                 var myid = $(this).attr("id").replace("chk-","");
-                $.post("/records", { "what": what, "myid":myid }, function() {}, "json");
+                $.post("records", { "what": what, "myid":myid }, function() {}, "json");
             });
             $("#edt-" + data[i][7]).click(function(event) {
                 event.stopPropagation();

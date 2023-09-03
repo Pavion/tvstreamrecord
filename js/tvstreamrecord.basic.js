@@ -83,7 +83,7 @@ function endsWith(str, suffix) {
  */
 function where() {
     var pos = window.location.href.lastIndexOf("&");
-    return window.location.href.slice(window.location.href.lastIndexOf("/"), pos==-1?999:pos);
+    return window.location.href.slice(window.location.href.lastIndexOf("/"), pos==-1?999:pos).replace('/','');
 }
 
 /**
@@ -322,7 +322,7 @@ function initEpgState() {
     getEpgState();
     $( "#grabepg" ).button()
     .click(function(event) {
-        $.post("/grabepg", {"mode": epgmode},
+        $.post("grabepg", {"mode": epgmode},
             function() {
                 getEpgState();
             }, "json");
@@ -335,7 +335,7 @@ function initEpgState() {
  * @return none
  */
 function getEpgState() {
-    $.get("/getepgstate",
+    $.get("getepgstate",
         function(data) {
             var state = data.grabState;
             epgmode = 0;
@@ -396,11 +396,11 @@ $(function() {
             text: $( "#dialog_remove" ).attr("delete"),
             click: function() {
                 if (here("config")) {
-                    post("/removeepg", {}, 1);
+                    post("removeepg", {}, 1);
                 } else if (here("epglist") || here("records")) {
-                    post("/records", { myid:dialognr, what:"-1" }, 2);
+                    post("records", { myid:dialognr, what:"-1" }, 2);
                 } else if (here("epgchart")) {
-                    post("/records", { myid:dialognr, what:"-1" }, 1);
+                    post("records", { myid:dialognr, what:"-1" }, 1);
                 } else {
                     post(where(), { myid:dialognr, what:"-1" }, 1);
                 }
@@ -489,7 +489,7 @@ $(function() {
                         $( this ).dialog( "close" );
                         var akt = 0;
                         if ($("#switch_create").attr("checked") == "checked") akt = 1;
-                        post("/create", {
+                        post("create", {
                             rprev:$("#rprev").val(),
                             recname:$("#recname").val(),
                             Sender:$("#channel").val(),
@@ -590,7 +590,7 @@ $(function() {
             text: $( "#dialog_record_from_epg" ).attr("record"),
             click: function() {
                 $( this ).dialog( "close" );
-                post("/createepg", { ret:$("#ret").val() }, 
+                post("createepg", { ret:$("#ret").val() }, 
                     here('epglist')?2:1 );
             }
         },
@@ -670,7 +670,7 @@ $(function() {
             "sPaginationType": "full_numbers",
             "bProcessing": true,
             "bAutoWidth": false,
-            "sAjaxSource": "/getrecordlist",
+            "sAjaxSource": "getrecordlist",
             "stateSave": true,
             "stateDuration": 60 * 60 * 60 * 24,
             "stateSaveCallback": function (oSettings, oData) {
@@ -736,7 +736,7 @@ $(function() {
         .click(function(event ) {
             $.ajax({
                 type: "POST",
-                url: "/clgen",
+                url: "clgen",
                 data: {},
                 dataType: "json",
                 success: function(data, textStatus) {
@@ -800,7 +800,7 @@ $(function() {
                             var akt = 0;
                             if ($("#switch_list_active").attr("checked") == "checked") {akt = 1;}
 
-                            post("/create_channel", {
+                            post("create_channel", {
                                 cprev: $("#cprev").val(),
                                 ccid: $("#ccid").val(),
                                 cname:$("#cname").val(),
@@ -862,7 +862,7 @@ $(function() {
             "sPaginationType": "full_numbers",
             "bAutoWidth": false,
             "bProcessing": true,
-            "sAjaxSource": "/channellist",
+            "sAjaxSource": "channellist",
             "stateSave": true,
             "stateDuration": 60 * 60 * 60 * 24,
             "stateSaveCallback": function (oSettings, oData) {
@@ -1014,7 +1014,7 @@ $(function() {
         $( "#searchepg" ).change(function(param) {
             var tofind = $(this).val().toLowerCase().trim();
             if(!param.hasOwnProperty("isTrigger")) {
-                post("/setsearch", { search:tofind }, 0);
+                post("setsearch", { search:tofind }, 0);
             }
             $( "[id=event]" ).each(function(i) {
                 if ($(this).attr("cnt")!=="0") {
@@ -1095,7 +1095,7 @@ $(function() {
             "sPaginationType": "full_numbers",
             "bProcessing": true,
             "bAutoWidth": false,
-            "sAjaxSource": "/epglist_getter",
+            "sAjaxSource": "epglist_getter",
             "fnDrawCallback": function( oSettings ) {
                 initIcons();
                 paintTable();
@@ -1189,7 +1189,7 @@ $(function() {
             $("#cfg_recordpath").addClass("ui-state-disabled");
         }
 
-        $.get( "/getconfig", function( data )  {
+        $.get( "getconfig", function( data )  {
             var p = new Function('return ' + data + ';')();
             configdata = p.configdata;
             for (var i = 0; i < configdata.length; i++) {
@@ -1204,7 +1204,7 @@ $(function() {
         $( "#button_resetlog" )
         .button()
         .click(function(event ) {
-            post("/resetlog", {}, 1);
+            post("resetlog", {}, 1);
             event.preventDefault();
         });
 
@@ -1300,7 +1300,7 @@ $(function() {
             if (!myalert) {
                 var my_config_data_str = JSON.stringify(my_config_data);
                 $("#label_config_saved").text($("#label_config_saved").attr("info"));
-                $.post("/config",  {configdata:my_config_data_str}, function() {
+                $.post("config",  {configdata:my_config_data_str}, function() {
                         $("#label_config_saved").text("");
                         if(reload) window.location.reload(false);
                     }, "json");
@@ -1312,7 +1312,7 @@ $(function() {
             buttons: [{
                 text: $( "#dialog_password" ).attr("ok"),
                 click: function() {
-                    $.post("/setpass",
+                    $.post("setpass",
                         {
                             "pass_old": $("#pass_old").val(),
                             "pass_new_1": $("#pass_new_1").val(),
@@ -1345,7 +1345,7 @@ $(function() {
             buttons: [{
                 text: $( "#dialog_database" ).attr("ok"),
                 click: function() {
-                    $.post("/setdbpath",
+                    $.post("setdbpath",
                         {
                             "input_dbpath": $("#input_dbpath").val()
                         },
@@ -1399,7 +1399,7 @@ $(function() {
             "sPaginationType": "full_numbers",
             "bAutoWidth": false,
             "bProcessing": true,
-            "sAjaxSource": "/logget",
+            "sAjaxSource": "logget",
             "stateSave": true,
             "stateDuration": 60 * 60 * 60 * 24,
             "stateSaveCallback": function (oSettings, oData) {

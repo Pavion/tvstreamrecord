@@ -11,7 +11,7 @@
             <div id="myLogo">
                 <a href=""><img alt="" src="images/tvstreamrecordlogo.png" /></a>
             </div>
-            <form action="/login" method="post">
+            <form action="login" method="post">
                 <div>
                     <center>
                     Password<br />

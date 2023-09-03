@@ -81,8 +81,18 @@ dayshown = datetime.combine(date.today(), time.min)
 shutdown = False
 version = "1.6.4"
 
+def redirect(url):
+    try:
+        parser = urlparse.urlsplit(bottle.request.url)
+        path = (parser.path + url).replace('//','/').replace('/upload','').replace('/login','')
+        url = urlparse.urlunsplit([parser.scheme, parser.netloc, path, parser.query, parser.fragment])
+    except:
+        pass
+    bottle.redirect(url)
+
+@route('/<name>/live/<filename>')
 @route('/live/<filename>')
-def server_static9(filename):
+def server_static12(name='', filename=''):
     rows = sqlRun("SELECT * FROM channels WHERE cid=?", (filename.split(".")[0], ))
     if rows:
         write_m3u(rows[0][0], rows[0][1])
@@ -97,46 +107,66 @@ def write_m3u(name, path):
     f.write(path+"\n")
     f.close()
 
+@route('/<name>/channels.m3u')
 @route('/channels.m3u')
-def server_static8():
+def server_static9(name=''):
     return static_file("/channels.m3u", root='')
+
+@route('/<name>/settings.db')
 @route('/settings.db')
-def server_static8():
+def server_static8(name=''):
     return static_file("/settings.db", root='', download="settings.db")
+
 # Languages
+@route('/<name>/lang/<filename>')
 @route('/lang/<filename>')
-def server_static10(filename):
+def server_static10(name='', filename=''):
     return static_file(filename, root='./lang')
+
 # Log file
+@route('/<name>/log.txt')
 @route('/log.txt')
-def server_static7():
+def server_static7(name=''):
     return static_file("/log.txt", root='', download="log.txt")
 # JavaScript
+
+@route('/<name>/js/<filename>')
 @route('/js/<filename>')
-def server_static1(filename):
+def server_static1(name='', filename=''):
     return static_file(filename, root='./js')
+
+@route('/<name>/js/i18n/<filename>')
 @route('/js/i18n/<filename>')
-def server_static11(filename):
+def server_static11(name='', filename=''):
     return static_file(filename, root='./js/i18n')
 # CSS handling
+
+@route('/<name>/css/<curstyle>/<filename>')
 @route('/css/<curstyle>/<filename>')
-def server_static2(curstyle,filename):
+def server_static2(name='', curstyle='', filename=''):
     return static_file(filename, root='./css/'+curstyle)
+
+@route('/<name>/css/<curstyle>/images/<filename>')
 @route('/css/<curstyle>/images/<filename>')
-def server_static4(curstyle,filename):
+def server_static4(name='', curstyle='', filename=''):
     return static_file(filename, root='./css/'+curstyle+'/images')
+    
+@route('/<name>/css/<filename>')
 @route('/css/<filename>')
-def server_static3(filename):
+def server_static3(name='', filename=''):
     return static_file(filename, root='./css')
+
 # Common images
+@route('/<name>/images/<filename>')
 @route('/images/<filename>')
-def server_static5(filename):
+def server_static5(name='', filename=''):
     return static_file(filename, root='./images')
 
 #------------------------------- Login script ------------------------------------
 
+@post('/<name>/login')
 @post('/login')
-def postLogin():
+def postLogin(name=''):
     global credentials
     pw = request.forms.pw.encode("utf-8")
     hash = hashlib.sha224(pw).hexdigest()
@@ -151,14 +181,17 @@ def postLogin():
 
     redirect("/")
 
+@route('/<name>/logoff')
 @route('/logoff')
-def postLogout():
+def postLogout(name=''):
+    print("logoff")
     response.delete_cookie(tvcookie)
     if config.checkIP(request.remote_addr) == True:
         return template('login')
 
+@post('/<name>/setpass')
 @post('/setpass')
-def setPass():
+def setPass(name=''):
     global credentials
     po  = request.forms.pass_old
     pn1 = request.forms.pass_new_1
@@ -266,23 +299,24 @@ def fileexists(file):
 #------------------------------- Main menu -------------------------------
 
 @route('/')
+@route('/<name>/')
+@route('/<name>/login')
 @route('/login')
-def root_s():
+def root_s(name=''):
     agent = request.headers.get('User-Agent')
     try:
         if ("Android" in agent and "Mobile" in agent) or "berry" in agent or "Symbian" in agent or "Nokia" in agent or "iPhone" in agent:
             count = sqlRun("select count(cid) from channels where cenabled=1")[0][0]
             if count > 0:
                 redirect("/mobile")
-            else:
-                redirect("/records")
-        else:
-            redirect("/records")
+                return
     except:
-        redirect("/records")
+        pass
+    redirect("/records")
 
+@route('/<name>/about')
 @route('/about')
-def about_s():
+def about_s(name=''):
     changelog=""
     if fileexists("CHANGELOG"):
         f = codecs.open("CHANGELOG", "r", "utf-8")
@@ -297,17 +331,20 @@ logInit('a')
 print ("Starting tvstreamrecord v.%s with Python %s.%s" % (version, sys.version_info[0], sys.version_info[1]))
 print ("Logging output initialized")
 
+@post('/<name>/resetlog')
 @post('/resetlog')
-def log_reset():
+def log_reset(name=''):
     logRenew()
     return "null"
 
+@route('/<name>/log')
 @route('/log')
-def log_s():
+def log_s(name=''):
     return internationalize(template('log'))
 
+@route('/<name>/logget')
 @route('/logget')
-def log_get():
+def log_get(name=''):
     l = list()
     lfile = codecs.open("log.txt", "r", "utf-8")
     for lline in lfile:
@@ -318,17 +355,20 @@ def log_get():
 
 #------------------------------- Channel List -------------------------------
 
+@route('/<name>/channellist')
 @route('/channellist')
-def chanlist():
+def chanlist(name='', ):
     rows=sqlRun('SELECT channels.cid, cname, cpath, cext, epgscan, cenabled FROM channels')
     return json.dumps({"aaData": rows } )
 
+@route('/<name>/list')
 @route('/list')
-def list_s():
+def list_s(name='', ):
     return internationalize(template('list',rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid')))
 
+@post('/<name>/list')
 @post('/list')
-def list_p():
+def list_p(name='', ):
     what = request.forms.get("what")
     myid = request.forms.get("myid")
     if what=="-1":
@@ -342,8 +382,9 @@ def list_p():
 
 #------------------------------- Channel creation -------------------------------
 
+@post('/<name>/clgen')
 @post('/clgen')
-def clgen_p():
+def clgen_p(name=''):
     rows = sqlRun("select cid, cname, cpath from channels where cenabled=1 ORDER BY cid")
     if rows:
         f = codecs.open("channels.m3u", "w", "utf-8")
@@ -354,8 +395,9 @@ def clgen_p():
         f.close()
     return "null"
 
+@post('/<name>/create_channel')
 @post('/create_channel')
-def createchannel():
+def createchannel(name=''):
     prev = request.forms.cprev
     cid =  request.forms.ccid
     cname = request.forms.cname
@@ -417,8 +459,9 @@ def createchannel():
         sqlRun("INSERT INTO channels VALUES (?, ?, ?, ?, ?, ?)", (cname, cpath, aktiv, cext, cid, epggrab))
     return "null"
 
+@post('/<name>/upload')
 @post('/upload')
-def upload_p():
+def upload_p(name=''):
     print ("M3U import started")
     retl = []
     upfile = request.files.upfile
@@ -471,8 +514,9 @@ def upload_p():
 
 #------------------------------- Configuration -------------------------------
 
+@post('/<name>/config')
 @post('/config')
-def config_p():
+def config_p(name=''):
     configdata = json.loads(request.forms.get('configdata'))
     for cfg in configdata:
         if cfg[0]=="cfg_grab_time":
@@ -490,8 +534,9 @@ def config_p():
     config.setConfig(configdata)
     return "null"
 
+@route('/<name>/config')
 @route('/config')
-def config_s():
+def config_s(name=''):
     themes = list()
     for theme in os.listdir("css"):
         if os.path.isdir("css/"+theme) == True:
@@ -515,14 +560,16 @@ def config_s():
                 locales.append(locale)
     return internationalize(template('config', themes=themes, languages=languages, locales=locales))
 
+@route('/<name>/getconfig')
 @route('/getconfig')
-def getconfig():
+def getconfig(name=''):
     rows=sqlRun("SELECT param, '', value FROM config WHERE param<>'cfg_dbpath' AND param<>'cfg_version' AND not param LIKE 'table_%'")
     rows.append(['cfg_dbpath', '', readDbFile()])
     return json.dumps({"configdata": rows } )
 
+@post('/<name>/gettree')
 @post('/gettree')
-def gettree():
+def gettree(name=''):
     deny=['/etc', '/var', '/usr', '/sbin', '/bin', '/recycler']
     r=['<ul class="jqueryFileTree" style="display: none;">']
     try:
@@ -538,8 +585,9 @@ def gettree():
     r.append('</ul>')
     return r
 
+@post('/<name>/setdbpath')
 @post('/setdbpath')
-def setDbPath():
+def setDbPath(name=''):
     global grabthread
     dbpath = request.forms.input_dbpath
     if dbpath:
@@ -638,12 +686,14 @@ class epggrabthread(Thread):
     def stop(self):
         self.stopflag = True
 
+@route('/<name>/getepgstate')
 @route('/getepgstate')
-def getepgstate():
+def getepgstate(name=''):
     return json.dumps( {"grabState": grabthread.getState() } )
 
+@post('/<name>/grabepg')
 @post('/grabepg')
-def grabepg():
+def grabepg(name=''):
     mode = int(request.forms.mode)
     if not grabthread.isRunning():
         if mode == 0:
@@ -655,36 +705,42 @@ def grabepg():
 
 #------------------------------- EPG painting part -------------------------------
 
+@post('/<name>/removeepg')
 @post('/removeepg')
-def removeepg():
+def removeepg(name=''):
     sqlRun("DELETE FROM guide")
     sqlRun("DELETE FROM guide_chan")
     sqlRun("DELETE FROM caching")
     print ("All EPG data was deleted")
     return "null"
 
+@post('/<name>/epg')
 @post('/epg')
-def epg_p():
+def epg_p(name=''):
     day = request.forms.datepicker_epg
     global dayshown
     dayshown = datetime.strptime(day,"%Y-%m-%d")
     return "null"
 
+@post('/<name>/setzoom')
 @post('/setzoom')
-def zoom_p():
+def zoom_p(name=''):
     zoom = request.forms.zoom
     config.cfg_grab_zoom = zoom
     config.saveConfig()
     return "null"
 
+@post('/<name>/setsearch')
 @post('/setsearch')
-def setsearch_p():
+def setsearch_p(name=''):
     search = request.forms.search
     sqlRun("REPLACE INTO config(param, value) VALUES('cfg_epgchart_search', ?);", (search, ))
 
-@route('/epgchart&<keyword>')
+@route('/<name>/epgchart')
 @route('/epgchart')
-def epg_s(keyword=''):
+@route('/<name>/epgchart&<keyword>')
+@route('/epgchart&<keyword>')
+def epg_s(name='', keyword=''):
     grabthread.setChannelCount()
 
     global dayshown
@@ -785,9 +841,11 @@ def epg_s(keyword=''):
             keyword = keyword.replace('%20',' ')
     return internationalize(template('epgchart', keyword_for_epg=keyword, curr=datetime.strftime(dayshown, "%Y-%m-%d"), rowss=ret, zoom=config.cfg_grab_zoom, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), deltab=config.cfg_delta_before_epg, deltaa=config.cfg_delta_after_epg))
 
+@route('/<name>/epglist')
+@route('/<name>/epglist&<keyword>')
 @route('/epglist')
 @route('/epglist&<keyword>')
-def epglist_s(keyword=''):
+def epglist_s(name='', keyword=''):
     if keyword != '':
         try:
             keyword = keyword.decode("utf-8")
@@ -796,8 +854,9 @@ def epglist_s(keyword=''):
         keyword = keyword.replace('%20',' ')
     return internationalize(template('epglist', keyword_for_epg=keyword, listmode=config.cfg_switch_epglist_mode, rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid'), deltab=config.cfg_delta_before_epg, deltaa=config.cfg_delta_after_epg))
 
+@route('/<name>/epglist_getter')
 @route('/epglist_getter')
-def epglist_getter():
+def epglist_getter(name=''):
     sEcho =  request.query.sEcho
     retlist = []
     totalrows = 0
@@ -867,12 +926,14 @@ def getLocale():
             print ("Error at parsing locales to JSON string")
             return None
 
+@route('/<name>/mobile')
 @route('/mobile')
-def records_s():
+def records_s(name=''):
     return internationalize(template('mobile',locale=getLocale(), deltab=config.cfg_delta_before_epg, deltaa=config.cfg_delta_after_epg),True)
 
+@route('/<name>/getchannelgroups')
 @route('/getchannelgroups')
-def getchannelgroups():
+def getchannelgroups(name=''):
     l = []
     sql = "case WHEN  substr(upper(cname), 1, 1)  >= 'A' AND  substr(upper(cname), 1, 1) <= 'Z' THEN  substr(upper(cname), 1, 1) ELSE '0' END"
     sql = "select " + sql + ", count(cname) from channels where cenabled=1 group by " + sql
@@ -881,8 +942,9 @@ def getchannelgroups():
         l.append([row[0], row[1]])
     return json.dumps({"aaData": l} )
 
+@post('/<name>/getchannelgroup')
 @post('/getchannelgroup')
-def getchannelgroup():
+def getchannelgroup(name=''):
     l = []
     id = request.forms.get("id")
     sql = "select cid, cname from channels where cenabled=1 "
@@ -897,8 +959,9 @@ def getchannelgroup():
         l.append([row[0], row[1]])
     return json.dumps({"aaData": l} )
 
+@post('/<name>/getepgday')
 @post('/getepgday')
-def getepgday():
+def getepgday(name=''):
     cname = request.forms.get("cname")
     try:
         cname = cname.decode("utf-8")
@@ -913,8 +976,9 @@ def getepgday():
 
 #------------------------------- Record List -------------------------------
 
+@route('/<name>/getrecordlist')
 @route('/getrecordlist')
-def getrecordlist():
+def getrecordlist(name=''):
     l = []
     rows=sqlRun("SELECT recname, cname, rvon, rbis, rmask, renabled, 100*(strftime('%s','now', 'localtime')-strftime('%s',rvon)) / (strftime('%s',rbis)-strftime('%s',rvon)), records.rowid, rvon, rbis, channels.cid FROM channels, records where channels.cid=records.cid ORDER BY rvon")
     for row in rows:
@@ -922,12 +986,14 @@ def getrecordlist():
         l.append([row[0], m3u, row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]])
     return json.dumps({"aaData": l} )
 
+@route('/<name>/records')
 @route('/records')
-def records_s():
+def records_s(name=''):
     return internationalize(template('records', rows2=sqlRun('SELECT cid, cname FROM channels where cenabled=1 ORDER BY cid')))
 
+@post('/<name>/records')
 @post('/records')
-def records_p():
+def records_p(name=''):
     what = request.forms.get("what")
     myid = request.forms.get("myid")
     if what=="-2":
@@ -941,14 +1007,16 @@ def records_p():
 
 #------------------------------- Record creation -------------------------------
 
+@post('/<name>/createepg')
 @post('/createepg')
-def createepg():
+def createepg(name=''):
     sqlRun("INSERT OR IGNORE INTO records SELECT guide.g_title, channels.cid, datetime(guide.g_start, '-%s minutes'), datetime(guide.g_stop, '+%s minutes'), 1, 0, '' FROM guide, guide_chan, channels WHERE guide.g_id = guide_chan.g_id AND channels.cname = guide_chan.g_name AND guide.rowid=? GROUP BY datetime(guide.g_start, '-%s minutes')" % (config.cfg_delta_before_epg, config.cfg_delta_after_epg, config.cfg_delta_before_epg), (request.forms.ret, ))
     setRecords()
     return "null"
 
+@post('/<name>/createtvb')
 @post('/createtvb')
-def create_tvb():
+def create_tvb(name=''):
 
     recname = request.forms.recname
     sender = request.forms.sender
@@ -980,16 +1048,18 @@ def create_tvb():
         print ("Channel %s could not be found, please check your channel names" % (sender))
         return "false"
 
+@route('/<name>/gettvb')
 @route('/gettvb')
-def gettvb():
+def gettvb(name=''):
     ret = ""
     rows=sqlRun("SELECT uniqueid FROM records WHERE uniqueid <> '' AND renabled=1")
     for row in rows:
         ret += row[0] + "\n"
     return ret.rstrip()
 
+@post('/<name>/deletetvb')
 @post('/deletetvb')
-def deletetvb():
+def deletetvb(name=''):
     uniqueid = request.forms.uniqueid
     rows = sqlRun("SELECT * FROM records WHERE uniqueid = ?", (uniqueid, ))
     if len(rows) == 0:
@@ -1000,8 +1070,9 @@ def deletetvb():
         setRecords()
         return "true"
 
+@post('/<name>/create')
 @post('/create')
-def create_p():
+def create_p(name=''):
     prev = request.forms.rprev
     recname = request.forms.recname
     sender = request.forms.Sender

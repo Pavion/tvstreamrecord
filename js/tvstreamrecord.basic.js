@@ -1136,8 +1136,7 @@ $(function() {
 
         $( "#configtabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
         $( "#configtabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
-
-        $("#cfg_purgedelta,#cfg_delta_before_epg,#cfg_delta_after_epg,#cfg_retry_count,#cfg_failsafe_delta,#cfg_xmltvtimeshift").spinner();
+        $("#cfg_purgedelta,#cfg_delta_before_epg,#cfg_delta_after_epg,#cfg_retry_count,#cfg_failsafe_delta,#cfg_xmltvtimeshift,#cfg_m3u_timer").spinner();
         $("#cfg_grab_zoom").spinner( { step: 0.1 } );
         $("#cfg_epg_max_events").spinner( { step: 1000 } );
 
@@ -1259,6 +1258,11 @@ $(function() {
                     }
                 } else if ($(this).attr('id')=="cfg_retry_count") {
                     if ( !checkRegexp( "cfg_retry_count", /^\d+$/, "" ) ) {
+                        alert( $(this).attr('alert') );
+                        myalert = true;
+                    }
+                } else if ($(this).attr('id')=="cfg_m3u_timer") {
+                    if ( !checkRegexp( "cfg_m3u_timer", /^\d+$/, "" ) ) {
                         alert( $(this).attr('alert') );
                         myalert = true;
                     }

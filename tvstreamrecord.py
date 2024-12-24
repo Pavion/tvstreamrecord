@@ -487,7 +487,6 @@ def parse_list_cyclic():
         content = xmltv.getFileFromHTTP(path, version)
         if content:
             parse_list(content, 1)
-            print ("DEBUG: PARSE COMPLETED")
 
 def parse_list(content,how):
     retl = []

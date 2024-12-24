@@ -75,6 +75,8 @@
     "Enable concurrent recording": "Включить одновременную запись",
     "Password-free IPs start with (comma separated, default": "Беспарольные IP-адреса начинаются с (через запятую, по умолчанию",
     "Valid placeholders": "Допустимые шаблоны",
+    "Remote URL for automatic channel update": "Удаленный URL для автоматического обновления каналов",
+    "Channel update frequency [minutes]": "Частота автоматического обновления каналов [мин]",
 
     "at": "от",
     "till": "до",

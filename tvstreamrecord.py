@@ -19,19 +19,20 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
-
+import sys, os
+sys.path.append(os.getcwd())
 from bottle import CherryPyServer # , TEMPLATES
 from bottle import route, run, template, post, request, response
 from bottle import static_file, redirect
 from datetime import datetime, timedelta, time, date
 from timezone import tDiff
 from time import sleep
+from time import time as timertime
 import subprocess
 import config
 from sql import sqlRun, sqlCreateAll, purgeDB, setDb
 import xmltv
 import json
-import sys
 import shlex
 import shutil
 import re
@@ -45,8 +46,7 @@ else:
     import urllib.request as urllib32
     import urllib.parse as urlparse
     tvcookie = "tvstreamrecord_user"
-from threading import Thread, Timer
-import os
+from threading import Thread, Timer, Event
 from mylogging import logInit, logRenew, logStop
 import hashlib
 import codecs
@@ -79,7 +79,7 @@ localtime = "%H:%M"
 localdate = "%d.%m.%Y"
 dayshown = datetime.combine(date.today(), time.min)
 shutdown = False
-version = "1.6.4"
+version = "1.6.6"
 
 @route('/live/<filename>')
 def server_static9(filename):
@@ -420,9 +420,9 @@ def createchannel():
 @post('/upload')
 def upload_p():
     print ("M3U import started")
-    retl = []
     upfile = request.files.upfile
     upfileurl = request.forms.get("upfileurl")
+    how = getBool(request.forms.get("switch_list_append"))
 
     content = ""
     if upfile != "" and not upfile.filename == "empty":
@@ -433,47 +433,103 @@ def upload_p():
         print ("No MU3 file or URL specified, please try again")
 
     if content:
-        try:
-            content = content.decode("UTF-8")
-        except:
-            pass
-        if "#EXTM3U" in content:
-            how = getBool(request.forms.get("switch_list_append"))
-            rowid = 1
-            if how==0:
-                sqlRun('DELETE FROM channels')
-                sqlRun('DELETE FROM records')
-                setRecords()
-            else:
-                rows2 = sqlRun("select max(cid) from channels")
-                if rows2 and not rows2[0][0] is None:
-                    rowid = rows2[0][0]+1
-
-            lines = content.splitlines()
-            i = 0
-            name = ""
-            for line in lines:
-                if line != "" and not "#EXTVLCOPT" in line and not "#EXTM3U" in line:
-                    i = i + 1
-                    if i % 2 == 1:
-                        name = line.split(",",1)[1]
-                    if i % 2 == 0:
-                        retl.append([name, line, rowid])
-                        rowid = rowid + 1
-                        name = ""
-            sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?, 0)", retl, 1)
-            sqlRun("UPDATE channels SET cpath=?2 WHERE cname=?1 AND ?3=?3", retl, 1)
-            print("M3U parsing completed with %d entries" % len(retl))
-        else:
-            print("Bad M3U format detected (missing #EXTM3U tag)")
+        parse_list(content, how)
 
     redirect("/list")
+
+class Parse_list_timer:
+    def __init__(self, interval):
+        self.interval = interval
+        self.thread = None
+        self.stop_event = Event()
+
+    def start(self):
+        if self.thread and self.thread.is_alive():
+            # Timer läuft bereits
+            return
+        
+        self.stop_event.clear()
+        
+        def wrapper():
+        
+            remaining_time = self.interval
+            while not self.stop_event.is_set():
+                start_time = timertime()
+                parse_list_cyclic()
+                
+                while remaining_time > 0:
+                    if self.stop_event.is_set():
+                        return
+                    sleep(min(0.5, remaining_time))  # Warte in kleinen Schritten
+                    elapsed_time = timertime() - start_time
+                    remaining_time -= elapsed_time
+                    start_time = timertime()
+                
+                remaining_time = self.interval  # Reset für den nächsten Zyklus
+        
+        self.thread = Thread(target=wrapper)
+        self.thread.daemon = True
+        self.thread.start()
+        # Timer gestartet
+
+    def stop(self):
+        if self.thread and self.thread.is_alive():
+            self.stop_event.set()
+            self.thread.join()
+            # Timer gestoppt
+        else: 
+            pass
+            # Kein aktiver Timer zu stoppen
+
+def parse_list_cyclic():    
+    path = config.cfg_m3u_path.strip()
+    if path != "":
+        content = xmltv.getFileFromHTTP(path, version)
+        if content:
+            parse_list(content, 1)
+            print ("DEBUG: PARSE COMPLETED")
+
+def parse_list(content,how):
+    retl = []
+    try:
+        content = content.decode("UTF-8")
+    except:
+        pass
+    if "#EXTM3U" in content:
+        rowid = 1
+        if how==0:
+            sqlRun('DELETE FROM channels')
+            sqlRun('DELETE FROM records')
+            setRecords()
+        else:
+            rows2 = sqlRun("select max(cid) from channels")
+            if rows2 and not rows2[0][0] is None:
+                rowid = rows2[0][0]+1
+
+        lines = content.splitlines()
+        i = 0
+        name = ""
+        for line in lines:
+            if line != "" and not "#EXTVLCOPT" in line and not "#EXTM3U" in line:
+                i = i + 1
+                if i % 2 == 1:
+                    name = line.split(",",1)[1]
+                if i % 2 == 0:
+                    retl.append([name, line, rowid])
+                    rowid = rowid + 1
+                    name = ""
+        sqlRun("INSERT OR IGNORE INTO channels VALUES (?, ?, '1', '', ?, 0)", retl, 1)
+        sqlRun("UPDATE channels SET cpath=?2 WHERE cname=?1 AND ?3=?3", retl, 1)
+        print("M3U parsing completed with %d entries" % len(retl))
+    else:
+        print("Bad M3U format detected (missing #EXTM3U tag)")
 
 #------------------------------- Configuration -------------------------------
 
 @post('/config')
 def config_p():
     configdata = json.loads(request.forms.get('configdata'))
+    restart_sync = False
     for cfg in configdata:
         if cfg[0]=="cfg_grab_time":
             if cfg[1]!=config.cfg_grab_time:
@@ -487,7 +543,14 @@ def config_p():
         if cfg[0]=="cfg_ffmpeg_path":
             if which(cfg[1]) == None:
                 print("FFMPEG executable probably not found, please check your configuration")
+        if ((cfg[0]=="cfg_m3u_path" and cfg[1]!=config.cfg_m3u_path) or
+            (cfg[0]=="cfg_m3u_timer" and cfg[1]!=config.cfg_m3u_timer)):
+                restart_sync = True
     config.setConfig(configdata)
+    if restart_sync:
+        channel_sync_end()
+        sleep(10)
+        channel_sync_start()
     return "null"
 
 @route('/config')
@@ -1388,6 +1451,22 @@ def writeDbFile(path):
     file.write(path + "\n")
     file.close()
 
+#------------------------------- Sync thread ----------------------------------
+parse_list_timer = None
+
+def channel_sync_start():
+    global parse_list_timer
+    timer_timeout = int(config.cfg_m3u_timer)
+    if timer_timeout > 0 and not config.cfg_m3u_path == "":
+        print ("Starting channel import thread for every %s minutes" % (timer_timeout))
+        parse_list_timer = Parse_list_timer(timer_timeout * 60)
+        parse_list_timer.start()
+        
+def channel_sync_end():
+    global parse_list_timer
+    if parse_list_timer:
+        parse_list_timer.stop()
+
 #------------------------------- Main loop -------------------------------------
 
 print ("Initializing database... ")
@@ -1404,6 +1483,7 @@ setRecords()
 print ("Initializing EPG import thread...")
 grabthread = epggrabthread()
 grabthread.run()
+channel_sync_start()
 
 print ("Starting server on: %s:%s" % (config.cfg_server_bind_address, config.cfg_server_port))
 try:
@@ -1425,6 +1505,7 @@ while len(records)>0:
 
 print ("Stopping EPG grab thread...")
 grabthread.kill()
+channel_sync_end()
 
 print ("tvstreamrecord v.%s: bye-bye" % version)
 logStop()

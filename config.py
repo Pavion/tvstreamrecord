@@ -223,6 +223,18 @@ configuration = [
 'cfg_failsafe_delta',
 'Do not restart ffmpeg if that much seconds remains',
 10
+],
+
+[
+'cfg_m3u_path',
+"m3u uri",
+''
+],
+
+[
+'cfg_m3u_timer',
+'Repeat each [minutes]',
+0
 ]
 
 ]

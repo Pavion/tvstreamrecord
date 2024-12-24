@@ -122,6 +122,8 @@
 <tr><td>§Enable concurrent recording§</td><td><input type="checkbox" class="switch icons" id="cfg_switch_concurrent" /></td></tr>
 <tr><td>§Alternative URL (host:port only) for FFMPEG (if using two similar devices)§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ffmpeg_alternate_url" value="" autocomplete="off" /></td></tr>
 <tr><td>§Password-free IPs start with (comma separated, default§: '10.,127.,192.,localhost')</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_ip_filter" value="" autocomplete="off" /></td></tr>
+<tr><td>§Remote URL for automatic channel update§</td><td><input type="text" class="text ui-widget-content ui-corner-all" id="cfg_m3u_path" value="" autocomplete="off" /></td></tr>
+<tr><td>§Channel update frequency [minutes]§</td><td><input id="cfg_m3u_timer" alert="§Invalid value, please enter a positive number or a zero§"/></td></tr>
 </tbody>
 </table>
 <font size="0.6em"><sup>*</sup> §Valid placeholders§: %date%, %fulltitle%, %title%, %year%, %month%, %day%, %hour%, %minute%, %second%, %channel%, %channelid%. </font>

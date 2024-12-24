@@ -75,6 +75,8 @@
     "Enable concurrent recording": "Gleichzeitige Aufnahmen zulassen",
     "Password-free IPs start with (comma separated, default": "Keine Passwortabfrage für IPs beginnend mit (kommagetrennt, Vorgabe",
     "Valid placeholders": "Zulässige Platzhalter",
+    "Remote URL for automatic channel update": "Remote-URL für die automatische Senderaktualisierung",
+    "Channel update frequency [minutes]": "Häufigkeit automatischer Senderaktualisierung [Minuten]",
 
     "at": "von",
     "till": "bis",

@@ -75,6 +75,8 @@
     "Enable concurrent recording": "",
     "Password-free IPs start with (comma separated, default": "",
     "Valid placeholders": "",
+    "Remote URL for automatic channel update": "",
+    "Channel update frequency [minutes]": "",
     
     "at": "",
     "till": "",
